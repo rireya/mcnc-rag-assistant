@@ -1,0 +1,83 @@
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Build outputs
+dist/
+build/
+*.tsbuildinfo
+
+# Environment variables
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+.env.*.local
+
+# Logs
+logs/
+*.log
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Runtime data
+tmp/
+temp/
+.cache/
+
+# IDE/Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Vector database and embeddings
+data/vector-store/
+data/embeddings/
+data/indexes/
+*.faiss
+*.pkl
+*.bin
+
+# Processed data (keep source data, ignore processed)
+data/processed/
+data/temp/
+data/cache/
+
+# RAG specific
+embeddings_cache/
+vector_cache/
+search_cache/
+
+# MCP Server logs
+mcp-server.log
+server.log
+
+# Test coverage
+coverage/
+*.lcov
+
+# TypeScript
+*.d.ts.map
+
+# Backup files
+*.backup
+*.bak

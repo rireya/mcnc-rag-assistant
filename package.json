@@ -1,0 +1,25 @@
+{
+  "name": "@mcnc/rag-assistant",
+  "version": "1.0.0",
+  "description": "MCNC RAG Assistant - bizMOB Knowledge Management System with RAG & MCP",
+  "keywords": ["mcnc", "bizmob", "rag", "mcp", "assistant", "knowledge-management"],
+  "author": "최명훈 (모빌씨앤씨)",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rireya/mcnc-rag-assistant.git"
+  },
+  "scripts": {
+    "dev": "tsx src/mcp-server/mcnc-rag-server.ts",
+    "build": "tsc",
+    "start": "node dist/mcp-server/mcnc-rag-server.js",
+
+    "process-bizmob": "tsx scripts/data-management/import-bizmob-docs.ts",
+    "setup-assistant": "tsx scripts/data-management/setup-rag-assistant.ts",
+    "process-batch": "tsx scripts/data-management/process-mcnc-batch.ts",
+
+    "health-check": "tsx scripts/maintenance/health-check.ts",
+
+    "data": "node scripts/verify-data-setup.js",
+    "check-structure": "find data/ -type d | sort"
+  }
+}
