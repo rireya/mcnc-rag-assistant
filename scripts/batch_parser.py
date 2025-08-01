@@ -23,7 +23,7 @@ def get_file_hash(file_path):
 
 def load_processing_log():
     """처리 로그 로드"""
-    log_path = Path('./data/processed/processing_log.json')
+    log_path = Path('data/processed/processing_log.json')
     if log_path.exists():
         with open(log_path, 'r', encoding='utf-8') as f:
             return json.load(f)
@@ -31,7 +31,7 @@ def load_processing_log():
 
 def save_processing_log(log_data):
     """처리 로그 저장"""
-    log_path = Path('./data/processed/processing_log.json')
+    log_path = Path('data/processed/processing_log.json')
     log_path.parent.mkdir(parents=True, exist_ok=True)
 
     with open(log_path, 'w', encoding='utf-8') as f:
@@ -115,7 +115,7 @@ def save_parsing_result(file_path, result):
     """파싱 결과 저장"""
     # 상대 경로를 processed 경로로 변환
     relative_path = file_path.relative_to('data/source')
-    output_path = Path('./data/processed/parsed') / relative_path.with_suffix('.json')
+    output_path = Path('data/processed/parsed') / relative_path.with_suffix('.json')
 
     # 디렉터리 생성
     output_path.parent.mkdir(parents=True, exist_ok=True)
