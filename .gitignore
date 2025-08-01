@@ -58,11 +58,19 @@ data/indexes/
 *.bin
 
 # Processed data (keep source data, ignore processed)
+
 ## (파싱 결과는 포함, 임시 파일만 제외)
 data/processed/temp/
 data/processed/cache/
+
+## 캐시 관리 - 선택적 포함
+data/cache/temp/           # 임시 캐시 제외 (개인용)
+data/cache/logs/           # 로그 캐시 제외 (개발용)
+# data/cache/chunks/       # 청킹 캐시 포함 (팀 공유)
+# data/cache/embeddings/   # 임베딩 메타데이터 포함 (팀 공유)
+
+## 기타
 data/temp/
-data/cache/
 
 # RAG specific
 embeddings_cache/
