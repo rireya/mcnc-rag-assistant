@@ -39,7 +39,7 @@ export const PATHS = {
     CORPORATE: {
       ROOT: {
         path: './data/source/documents/corporate',
-        displayName: '회사소개서'
+        displayName: '회사 관련 문서'
       }
     }
   },

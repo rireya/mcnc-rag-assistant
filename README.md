@@ -1,191 +1,182 @@
-# MCNC RAG Assistant - 청킹 및 임베딩 시스템 설계 요약
+# MCNC RAG Assistant 프로젝트 - 컨텍스트 요약
 
-## 📋 프로젝트 현황
+## 📋 프로젝트 개요
 
-### 완료된 작업 (95%)
-- ✅ **파싱 시스템**: GitHub Actions + Python으로 JSON 파싱 완료
-- ✅ **폴더 구조**: documents/, code/, guides/ 체계 구축
-- ✅ **경로 관리**: paths.ts 중앙 관리 시스템
-- ✅ **데이터 검증**: 파일 구조 및 처리 검증 시스템
-
-### 현재 파싱된 샘플 데이터
-```
-data/processed/parsed/
-├── documents/corporate/2025_회사소개서.json (53페이지, ~20,000토큰)
-├── code/bizmob-sdk/core/bizMOB-core-web.json (4,296단어, ~6,000토큰)
-└── guides/api-docs/bizMOB-Device.json, bizMOB-Network.json (~3,000토큰)
-```
+- **회사**: 모빌씨앤씨 (MCNC)
+- **SDK**: bizMOB
+- **프로젝트**: MCNC-RAG-Assistant
+- **목적**: bizMOB SDK 지식 관리 및 RAG 기반 MCP 서버 구축
+- **현재 단계**: 청킹 시스템 구현 준비 완료
 
 ## 🎯 확정된 기술 스택
 
+### 임베딩 모델
+- **선택**: text-embedding-3-small
+- **이유**: text-embedding-3-large 대비 85% 저렴 ($0.00002/1K vs $0.00013/1K)
+- **성능**: 1536 차원, 충분한 검색 품질, 빠른 처리 속도
+
 ### 청킹 시스템
-- **라이브러리**: LangChain의 `SemanticChunker`
-- **임베딩 모델**: OpenAI `text-embedding-3-large`
-- **접근 방식**: 시맨틱 청킹 (의미적 경계 기반 분할)
-- **언어**: TypeScript/JavaScript
+- **라이브러리**: LangChain의 SemanticChunker
+- **접근 방식**: 의미적 경계 기반 분할
+- **문서별 전략**: 10가지 문서 타입별 맞춤 설정
 
-### 임베딩 및 저장
-- **임베딩 모델**: OpenAI `text-embedding-3-large`
-- **벡터 저장소**: ChromaDB
-- **배포 환경**: Docker → Render
+### 벡터 저장소
+- **선택**: ChromaDB
+- **로컬 개발**: Docker (`docker run -p 8000:8000 chromadb/chroma`)
+- **배포**: Render 예정
 
-## 🏗️ 문서 타입별 청킹 전략
+## 🏗️ 프로젝트 구조
 
-### 1. DOCUMENTS 폴더
-#### CORPORATE (회사소개서)
-- **전략**: 페이지 + 섹션 기반 분할
-- **청크 크기**: 1500 토큰
-- **오버랩**: 200 토큰
-- **특징**: 마케팅 문서, 큰 청크로 문맥 보존
-
-#### SPECIFICATIONS (기술명세서)
-- **전략**: 기술 섹션 기반 분할
-- **청크 크기**: 1000 토큰
-- **오버랩**: 150 토큰
-
-### 2. CODE 폴더
-#### BIZMOB_SDK/CORE
-- **전략**: 클래스 및 메서드 기반 분할
-- **청크 크기**: 800 토큰
-- **오버랩**: 100 토큰
-- **특징**: 함수/클래스 완결성 보장
-
-### 3. GUIDES 폴더
-#### API_DOCS
-- **전략**: 메서드별 완전 분할
-- **청크 크기**: 600 토큰
-- **오버랩**: 0 토큰 (독립적 문서)
-- **특징**: `<method>` 태그 기반 구조화
-
-## 💰 비용 분석
-
-### 예상 처리 비용 (text-embedding-3-large 기준)
+### 기본 구조 (기존 완료)
 ```
-현재 샘플 파일들:
-- 청킹 비용: ~$4 (최초 1회)
-- 임베딩 비용: ~$77 (청크 개수에 비례)
-- 총 비용: ~$81
-
-전체 프로젝트 예상:
-- 개발 단계: $100-200 (캐싱 없이)
-- 운영 단계: 월 $20-40
+scripts/
+├── config/
+│   ├── paths.ts              # 경로 중앙 관리 (완료)
+│   ├── rag-config.ts         # RAG 최적화 설정 (완료)
+│   └── database-config.ts    # ChromaDB 설정 (완료)
+├── parsers/                  # Python 파싱 (완료)
+├── batch_parser.py          # 문서 파싱 실행 (완료)
+└── verify-data-setup.ts     # 데이터 검증 (완료)
 ```
 
-### 캐싱을 통한 비용 절약
-- **개발 단계**: 90% 절약 가능 ($100-200 → $10-20)
-- **운영 단계**: 75% 절약 가능 (부분 업데이트)
-
-## 🏛️ 최종 시스템 아키텍처
-
-### 데이터 플로우
+### RAG 구조 (구현 예정)
 ```
-원본 파일 → 파싱 (JSON) → 청킹 → 임베딩 → ChromaDB 저장
-    ↓           ↓            ↓        ↓
-GitHub Actions  완료      캐싱 적용   중복 체크
-```
+scripts/rag/
+├── chunker.ts               # 청킹 로직 (다음 구현)
+├── embedder.ts              # 임베딩 로직
+├── utils.ts                 # 기본 유틸리티
+└── types.ts                 # 타입 정의
 
-### 캐싱 전략 (단순화된 구조)
-```typescript
-interface CachingSystem {
-  // Level 1: 청킹 캐시 (파일 시스템)
-  chunking_cache: {
-    location: "./data/cache/chunks/",
-    format: "JSON 파일",
-    key: "file_hash + chunking_config"
-  },
-
-  // Level 2: ChromaDB (임베딩 영구 저장소)
-  embedding_storage: {
-    location: "ChromaDB",
-    duplicate_check: "내장 기능 활용",
-    metadata: "chunk_hash, file_path, created_at"
-  }
-}
+scripts/ (루트)
+├── chunk-processor.ts       # 청킹 실행 파일
+└── embedding-processor.ts   # 임베딩 실행 파일
 ```
 
-## 📊 처리 플로우
+## 🔄 단계별 처리 파이프라인
 
-### 1. 청킹 단계
+### 1단계: 문서 파싱 (완료)
+```bash
+python scripts/batch_parser.py --all
 ```
-1. 파일 해시 생성
-2. 청킹 캐시 확인
-3. [HIT] 캐시된 청크 반환 | [MISS] SemanticChunker 실행
-4. 새 결과 캐시 저장
+**결과**: `data/processed/parsed/` 에 JSON 파일들 생성
+
+### 2단계: 청킹 처리 (다음 구현)
+```bash
+tsx scripts/chunk-processor.ts
+```
+**결과**: `data/processed/chunks/` 에 청크 JSON 파일들 생성
+
+### 3단계: 임베딩 처리 (향후 구현)
+```bash
+tsx scripts/embedding-processor.ts
+```
+**결과**: ChromaDB에 벡터 저장
+
+## ⚙️ 설정 파일 구조
+
+### rag-config.ts (완료)
+- **크기**: ~80줄 (매우 미니멀)
+- **함수**: 2개만 (`getChunkingStrategy`, `validateConfig`)
+- **설정**: 임베딩, 청킹 전략, 성능 최적화, 검색 설정
+- **특징**: 캐싱, 복잡한 로깅, 비용 제한 모두 제거
+
+### database-config.ts (완료)
+- **역할**: ChromaDB 인프라 설정만
+- **포함**: URL, 컬렉션명, 연결 설정, 배치 처리
+- **분리 이유**: 알고리즘 최적화와 인프라 분리
+
+## 📊 문서별 청킹 전략
+
+| 문서 타입 | 청크 크기 | 오버랩 | 특징 |
+|-----------|-----------|--------|------|
+| documents/corporate | 1200 | 150 | 회사 관련 문서 - 문맥 보존 |
+| documents/specifications | 800 | 120 | 기술명세서 - 정확성 확보 |
+| code/bizmob-sdk | 600 | 80 | SDK 코드 - 빠른 검색 |
+| guides/api-docs | 500 | 0 | API 문서 - 메서드별 독립 |
+| [... 총 10가지 전략] | | | |
+
+## 🚫 제거된 복잡성들
+
+### 캐싱 시스템
+- **결정**: 완전 제거 (추후 필요시 추가)
+- **이유**: 초기 개발 단순화, 비용 최적화는 나중에 고려
+- **영향**: cache-manager.ts 파일 불필요, generateCacheKey() 함수 제거
+
+### 복잡한 로깅/모니터링
+- **제거**: MONITORING, ALERTS, 상세 진행상황 표시
+- **유지**: 기본적인 console.log만
+
+### 금액 제한/비용 추적
+- **제거**: COST_LIMIT, estimateCost() 함수 등
+- **이유**: 개발 단계에서는 불필요한 복잡성
+
+### 동적 최적화
+- **제거**: getOptimizedConfig(), getOptimizedSearchParams()
+- **이유**: 각 전략이 이미 충분히 튜닝됨
+
+## 📁 데이터 구조
+
+### 현재 파싱된 데이터
+```
+data/processed/parsed/
+├── documents/corporate/2025_회사소개서.json (~20,000토큰)
+├── code/bizmob-sdk/core/bizMOB-core-web.json (~6,000토큰)
+└── guides/api-docs/bizMOB-Device.json (~3,000토큰)
 ```
 
-### 2. 임베딩 단계
+### 예상 처리 비용
+- **현재 총 토큰**: ~29,000토큰
+- **text-embedding-3-small 비용**: ~$0.58 (1회 처리)
+- **개발 중 반복**: 캐싱 없어도 몇 달러 수준
+
+## 🎯 다음 구현 단계
+
+### 즉시 구현할 것
+1. **scripts/rag/types.ts** - 기본 타입 정의
+2. **scripts/rag/utils.ts** - 파일 처리 유틸리티
+3. **scripts/rag/chunker.ts** - 청킹 로직 (SemanticChunker 활용)
+4. **scripts/chunk-processor.ts** - 청킹 실행 파일
+
+### 구현 방향
+- **단순함 우선**: 복잡한 기능 없이 기본 청킹부터
+- **단계별 검증**: 청킹 완료 → 결과 확인 → 임베딩 진행
+- **점진적 확장**: 필요에 따라 캐싱, 최적화 기능 추가
+
+## 🔧 환경 설정
+
+### 필수 환경변수
+```bash
+OPENAI_API_KEY=your_api_key_here
+CHROMA_URL=http://localhost:8000
+CHROMA_COLLECTION_NAME=mcnc_documents
 ```
-1. 각 청크를 ChromaDB에서 중복 체크
-2. [존재] 스킵 | [없음] OpenAI 임베딩 생성
-3. 새 임베딩을 ChromaDB에 저장
-4. 메타데이터와 함께 인덱싱
+
+### 개발 명령어 (예정)
+```bash
+# 청킹 처리
+npm run chunk
+
+# 임베딩 처리
+npm run embed
+
+# 전체 파이프라인
+npm run rag:full
 ```
 
-## 🎯 구현 우선순위
+## 💡 핵심 설계 원칙
 
-### Phase 1: 청킹 시스템 구현
-- [ ] SemanticChunker 설정 및 초기화
-- [ ] 문서 타입별 청킹 전략 구현
-- [ ] 청킹 캐시 시스템 구현
-- [ ] 배치 처리 스크립트 작성
+1. **미니멀한 설계**: 꼭 필요한 기능만
+2. **단계별 처리**: 청킹 → 임베딩 분리
+3. **설정 중심**: rag-config.ts 하나로 모든 최적화 관리
+4. **타입 안전**: TypeScript로 런타임 오류 방지
+5. **확장 가능**: 필요시 기능 추가 용이
 
-### Phase 2: 임베딩 시스템 구현
-- [ ] OpenAI 임베딩 API 연동
-- [ ] ChromaDB 연결 및 설정
-- [ ] 중복 체크 로직 구현
-- [ ] 배치 임베딩 처리
+## 🚀 현재 상태
 
-### Phase 3: 통합 및 최적화
-- [ ] 전체 파이프라인 통합
-- [ ] 에러 처리 및 로깅
-- [ ] 성능 최적화
-- [ ] 모니터링 시스템
+- ✅ **프로젝트 구조 설계 완료**
+- ✅ **설정 파일 구현 완료** (rag-config.ts, database-config.ts)
+- ✅ **문서 파싱 시스템 완료** (Python)
+- ✅ **기술 스택 최종 확정**
+- 🔄 **청킹 시스템 구현 시작 준비 완료**
 
-## 🚀 다음 개발 단계
-
-### 즉시 구현할 항목
-1. **청킹 스크립트 구조 설계**
-   ```
-   scripts/chunking/
-   ├── chunker.ts (메인 로직)
-   ├── strategies/ (문서별 전략)
-   └── cache/ (캐싱 시스템)
-   ```
-
-2. **SemanticChunker 설정**
-   ```typescript
-   const textSplitter = new SemanticChunker({
-     embeddings: new OpenAIEmbeddings({
-       modelName: "text-embedding-3-large"
-     })
-   });
-   ```
-
-3. **캐시 시스템 구현**
-   - 파일 기반 청킹 캐시
-   - ChromaDB 중복 체크
-
-## 💡 핵심 설계 결정사항
-
-### ✅ 확정된 사항
-- **시맨틱 청킹 채택**: 품질 우선, 비용은 캐싱으로 해결
-- **OpenAI 임베딩 사용**: text-embedding-3-large 모델
-- **ChromaDB 활용**: 벡터 저장 + 중복 방지
-- **단순한 캐싱**: Redis 없이 파일 기반 캐싱
-- **TypeScript 구현**: 기존 프로젝트와 일관성
-
-### ⚠️ 주의사항
-- **API 비용 관리**: 캐싱 전략으로 90% 절약 목표
-- **결과 일관성**: 캐싱으로 동일한 청킹 결과 보장
-- **확장성 고려**: 문서 증가에 대비한 배치 처리
-
-## 📅 마일스톤
-
-- **Week 1**: 청킹 시스템 구현 완료
-- **Week 2**: 임베딩 시스템 구현 완료
-- **Week 3**: 통합 테스트 및 최적화
-- **Week 4**: 배포 준비 및 문서화
-
----
-
-**다음 대화 주제**: SemanticChunker 구현 및 청킹 캐시 시스템 개발
+**다음 대화에서 할 일**: scripts/rag/chunker.ts 구현부터 시작
