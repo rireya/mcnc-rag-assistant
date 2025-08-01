@@ -98,6 +98,10 @@ export const PATHS = {
       path: './data/processed',
       displayName: '처리된 데이터 루트'
     },
+    PARSED: {
+      path: './data/processed/parsed',
+      displayName: '파싱된 원본 데이터'
+    },
     CHUNKS: {
       path: './data/processed/chunks',
       displayName: '청크 데이터'
@@ -113,6 +117,10 @@ export const PATHS = {
     DOCUMENTS: {
       path: './data/processed/documents',
       displayName: '처리된 문서'
+    },
+    LOGS: {
+      path: './data/processed/processing_log.json',
+      displayName: '처리 로그 파일'
     }
   },
 

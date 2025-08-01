@@ -1,0 +1,50 @@
+# .github/workflows/manual-parsing.yml
+name: Manual Document Parsing
+on:
+  workflow_dispatch:
+    inputs:
+      parse_all:
+        description: '모든 문서 재파싱'
+        type: boolean
+        default: false
+      specific_path:
+        description: '특정 경로만 파싱 (선택사항)'
+        type: string
+        required: false
+
+jobs:
+  parse:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          pip install PyMuPDF python-docx python-pptx pandas openpyxl
+
+      - name: Parse documents
+        run: |
+          if [ "${{ inputs.parse_all }}" = "true" ]; then
+            echo "모든 문서 파싱 중..."
+            python scripts/batch_parser.py --all
+          elif [ -n "${{ inputs.specific_path }}" ]; then
+            echo "특정 경로 파싱: ${{ inputs.specific_path }}"
+            python scripts/batch_parser.py "${{ inputs.specific_path }}"
+          else
+            echo "새로 추가된 파일 파싱 중..."
+            python scripts/batch_parser.py --new-only
+          fi
+
+      - name: Commit results
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: 'Parsed documents [skip ci]'
+          file_pattern: 'data/processed/**'

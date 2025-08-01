@@ -1,0 +1,34 @@
+<product>xross</product>
+<language>javascript</language>
+<Namespace>bizMOB</Namespace>
+
+<class name="Device">
+  <description>
+    Front화면 개발시 Native 앱 또는 디바이스 정보를 제공하는 Class.
+    디바이스/앱 정보는 bizMOB Native app에서 직접 이 Class내 프로퍼트로 저장합니다.
+    저장 시점은 3.x에서는 웹뷰 생성시마다 loading complete 또는 Resume 이벤트시에 저장되며,
+    4.x에서는 SPA방식의 환경으로 loading complete 초기1회만 정보를 저장합니다.
+  </description>
+  <method name="isIOS">
+    <description>실행환경이 iOS인지 아닌지 유무 내용을 제공</description>
+    <request />
+    <response>
+      <type>boolean</type>
+      <response>iOS 환경 여부를 나타내는 Boolean 값</response>
+      <value>
+        <case condition="iOS 환경">true</case>
+        <case condition="기타 환경">false</case>
+      </value>
+      <example>true</example>
+    </response>
+    <example>
+    ```js
+      if (bizMOB.Device.isIOS()) {
+        requestTr.bioType = "face";
+      } else {
+        requestTr.bioType = "finger";
+      }
+    ```
+    </example>
+  </method>
+</class>

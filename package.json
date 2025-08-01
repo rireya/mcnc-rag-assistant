@@ -28,9 +28,15 @@
     "build-scripts": "tsc scripts/*.ts --outDir dist/scripts"
   },
   "devDependencies": {
+    "@types/fs-extra": "^11.0.4",
     "@types/node": "^24.1.0",
     "ts-node": "^10.9.2",
     "tsx": "^4.20.3",
     "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "fs-extra": "^11.3.0",
+    "officeparser": "^5.2.0",
+    "pdf-parse": "^1.1.1"
   }
 }
