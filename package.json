@@ -27,7 +27,8 @@
     "build-scripts": "tsc scripts/*.ts --outDir dist/scripts",
 
     "data": "chcp 65001 >nul && tsx scripts/verify-data-setup.ts",
-    "chunk": "tsx scripts/chunk-processor.ts --parallel"
+    "chunk": "tsx scripts/chunk-processor.ts --parallel",
+    "chunk-검증": "tsx scripts/chunk-strategy-validator.ts"
   },
   "devDependencies": {
     "@types/node": "^24.1.0",

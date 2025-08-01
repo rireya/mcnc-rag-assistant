@@ -199,30 +199,33 @@ class ChunkProcessor {
 
     console.log(`Processing ${documents.length} documents in ${documentBatches.length} batches (max ${maxParallel} parallel)`);
 
-    let allChunks: any[] = [];
-    let allFileStatuses: any[] = [];
-    let combinedStats: any = {
+    let allChunks: ChunkData[] = [];
+    let allFileStatuses: FileProcessingStatus[] = [];
+
+    // 통계 초기화 - 필요한 필드 추가
+    let combinedStats: ChunkingStats = {
       total_files: 0,
       total_chunks: 0,
       total_tokens: 0,
-      processing_time_ms: 0,
-      strategies_used: {}
+      avg_chunk_size: 0,
+      min_chunk_size: Number.MAX_VALUE,
+      max_chunk_size: 0,
+      avg_tokens_per_chunk: 0,
+      strategies_used: {},
+      processing_time_ms: 0
     };
 
     for (let i = 0; i < documentBatches.length; i++) {
       const batch = documentBatches[i];
       console.log(`Processing batch ${i + 1}/${documentBatches.length} (${batch.length} documents)...`);
 
+      // processInParallel 메서드 내부 수정
       const batchPromises = batch.map(async (document, docIndex) => {
         const result = await this.documentChunker.chunkDocument(document);
 
-        // 개별 파일로 저장 - 경로 직접 계산
+        // 파일명 생성 (폴더 구조 없이)
         const fileName = `${path.parse(document.file_name).name}.chunks.json`;
-
-        // 원본 파일의 상대 경로를 기반으로 출력 경로 생성
-        const inputRelativePath = path.relative('data/processed/parsed', document.file_path);
-        const outputRelativeDir = path.dirname(inputRelativePath);
-        const outputPath = path.join(outputDir, outputRelativeDir, fileName);
+        const outputPath = path.join(outputDir, fileName);
 
         console.log(`Saving chunks for ${document.file_name} to: ${outputPath}`);
         await saveChunks(result.chunks, outputPath);
@@ -245,6 +248,12 @@ class ChunkProcessor {
           const { chunks, stats } = result.value;
           allChunks.push(...chunks);
 
+          // 청크별 통계 수집
+          chunks.forEach(chunk => {
+            combinedStats.min_chunk_size = Math.min(combinedStats.min_chunk_size, chunk.char_count);
+            combinedStats.max_chunk_size = Math.max(combinedStats.max_chunk_size, chunk.char_count);
+          });
+
           allFileStatuses.push({
             file_path: document.file_path,
             status: 'completed',
@@ -262,11 +271,13 @@ class ChunkProcessor {
             combinedStats.strategies_used[strategy] = {
               file_count: 0,
               chunk_count: 0,
-              avg_size: 0
+              avg_size: 0,
+              total_tokens: 0  // 추가
             };
           }
           combinedStats.strategies_used[strategy].file_count++;
           combinedStats.strategies_used[strategy].chunk_count += stats.chunk_count;
+          combinedStats.strategies_used[strategy].total_tokens += stats.total_tokens;  // 추가
 
         } else {
           console.error(`Failed to process ${document.file_name}:`, result.reason);
@@ -280,16 +291,24 @@ class ChunkProcessor {
       });
     }
 
-    // 평균 크기 계산
+    // 최종 평균 계산
+    if (allChunks.length > 0) {
+      const totalChars = allChunks.reduce((sum, chunk) => sum + chunk.char_count, 0);
+      combinedStats.avg_chunk_size = Math.round(totalChars / allChunks.length);
+      combinedStats.avg_tokens_per_chunk = Math.round(combinedStats.total_tokens / allChunks.length);
+
+      // min_chunk_size가 초기값인 경우 0으로 설정
+      if (combinedStats.min_chunk_size === Number.MAX_VALUE) {
+        combinedStats.min_chunk_size = 0;
+      }
+    }
+
+    // 전략별 평균 크기 계산
     Object.values(combinedStats.strategies_used).forEach((strategyStats: any) => {
       if (strategyStats.chunk_count > 0) {
         strategyStats.avg_size = Math.round(strategyStats.total_tokens / strategyStats.chunk_count);
       }
     });
-
-    // 전체 청크를 통합 파일로도 저장
-    const allChunksPath = path.join(outputDir, 'all-chunks.json');
-    await saveChunks(allChunks, allChunksPath);
 
     return {
       allChunks,

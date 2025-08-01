@@ -22,14 +22,14 @@ import {
   isDuplicateChunk,
   generateChunkId,
   assessChunkQuality,
-  getStrategyNameFromPath
+  getStrategyNameFromPath,
+  truncateToTokenLimit
 } from './utils.js';
 import { getChunkingStrategy, RAG_CONFIG } from '../config/rag-config.js';
 
 /**
  * RecursiveCharacterTextSplitter 래퍼 클래스
- */
-export class TextChunker {
+ */export class TextChunker {
   private splitter: RecursiveCharacterTextSplitter;
   private strategy: ChunkingStrategy;
   private strategyName: string;
@@ -38,17 +38,26 @@ export class TextChunker {
     this.strategy = strategy;
     this.strategyName = strategyName;
 
+    // 문서 타입별 다른 변환 비율 적용
+    let avgCharsPerToken = 3; // 기본값
+
+    if (strategyName.includes('documents/corporate')) {
+      avgCharsPerToken = 2.5; // 한글 중심
+    } else if (strategyName.includes('code/')) {
+      avgCharsPerToken = 3.5; // 코드
+    } else if (strategyName.includes('guides/')) {
+      avgCharsPerToken = 3; // 혼합
+    }
+
+    const chunkSizeInChars = Math.floor(strategy.chunkSize * avgCharsPerToken);
+    const overlapInChars = Math.floor(strategy.overlap * avgCharsPerToken);
+
     // RecursiveCharacterTextSplitter 인스턴스 생성
     this.splitter = new RecursiveCharacterTextSplitter({
-      chunkSize: strategy.chunkSize,
-      chunkOverlap: strategy.overlap,
-      separators: [...strategy.separators] // readonly 배열을 일반 배열로 변환
+      chunkSize: chunkSizeInChars,
+      chunkOverlap: overlapInChars,
+      separators: [...strategy.separators]
     });
-
-    console.log(`Initialized TextChunker for ${strategyName}`);
-    console.log(`  - Chunk size: ${strategy.chunkSize} tokens`);
-    console.log(`  - Overlap: ${strategy.overlap} tokens`);
-    console.log(`  - Separators: ${strategy.separators.length} patterns`);
   }
 
   /**
@@ -80,10 +89,21 @@ export class TextChunker {
         .filter(chunk => !isEmptyChunk(chunk))
         .filter(chunk => estimateTokenCount(chunk) >= RAG_CONFIG.CHUNKING.QUALITY.MIN_CHUNK_SIZE);
 
-      // 중복 제거
-      const deduplicatedChunks = this.removeDuplicates(textChunks);
+      // ✅ 여기에 추가! - 토큰 한도 초과 청크 자르기
+      const maxTokens = RAG_CONFIG.CHUNKING.QUALITY.MAX_CHUNK_SIZE;
+      const sizedChunks = textChunks.map(chunk => {
+        const tokens = estimateTokenCount(chunk);
+        if (tokens > maxTokens) {
+          console.log(`Chunk exceeds token limit (${tokens} > ${maxTokens}), truncating...`);
+          return truncateToTokenLimit(chunk, maxTokens);
+        }
+        return chunk;
+      });
 
-      console.log(`Chunking complete for ${this.strategyName}: ${chunks.length} → ${textChunks.length} → ${deduplicatedChunks.length} chunks (${processingTime}ms)`);
+      // 중복 제거 (sizedChunks 사용)
+      const deduplicatedChunks = this.removeDuplicates(sizedChunks);
+
+      console.log(`Chunking complete for ${this.strategyName}: ${chunks.length} → ${textChunks.length} → ${sizedChunks.length} → ${deduplicatedChunks.length} chunks (${processingTime}ms)`);
 
       return deduplicatedChunks;
 
@@ -97,6 +117,7 @@ export class TextChunker {
    * 중복 청크 제거
    */
   private removeDuplicates(chunks: string[]): string[] {
+    // 기존 코드 그대로 유지
     const uniqueChunks: string[] = [];
     const threshold = RAG_CONFIG.CHUNKING.QUALITY.DUPLICATE_THRESHOLD;
 
