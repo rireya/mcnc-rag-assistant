@@ -23,6 +23,14 @@ interface ValidationResult {
     optimalRangePercentage: number;
   };
 
+  enrichmentStats: {
+    chunksWithTables: number;
+    chunksWithImages: number;
+    totalTables: number;
+    totalImages: number;
+    enrichmentCoverage: number;  // 보강 정보가 있는 청크 비율
+  };
+
   configComparison: {
     expectedChunkSize: number;
     actualAvgTokens: number;
@@ -101,6 +109,9 @@ class ChunkingValidator {
       // 청크 통계 계산
       const chunkStats = this.calculateChunkStats(chunks);
 
+      // 보강 정보 통계 계산
+      const enrichmentStats = this.calculateEnrichmentStats(chunks);
+
       // 오버랩 검증
       const overlapChecks = this.checkOverlaps(chunks);
 
@@ -154,6 +165,13 @@ class ChunkingValidator {
         }
       }
 
+      // 보강 정보 검증
+      if (enrichmentStats.enrichmentCoverage === 0) {
+        warnings.push('테이블/이미지 정보가 전혀 포함되지 않았습니다');
+      } else if (enrichmentStats.enrichmentCoverage < 10) {
+        warnings.push(`보강 정보 적용률이 낮습니다: ${enrichmentStats.enrichmentCoverage.toFixed(1)}%`);
+      }
+
       // 결과 저장
       const result: ValidationResult = {
         fileName,
@@ -162,6 +180,7 @@ class ChunkingValidator {
         expectedStrategy: expectedStrategyName,
         isStrategyCorrect,
         chunkStats,
+        enrichmentStats,
         configComparison: {
           expectedChunkSize: expectedStrategy.chunkSize,
           actualAvgTokens: chunkStats.avgTokens,
@@ -201,6 +220,38 @@ class ChunkingValidator {
       avgChars: Math.round(charCounts.reduce((a, b) => a + b, 0) / charCounts.length),
       tokensInOptimalRange,
       optimalRangePercentage: (tokensInOptimalRange / chunks.length) * 100
+    };
+  }
+
+  /**
+   * 보강 정보 통계 계산
+   */
+  private calculateEnrichmentStats(chunks: ChunkData[]): ValidationResult['enrichmentStats'] {
+    let chunksWithTables = 0;
+    let chunksWithImages = 0;
+    let totalTables = 0;
+    let totalImages = 0;
+
+    chunks.forEach(chunk => {
+      if (chunk.enrichments?.tables && chunk.enrichments.tables.length > 0) {
+        chunksWithTables++;
+        totalTables += chunk.enrichments.tables.length;
+      }
+      if (chunk.enrichments?.images && chunk.enrichments.images.length > 0) {
+        chunksWithImages++;
+        totalImages += chunk.enrichments.images.length;
+      }
+    });
+
+    const enrichedChunks = new Set([...Array(chunksWithTables), ...Array(chunksWithImages)]).size;
+    const enrichmentCoverage = (enrichedChunks / chunks.length) * 100;
+
+    return {
+      chunksWithTables,
+      chunksWithImages,
+      totalTables,
+      totalImages,
+      enrichmentCoverage
     };
   }
 
@@ -263,6 +314,12 @@ class ChunkingValidator {
     console.log(`  토큰: 평균 ${result.chunkStats.avgTokens} (${result.chunkStats.minTokens}-${result.chunkStats.maxTokens})`);
     console.log(`  최적 범위: ${result.chunkStats.optimalRangePercentage.toFixed(1)}% (${result.chunkStats.tokensInOptimalRange}/${result.chunkStats.totalChunks})`);
 
+    // 보강 정보 출력
+    console.log(`  [보강 정보]`);
+    console.log(`    테이블: ${result.enrichmentStats.chunksWithTables}개 청크 (총 ${result.enrichmentStats.totalTables}개 테이블)`);
+    console.log(`    이미지: ${result.enrichmentStats.chunksWithImages}개 청크 (총 ${result.enrichmentStats.totalImages}개 이미지)`);
+    console.log(`    적용률: ${result.enrichmentStats.enrichmentCoverage.toFixed(1)}%`);
+
     if (result.configComparison.overlapVerified) {
       console.log(`  오버랩: [적용됨]`);
     } else if (result.configComparison.expectedOverlap > 0) {
@@ -298,6 +355,16 @@ class ChunkingValidator {
     console.log(`전략 일치: ${correctStrategies}/${totalFiles} (${(correctStrategies/totalFiles*100).toFixed(1)}%)`);
     console.log(`이슈 있음: ${filesWithIssues}개`);
     console.log(`경고 있음: ${filesWithWarnings}개`);
+
+    // 보강 정보 통계
+    console.log('\n[보강 정보 현황]');
+    const totalTablesAcrossFiles = this.results.reduce((sum, r) => sum + r.enrichmentStats.totalTables, 0);
+    const totalImagesAcrossFiles = this.results.reduce((sum, r) => sum + r.enrichmentStats.totalImages, 0);
+    const avgEnrichmentCoverage = this.results.reduce((sum, r) => sum + r.enrichmentStats.enrichmentCoverage, 0) / totalFiles;
+
+    console.log(`총 테이블: ${totalTablesAcrossFiles}개`);
+    console.log(`총 이미지: ${totalImagesAcrossFiles}개`);
+    console.log(`평균 보강 정보 적용률: ${avgEnrichmentCoverage.toFixed(1)}%`);
 
     // 전략별 통계
     console.log('\n[전략별 평균 토큰 크기]');

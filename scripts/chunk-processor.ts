@@ -18,7 +18,14 @@ import {
 } from './rag/utils.js';
 import { validateConfig } from './config/rag-config.js';
 import { PATHS } from './config/paths.js';
-import { ParsedDocument, ChunkingOptions, ChunkingResult } from './rag/types.js';
+import {
+  ParsedDocument,
+  ChunkingOptions,
+  ChunkingResult,
+  ChunkData,
+  FileProcessingStatus,
+  ChunkingStats
+} from './rag/types.js';
 
 /**
  * 청킹 처리 메인 클래스

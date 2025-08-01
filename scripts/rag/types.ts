@@ -63,6 +63,34 @@ export interface ChunkData {
   tokens: number;                // 토큰 수
   char_count: number;            // 문자 수
   created_at: string;            // 생성 시간
+  enrichments?: ChunkEnrichments; // 테이블/이미지 정보 (추가)
+}
+
+/**
+ * 청크 보강 정보 (테이블/이미지)
+ */
+export interface ChunkEnrichments {
+  tables?: Array<{
+    table_id: string;              // 고유 식별자
+    page: number;                  // 원본 페이지
+    position: 'before' | 'within' | 'after'; // 청크 내 위치
+    summary?: string;              // 테이블 요약
+    headers?: string[];            // 컬럼 헤더
+    row_count: number;
+    col_count: number;
+    data?: string[][];             // 원본 데이터 (선택적)
+  }>;
+
+  images?: Array<{
+    image_id: string;              // 고유 식별자
+    page: number;                  // 원본 페이지
+    position: 'before' | 'within' | 'after'; // 청크 내 위치
+    context?: string;              // 이미지 주변 텍스트
+    bbox?: number[];               // 이미지 위치 정보
+    type?: string;                 // 차트, 다이어그램 등
+  }>;
+
+  embedded_text?: string;          // 임베딩용 통합 텍스트
 }
 
 /**

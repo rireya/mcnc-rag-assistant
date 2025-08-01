@@ -1,6 +1,6 @@
 /**
- * MCNC RAG Assistant - 청킹 로직
- * RecursiveCharacterTextSplitter 기반 청킹 구현
+ * MCNC RAG Assistant - 개선된 청킹 로직
+ * 테이블/이미지 정보 보존 및 임베딩 최적화
  */
 
 import { RecursiveCharacterTextSplitter } from '@langchain/textsplitters';
@@ -10,6 +10,7 @@ import {
   ChunkData,
   ChunkMetadata,
   ChunkingStrategy,
+  ChunkEnrichments,
   ParsedDocument,
   FileProcessingStatus,
   ChunkingStats,
@@ -23,7 +24,11 @@ import {
   generateChunkId,
   assessChunkQuality,
   getStrategyNameFromPath,
-  truncateToTokenLimit
+  truncateToTokenLimit,
+  extractPageNumbers,
+  getChunkPageRange,
+  generateTableSummary,
+  prepareEmbeddingText
 } from './utils.js';
 import { getChunkingStrategy, RAG_CONFIG } from '../config/rag-config.js';
 
@@ -56,6 +61,7 @@ export class TextChunker {
       separators: [...strategy.separators]
     });
   }
+
   /**
    * 텍스트를 청크로 분할
    */
@@ -178,11 +184,11 @@ export class TextChunker {
 }
 
 /**
- * 문서 청킹 처리 클래스
+ * 문서 청킹 처리 클래스 (개선됨)
  */
 export class DocumentChunker {
   /**
-   * 단일 문서를 청킹
+   * 단일 문서를 청킹 (테이블/이미지 정보 포함)
    */
   public async chunkDocument(document: ParsedDocument): Promise<{
     chunks: ChunkData[];
@@ -195,12 +201,14 @@ export class DocumentChunker {
     const strategy = getChunkingStrategy(document.file_path);
 
     console.log(`Processing ${document.file_name} with strategy: ${strategyName}`);
+    console.log(`  - Tables: ${document.tables?.length || 0}`);
+    console.log(`  - Images: ${document.images?.length || 0}`);
 
     // 텍스트 청킹
     const chunker = new TextChunker(strategy, strategyName);
     const textChunks = await chunker.chunkText(document.content);
 
-    // 청크 데이터 생성
+    // 청크 데이터 생성 (개선됨)
     const chunks: ChunkData[] = [];
     let totalTokens = 0;
 
@@ -209,16 +217,34 @@ export class DocumentChunker {
       const tokens = estimateTokenCount(content);
       totalTokens += tokens;
 
-      const chunkData: ChunkData = {
+      // 청크가 포함하는 페이지 범위 계산
+      const pageRange = getChunkPageRange(content);
+
+      // 해당 페이지의 테이블/이미지 찾기
+      const enrichments = this.findRelatedAssets(
+        content,
+        pageRange,
+        document.tables || [],
+        document.images || []
+      );
+
+      // 임베딩용 텍스트 준비
+      const chunkDataTemp: ChunkData = {
         id: generateChunkId(document.file_path, i),
         content: content,
         metadata: this.createChunkMetadata(document, i, textChunks.length, strategyName, strategy),
         tokens: tokens,
         char_count: content.length,
-        created_at: new Date().toISOString()
+        created_at: new Date().toISOString(),
+        enrichments: enrichments
       };
 
-      chunks.push(chunkData);
+      // 임베딩용 통합 텍스트 생성
+      if (enrichments && (enrichments.tables?.length || enrichments.images?.length)) {
+        enrichments.embedded_text = prepareEmbeddingText(chunkDataTemp);
+      }
+
+      chunks.push(chunkDataTemp);
     }
 
     const processingTime = Date.now() - startTime;
@@ -228,6 +254,8 @@ export class DocumentChunker {
     console.log(`  - Chunks created: ${chunks.length}`);
     console.log(`  - Total tokens: ${totalTokens.toLocaleString()}`);
     console.log(`  - Average tokens/chunk: ${avgTokens}`);
+    console.log(`  - Chunks with tables: ${chunks.filter(c => c.enrichments?.tables?.length).length}`);
+    console.log(`  - Chunks with images: ${chunks.filter(c => c.enrichments?.images?.length).length}`);
     console.log(`  - Processing time: ${processingTime}ms`);
 
     return {
@@ -238,6 +266,72 @@ export class DocumentChunker {
         strategy_used: strategyName
       }
     };
+  }
+
+  /**
+   * 청크와 관련된 테이블/이미지 찾기
+   */
+  private findRelatedAssets(
+    chunkContent: string,
+    pageRange: { start: number; end: number } | null,
+    tables: any[],
+    images: any[]
+  ): ChunkEnrichments | undefined {
+    if (!pageRange && !tables.length && !images.length) {
+      return undefined;
+    }
+
+    const enrichments: ChunkEnrichments = {};
+
+    // 페이지 기반 매핑 (우선)
+    if (pageRange) {
+      // 해당 페이지 범위의 테이블 찾기
+      const relatedTables = tables.filter(table => {
+        const tablePage = table.page || table.slide || 0;
+        return tablePage >= pageRange.start && tablePage <= pageRange.end;
+      });
+
+      if (relatedTables.length > 0) {
+        enrichments.tables = relatedTables.map((table, idx) => ({
+          table_id: `t_${table.page || table.slide}_${table.table_index || idx}`,
+          page: table.page || table.slide || 0,
+          position: 'within' as const,
+          summary: generateTableSummary(table),
+          headers: table.data?.[0]?.filter((cell: any) => cell) || [],
+          row_count: table.row_count,
+          col_count: table.col_count,
+          data: table.data // 원본 데이터 보존 (선택적)
+        }));
+      }
+
+      // 해당 페이지 범위의 이미지 찾기
+      const relatedImages = images.filter(image => {
+        const imagePage = image.page || image.slide || 0;
+        return imagePage >= pageRange.start && imagePage <= pageRange.end;
+      });
+
+      if (relatedImages.length > 0) {
+        enrichments.images = relatedImages.map((image, idx) => ({
+          image_id: `i_${image.page || image.slide}_${image.image_index || idx}`,
+          page: image.page || image.slide || 0,
+          position: 'within' as const,
+          context: `페이지 ${image.page || image.slide}의 이미지`,
+          bbox: image.bbox,
+          type: image.type
+        }));
+      }
+    }
+
+    // 텍스트 기반 매핑 (보조)
+    // 청크 내용에 "표", "그림", "도표" 등의 참조가 있는지 확인
+    const tableReferences = chunkContent.match(/(?:표|테이블|Table)\s*\d+/gi);
+    const imageReferences = chunkContent.match(/(?:그림|이미지|Figure|Image)\s*\d+/gi);
+
+    if (tableReferences || imageReferences) {
+      console.log(`Found references in chunk: Tables=${tableReferences?.length || 0}, Images=${imageReferences?.length || 0}`);
+    }
+
+    return (enrichments.tables?.length || enrichments.images?.length) ? enrichments : undefined;
   }
 
   /**
@@ -329,6 +423,10 @@ export class BatchChunker {
 
     console.log(`Starting batch processing of ${documents.length} documents...`);
 
+    // 통계 정보 추가
+    let totalTablesIncluded = 0;
+    let totalImagesIncluded = 0;
+
     for (let i = 0; i < documents.length; i++) {
       const document = documents[i];
       const fileStartTime = Date.now();
@@ -338,6 +436,16 @@ export class BatchChunker {
 
         const result = await this.documentChunker.chunkDocument(document);
         allChunks.push(...result.chunks);
+
+        // 테이블/이미지 통계 업데이트
+        result.chunks.forEach(chunk => {
+          if (chunk.enrichments?.tables) {
+            totalTablesIncluded += chunk.enrichments.tables.length;
+          }
+          if (chunk.enrichments?.images) {
+            totalImagesIncluded += chunk.enrichments.images.length;
+          }
+        });
 
         // 전략별 통계 업데이트
         const strategy = result.stats.strategy_used;
@@ -377,6 +485,8 @@ export class BatchChunker {
 
     console.log(`Batch processing completed in ${totalProcessingTime}ms`);
     console.log(`Total chunks created: ${allChunks.length}`);
+    console.log(`Total tables included: ${totalTablesIncluded}`);
+    console.log(`Total images included: ${totalImagesIncluded}`);
     console.log(`Successful files: ${fileStatuses.filter(s => s.status === 'completed').length}/${documents.length}`);
 
     return { allChunks, stats, fileStatuses };
