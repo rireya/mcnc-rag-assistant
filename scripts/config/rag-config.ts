@@ -126,13 +126,26 @@ export function getChunkingStrategy(filePath: string): ChunkingStrategy {
 }
 
 /**
- * 설정 검증 (필수 환경변수만)
+ * 설정 검증 (OpenAI API 키는 선택적)
  */
 export function validateConfig(): { isValid: boolean; errors: string[] } {
   const errors: string[] = [];
 
+  // OpenAI API 키는 임베딩 단계에서만 필요하므로 경고만 출력
   if (!process.env.OPENAI_API_KEY) {
-    errors.push('OPENAI_API_KEY 환경변수가 설정되지 않았습니다.');
+    console.warn('Warning: OPENAI_API_KEY not set. This will be required for embedding generation.');
+  }
+
+  // 청킹 전략 기본 검증
+  const strategies = Object.values(RAG_CONFIG.CHUNKING.STRATEGIES);
+  for (const strategy of strategies) {
+    if (strategy.chunkSize < 50) {
+      errors.push(`청크 크기가 너무 작습니다: ${strategy.chunkSize} (최소 50 필요)`);
+    }
+
+    if (strategy.overlap >= strategy.chunkSize) {
+      errors.push(`오버랩이 청크 크기보다 크거나 같습니다: overlap ${strategy.overlap} >= chunkSize ${strategy.chunkSize}`);
+    }
   }
 
   return {
