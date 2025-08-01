@@ -6,7 +6,7 @@
 
 ## 🎯 설계 원칙
 
-- **단순함 우선**: 80줄, 2개 함수만으로 구성
+- **단순함 우선**: 100줄 이내, 2개 함수만으로 구성
 - **실용성 중심**: 실제 성능에 영향을 주는 파라미터만 포함
 - **확장 가능**: 필요 시 캐싱, 로깅 기능 추가 가능
 - **타입 안전**: TypeScript로 설정 오류 방지
@@ -30,18 +30,42 @@ EMBEDDING: {
 
 #### 문서별 맞춤 전략
 
-| 문서 타입 | 청크 크기 | 오버랩 | 전략 목적 |
-|-----------|-----------|--------|-----------|
-| **documents/corporate** | 1200 | 150 | 회사 관련 문서 - 문맥 보존 |
-| **documents/specifications** | 800 | 120 | 기술명세서 - 정확성 확보 |
-| **documents/manuals** | 900 | 100 | 매뉴얼 - 단계별 구조 |
-| **documents/policies** | 700 | 80 | 정책 - 명확한 구분 |
-| **documents/presentations** | 600 | 60 | 발표자료 - 슬라이드별 분할 |
-| **code/bizmob-sdk** | 600 | 80 | SDK 코드 - 빠른 검색 |
-| **code/components** | 500 | 50 | 컴포넌트 - 모듈별 독립 |
-| **guides/tutorials** | 800 | 100 | 튜토리얼 - 단계별 완성도 |
-| **guides/api-docs** | 500 | 0 | API 문서 - 메서드별 독립 |
-| **guides/examples** | 400 | 40 | 예제 - 작고 명확한 단위 |
+| 문서 타입 | 청크 크기 | 오버랩 | 문자/토큰 | 전처리 | 전략 목적 |
+|-----------|-----------|--------|-----------|---------|-----------|
+| **documents/corporate** | 1200 | 150 | 2.5 | weakenPage | 회사 문서 - 연속성 유지 |
+| **documents/specifications** | 800 | 120 | 3.0 | none | 기술명세서 - 독립적 섹션 |
+| **documents/manuals** | 900 | 100 | 2.8 | none | 매뉴얼 - 단계별 구조 |
+| **documents/policies** | 700 | 80 | 2.7 | none | 정책 - 명확한 구분 |
+| **documents/presentations** | 600 | 60 | 2.5 | weakenPage | 발표자료 - 연속성 유지 |
+| **code/bizmob-sdk** | 600 | 80 | 3.5 | none | SDK 코드 - 함수 단위 |
+| **code/components** | 500 | 50 | 3.5 | none | 컴포넌트 - 모듈 독립 |
+| **guides/tutorials** | 800 | 100 | 3.0 | weakenPage | 튜토리얼 - 학습 흐름 |
+| **guides/api-docs** | 500 | 0 | 3.2 | none | API 문서 - 메서드 독립 |
+| **guides/examples** | 400 | 40 | 3.3 | none | 예제 - 코드 단위 |
+
+#### 전처리 전략 (preprocessor)
+
+- **none**: 전처리 없음 (기본값)
+  - 사용: 코드, API 문서, 정책 등 독립적 단위가 중요한 문서
+  - 효과: 원본 구조 완전 보존
+
+- **weakenPage**: 페이지 구분자 약화
+  - 사용: 회사소개서, 발표자료, 튜토리얼 등 연속성이 중요한 문서
+  - 동작: `--- 페이지 X ---` → `<<PAGE_BOUNDARY_X>>` → 청킹 → 복원
+  - 효과: 페이지 정보 보존 + 오버랩 적용
+
+- **removePage**: 페이지 구분자 제거
+  - 사용: 페이지 정보가 불필요한 경우
+  - 동작: `--- 페이지 X ---` → 완전 제거
+  - 효과: 하나의 연속된 텍스트로 처리
+
+#### 문자/토큰 비율 (avgCharsPerToken) 설정 가이드
+
+- **한글 중심 문서**: 2.5 (회사소개서, 발표자료)
+- **한글 위주 문서**: 2.7-2.8 (매뉴얼, 정책)
+- **한글/영문 혼합**: 3.0 (튜토리얼, 기술명세)
+- **영문 위주 문서**: 3.2 (API 문서)
+- **코드 파일**: 3.5 (SDK, 컴포넌트)
 
 #### 구분자(Separators) 전략
 
@@ -91,17 +115,29 @@ SEARCH: {
 
 ```typescript
 // 사용 예시
-const strategy = getChunkingStrategy('data/source/code/bizmob-sdk/core.js');
-// 결과: { chunkSize: 600, overlap: 80, separators: [...] }
+const strategy = getChunkingStrategy('data/source/documents/corporate/회사소개서.pdf');
+// 결과: {
+//   chunkSize: 1200,
+//   overlap: 150,
+//   separators: [...],
+//   avgCharsPerToken: 2.5,
+//   preprocessor: 'weakenPage'
+// }
 
-const strategy = getChunkingStrategy('data/source/documents/corporate/회사소개서.json');
-// 결과: { chunkSize: 1200, overlap: 150, separators: [...] }
+const strategy = getChunkingStrategy('data/source/code/bizmob-sdk/core.js');
+// 결과: {
+//   chunkSize: 600,
+//   overlap: 80,
+//   separators: [...],
+//   avgCharsPerToken: 3.5,
+//   preprocessor: 'none'
+// }
 ```
 
 **매칭 로직**: 파일 경로에 포함된 패턴으로 전략 결정
 - `documents/corporate` 포함 → 회사 관련 문서 전략
 - `code/bizmob-sdk` 포함 → SDK 코드 전략
-- 매칭 안 됨 → DEFAULT_STRATEGY (chunkSize: 800, overlap: 100)
+- 매칭 안 됨 → DEFAULT_STRATEGY
 
 ### 2. validateConfig()
 
@@ -118,7 +154,10 @@ if (!isValid) {
 ```
 
 **검증 항목**:
-- `OPENAI_API_KEY` 환경변수 존재 여부
+- `OPENAI_API_KEY` 환경변수 존재 여부 (경고만)
+- 청크 크기 최소값 검증
+- 오버랩이 청크 크기를 초과하지 않는지 검증
+- 문자/토큰 비율이 정상 범위(1-5) 내인지 검증
 
 ## 🚀 사용 방법
 
@@ -141,24 +180,31 @@ if (!isValid) throw new Error(errors.join(', '));
 
 // 전략 선택
 const strategy = getChunkingStrategy(filePath);
-const chunker = new SemanticChunker({
-  chunkSize: strategy.chunkSize,
-  chunkOverlap: strategy.overlap,
-  separators: strategy.separators
-});
+const chunker = new TextChunker(strategy, strategyName);
+
+// strategy에는 이제 avgCharsPerToken과 preprocessor가 포함됨
+console.log(`Using ${strategy.avgCharsPerToken} chars per token`);
+console.log(`Preprocessor: ${strategy.preprocessor || 'none'}`);
 ```
 
-### 3. 임베딩 설정 사용
+### 3. 전처리 활용
 
 ```typescript
-// embedder.ts에서
-import { RAG_CONFIG } from './config/rag-config.js';
+// chunker.ts의 preprocessText 메서드
+private preprocessText(text: string): string {
+  switch (this.strategy.preprocessor) {
+    case 'removePage':
+      // 페이지 구분자 완전 제거
+      return text.replace(/\n--- 페이지 \d+ ---\n/g, '\n\n');
 
-const embeddings = new OpenAIEmbeddings({
-  modelName: RAG_CONFIG.EMBEDDING.MODEL,
-  dimensions: RAG_CONFIG.EMBEDDING.DIMENSIONS,
-  batchSize: RAG_CONFIG.EMBEDDING.BATCH_SIZE
-});
+    case 'weakenPage':
+      // 페이지 구분자를 약한 마커로 변경
+      return text.replace(/\n--- 페이지 (\d+) ---\n/g, '\n\n<<PAGE_BOUNDARY_$1>>\n\n');
+
+    default:
+      return text;
+  }
+}
 ```
 
 ## 🔄 설정 커스터마이징
@@ -170,39 +216,70 @@ const embeddings = new OpenAIEmbeddings({
 ```typescript
 // rag-config.ts에서 수정
 'documents/corporate': {
-  chunkSize: 1500,    // 더 큰 청크로 문맥 보존 강화
-  overlap: 200,       // 더 많은 오버랩으로 연결성 개선
-  separators: ['\n\n', '\n', '. ']  // 구분자 단순화
+  chunkSize: 1500,          // 더 큰 청크로 문맥 보존 강화
+  overlap: 200,             // 더 많은 오버랩으로 연결성 개선
+  separators: ['\n\n', '\n', '. '],  // 구분자 단순화
+  avgCharsPerToken: 2.3,    // 실제 측정값으로 미세 조정
+  preprocessor: 'removePage' // 페이지 구분 완전 제거
 }
 ```
 
-### 성능 튜닝
+### 새로운 전처리 전략 추가
 
-처리 속도 개선:
+필요한 경우 새로운 전처리 방식 추가:
 
 ```typescript
-PERFORMANCE: {
-  PARALLEL_CHUNKS: 5,     // 동시 처리 증가 (메모리 고려)
-  BATCH_SIZE: 20,         // 배치 크기 증가
-  AUTO_ADJUST_SIZE: false // 자동 조정 비활성화로 속도 우선
+// types.ts에서
+preprocessor?: 'removePage' | 'weakenPage' | 'removeHeaders' | 'none';
+
+// chunker.ts에서
+case 'removeHeaders':
+  // 섹션 헤더 제거
+  return text.replace(/^#+\s+.+$/gm, '');
+```
+
+### 문서별 오버랩 강제 적용
+
+특정 문서에서 오버랩을 확실히 보장하려면:
+
+```typescript
+'documents/critical': {
+  chunkSize: 1000,
+  overlap: 200,
+  separators: ['\n\n'],     // 단순한 구분자만 사용
+  avgCharsPerToken: 3.0,
+  preprocessor: 'weakenPage',
+  forceOverlap: true        // 향후 구현 가능
 }
 ```
 
 ## ⚠️ 주의사항
 
-### 1. 청크 크기 설정
+### 1. 전처리 전략 선택
+
+- **연속성 중요**: 회사소개서, 발표자료, 튜토리얼 → `weakenPage`
+- **독립성 중요**: API 문서, 정책, 코드 → `none`
+- **과도한 전처리 주의**: 원본 구조를 너무 많이 변경하면 검색 품질 저하
+
+### 2. 청크 크기 설정
 
 - **너무 작으면**: 문맥 손실, 검색 품질 저하
 - **너무 크면**: 토큰 한도 초과, 처리 속도 저하
 - **권장**: 400-1200 토큰 범위
 
-### 2. 오버랩 설정
+### 3. 오버랩 설정
 
 - **너무 적으면**: 문장/단락 경계에서 정보 손실
 - **너무 많으면**: 중복 정보로 저장 공간 낭비
 - **권장**: 청크 크기의 10-20%
 
-### 3. 병렬 처리
+### 4. 문자/토큰 비율
+
+- **정확한 측정**: 실제 데이터로 검증 후 조정
+- **문서 타입별**: 언어와 내용에 따라 큰 차이
+- **주기적 검토**: 데이터 변화 시 재조정 필요
+
+### 5. 병렬 처리
 
 - **PARALLEL_CHUNKS**: 메모리 사용량 고려하여 조정
 - **높은 값**: 속도 향상, 메모리 사용량 증가
@@ -222,13 +299,18 @@ CACHING: {
 }
 ```
 
-### 2. 고급 검색 최적화
+### 2. 고급 전처리 옵션
 
-MCP 서버 구현 후 필요하면 추가:
+더 정교한 전처리가 필요한 경우:
 
 ```typescript
-// 동적 검색 파라미터 조정 함수
-export function getOptimizedSearchParams(queryType: 'precise' | 'broad' | 'fast')
+preprocessor: {
+  type: 'custom',
+  rules: [
+    { pattern: /regex/, replacement: 'text' },
+    { pattern: /regex2/, action: 'remove' }
+  ]
+}
 ```
 
 ### 3. 품질 메트릭
@@ -239,12 +321,24 @@ export function getOptimizedSearchParams(queryType: 'precise' | 'broad' | 'fast'
 MONITORING: {
   COLLECT_QUALITY_METRICS: true,
   CHUNK_SIZE_DISTRIBUTION: true,
-  SEMANTIC_COHERENCE_CHECK: true
+  SEMANTIC_COHERENCE_CHECK: true,
+  OVERLAP_EFFECTIVENESS: true
 }
 ```
 
 ## 🎯 결론
 
-현재 `rag-config.ts`는 **필요한 기능은 모두 포함하면서도 최대한 단순한** 설계입니다. 복잡한 기능들은 실제 필요성이 검증된 후 단계적으로 추가할 예정입니다.
+현재 `rag-config.ts`는 **필요한 기능은 모두 포함하면서도 최대한 단순한** 설계입니다. 특히:
+
+1. **avgCharsPerToken**: 문서 타입별 정확한 토큰 변환
+2. **preprocessor**: 문서 특성에 맞는 전처리 전략
+3. **유연한 구분자**: 문서 구조에 최적화된 분할
+
+이를 통해 각 문서 타입에 최적화된 청킹이 가능합니다.
 
 **핵심 철학**: "지금 필요한 것만, 완벽하게"
+
+## 📅 최종 업데이트
+
+- 2025-01-31: avgCharsPerToken 필드 추가
+- 2025-01-31: preprocessor 전략 추가 및 문서별 권장사항 적용

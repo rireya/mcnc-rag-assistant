@@ -28,7 +28,10 @@
 
     "data": "chcp 65001 >nul && tsx scripts/verify-data-setup.ts",
     "chunk": "tsx scripts/chunk-processor.ts --parallel",
-    "chunk-검증": "tsx scripts/chunk-strategy-validator.ts"
+
+    "validate:setup": "tsx scripts/verify-data-setup.ts",
+    "validate:chunks": "tsx scripts/validate-chunking-strategy.ts",
+    "validate:all": "npm run validate:setup && npm run validate:chunks"
   },
   "devDependencies": {
     "@types/node": "^24.1.0",

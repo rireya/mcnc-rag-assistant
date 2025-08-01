@@ -9,7 +9,7 @@
       "chunk_index": 0,
       "total_chunks": 1,
       "chunk_strategy": "guides/api-docs",
-      "chunk_size": 500,
+      "chunk_size": 300,
       "overlap": 0,
       "original_metadata": {
         "word_count": 92,
@@ -19,6 +19,6 @@
     },
     "tokens": 247,
     "char_count": 823,
-    "created_at": "2025-08-01T16:17:10.681Z"
+    "created_at": "2025-08-01T17:03:08.844Z"
   }
 ]

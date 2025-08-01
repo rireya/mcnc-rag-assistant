@@ -103,6 +103,9 @@ export interface ChunkingStrategy {
   chunkSize: number;             // 청크 크기 (토큰)
   overlap: number;               // 오버랩 크기 (토큰)
   separators: readonly string[]; // 구분자 배열
+  avgCharsPerToken: number;      // 문자/토큰 비율
+  forceOverlap?: boolean;        // 강제 오버랩 적용 (선택적)
+  preprocessor?: 'removePage' | 'weakenPage' | 'none'; // 전처리 방식 (선택적)
 }
 
 /**

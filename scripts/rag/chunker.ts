@@ -29,7 +29,8 @@ import { getChunkingStrategy, RAG_CONFIG } from '../config/rag-config.js';
 
 /**
  * RecursiveCharacterTextSplitter 래퍼 클래스
- */export class TextChunker {
+ */
+export class TextChunker {
   private splitter: RecursiveCharacterTextSplitter;
   private strategy: ChunkingStrategy;
   private strategyName: string;
@@ -38,19 +39,15 @@ import { getChunkingStrategy, RAG_CONFIG } from '../config/rag-config.js';
     this.strategy = strategy;
     this.strategyName = strategyName;
 
-    // 문서 타입별 다른 변환 비율 적용
-    let avgCharsPerToken = 3; // 기본값
-
-    if (strategyName.includes('documents/corporate')) {
-      avgCharsPerToken = 2.5; // 한글 중심
-    } else if (strategyName.includes('code/')) {
-      avgCharsPerToken = 3.5; // 코드
-    } else if (strategyName.includes('guides/')) {
-      avgCharsPerToken = 3; // 혼합
-    }
-
+    const avgCharsPerToken = strategy.avgCharsPerToken;
     const chunkSizeInChars = Math.floor(strategy.chunkSize * avgCharsPerToken);
     const overlapInChars = Math.floor(strategy.overlap * avgCharsPerToken);
+
+    console.log(`Strategy: ${strategyName}`);
+    console.log(`  - Token to char ratio: ${avgCharsPerToken}`);
+    console.log(`  - Chunk size: ${strategy.chunkSize} tokens → ${chunkSizeInChars} chars`);
+    console.log(`  - Overlap: ${strategy.overlap} tokens → ${overlapInChars} chars`);
+    console.log(`  - Preprocessor: ${strategy.preprocessor || 'none'}`);
 
     // RecursiveCharacterTextSplitter 인스턴스 생성
     this.splitter = new RecursiveCharacterTextSplitter({
@@ -59,7 +56,6 @@ import { getChunkingStrategy, RAG_CONFIG } from '../config/rag-config.js';
       separators: [...strategy.separators]
     });
   }
-
   /**
    * 텍스트를 청크로 분할
    */
@@ -69,7 +65,10 @@ import { getChunkingStrategy, RAG_CONFIG } from '../config/rag-config.js';
       return [];
     }
 
-    const normalizedText = normalizeText(text);
+    // 전처리 적용
+    const preprocessedText = this.preprocessText(text);
+    const normalizedText = normalizeText(preprocessedText);
+
     console.log(`Chunking text: ${normalizedText.length} characters`);
 
     try {
@@ -84,14 +83,14 @@ import { getChunkingStrategy, RAG_CONFIG } from '../config/rag-config.js';
       const processingTime = Date.now() - startTime;
 
       // 텍스트 추출 및 필터링
-      const textChunks = chunks
+      let textChunks = chunks
         .map(doc => doc.pageContent)
         .filter(chunk => !isEmptyChunk(chunk))
         .filter(chunk => estimateTokenCount(chunk) >= RAG_CONFIG.CHUNKING.QUALITY.MIN_CHUNK_SIZE);
 
-      // ✅ 여기에 추가! - 토큰 한도 초과 청크 자르기
+      // 토큰 한도 초과 청크 자르기
       const maxTokens = RAG_CONFIG.CHUNKING.QUALITY.MAX_CHUNK_SIZE;
-      const sizedChunks = textChunks.map(chunk => {
+      textChunks = textChunks.map(chunk => {
         const tokens = estimateTokenCount(chunk);
         if (tokens > maxTokens) {
           console.log(`Chunk exceeds token limit (${tokens} > ${maxTokens}), truncating...`);
@@ -100,10 +99,15 @@ import { getChunkingStrategy, RAG_CONFIG } from '../config/rag-config.js';
         return chunk;
       });
 
-      // 중복 제거 (sizedChunks 사용)
-      const deduplicatedChunks = this.removeDuplicates(sizedChunks);
+      // 후처리: 페이지 경계 마커 복원
+      if (this.strategy.preprocessor === 'weakenPage') {
+        textChunks = this.postprocessChunks(textChunks);
+      }
 
-      console.log(`Chunking complete for ${this.strategyName}: ${chunks.length} → ${textChunks.length} → ${sizedChunks.length} → ${deduplicatedChunks.length} chunks (${processingTime}ms)`);
+      // 중복 제거
+      const deduplicatedChunks = this.removeDuplicates(textChunks);
+
+      console.log(`Chunking complete for ${this.strategyName}: ${chunks.length} → ${textChunks.length} → ${deduplicatedChunks.length} chunks (${processingTime}ms)`);
 
       return deduplicatedChunks;
 
@@ -114,10 +118,46 @@ import { getChunkingStrategy, RAG_CONFIG } from '../config/rag-config.js';
   }
 
   /**
+   * 전처리: 문서 타입에 따른 텍스트 전처리
+   */
+  private preprocessText(text: string): string {
+    if (!this.strategy.preprocessor || this.strategy.preprocessor === 'none') {
+      return text;
+    }
+
+    let processedText = text;
+
+    switch (this.strategy.preprocessor) {
+      case 'removePage':
+        // 페이지 구분자 완전 제거
+        processedText = text.replace(/\n--- 페이지 \d+ ---\n/g, '\n\n');
+        console.log('Preprocessor: Removed page separators');
+        break;
+
+      case 'weakenPage':
+        // 페이지 구분자를 약한 마커로 변경
+        processedText = text.replace(/\n--- 페이지 (\d+) ---\n/g, '\n\n<<PAGE_BOUNDARY_$1>>\n\n');
+        console.log('Preprocessor: Weakened page separators');
+        break;
+    }
+
+    return processedText;
+  }
+
+  /**
+   * 후처리: 페이지 경계 마커 복원
+   */
+  private postprocessChunks(chunks: string[]): string[] {
+    return chunks.map(chunk => {
+      // 페이지 경계 마커를 원래 형태로 복원
+      return chunk.replace(/<<PAGE_BOUNDARY_(\d+)>>/g, '--- 페이지 $1 ---');
+    });
+  }
+
+  /**
    * 중복 청크 제거
    */
   private removeDuplicates(chunks: string[]): string[] {
-    // 기존 코드 그대로 유지
     const uniqueChunks: string[] = [];
     const threshold = RAG_CONFIG.CHUNKING.QUALITY.DUPLICATE_THRESHOLD;
 

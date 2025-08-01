@@ -1,15 +1,15 @@
 [
   {
     "id": "1dce56e8_0000",
-    "content": "<class name=\"Network\">\n <description>\n Front화면 개발시 Native 앱 또는 디바이스 정보를 제공하는 Class.디바이스/앱 정보는 bizMOB Native app에서 직접 이 Class내 프로퍼트로 저장합니다.\n 저장 시점은 3.x에서는 웹뷰 생성시마다 loading complete 또는 Resume 이벤트시에 저장되며 4.x에서는 SPA방식의 환경으로 loading complete 초기1회만 정보를 저장합니다.\n </description>\n <method name=\"requestTr\">\n <description>bizMOB Server 전문 통신 기능</description>\n <request>\n <parameter name=\"_sTrcode\" type=\"string\">\n bizMOB Server 전문 코드(TrCode)\n </parameter>\n <parameter name=\"_oHeader\" type=\"Object\" Optional>\n bizMOB Server 전문 호출시 설정할 header object. 별도로 추가할 필드가 있을때 주로 사용하고 기본값으로는 프로젝트에서 설정코드(TrCode)\n <property name=\"result\" type=\"boolean\">\n <value>true 또는 false. 서버통신 후 처리 성공 여부값</value>\n </property>\n <property name=\"error_code\" type=\"string\">\n <value>bizMOB Server통신시 실패일 경우 서버에서 전달하는 에러코드값. eg)CDR1100</value>\n </property>\n <property name=\"error_text\" type=\"string\">\n <value>bizMOB Server통신시 실패일 경우 서버에서 전달하는 에러메세지. eg)카드잔액부족</value>\n </property>\n <property name=\"info_text\" type=\"string\">\n <value>bizMOB Server통신 후 서버에서 보넬 추가 메세지</value>\n </property>\n <property name=\"message_version\" type=\"string\">\n <value>bizMOB Server통신 프로토콜 버전</value>\n </property>\n <property name=\"login_session_id\" type=\"string\">\n <value>bizMOB Server통신시 요청한 세션 id. 서버에 생성된 session값이 자동으로 설정됨</value>\n </property>\n <property name=\"trcode\" type=\"string\">\n <value>bizMOB Server 전문 코드(TrCode). xross Core에서 자동으로 설정.</value>\n </property>\n </parameter>\n <parameter name=\"_oBody\" type=\"Object\" Optional>\n Server 전문 코드(TrCode). Service Bu",
+    "content": "<class name=\"Network\">\n <description>\n Front화면 개발시 Native 앱 또는 디바이스 정보를 제공하는 Class.디바이스/앱 정보는 bizMOB Native app에서 직접 이 Class내 프로퍼트로 저장합니다.\n 저장 시점은 3.x에서는 웹뷰 생성시마다 loading complete 또는 Resume 이벤트시에 저장되며 4.x에서는 SPA방식의 환경으로 loading complete 초기1회만 정보를 저장합니다.\n </description>\n <method name=\"requestTr\">\n <description>bizMOB Server 전문 통신 기능</description>\n <request>\n <parameter name=\"_sTrcode\" type=\"string\">\n bizMOB Server 전문 코드(TrCode)\n </parameter>\n <parameter name=\"_oHeader\" type=\"Object\" Optional>\n bizMOB Server 전문 호출시 설정할 header object. 별도로 추가할 필드가 있을때 주로 사용하고 기본값으로는 프로젝트에서 설정코드(TrCode)\n <property name=\"result\" type=\"boolean\">\n <value>true 또는 false. 서버통신 후 처리 성공 여부값</value>\n </property>\n <property name=\"error_code\" type=\"string\">\n <value>bizMOB Server통신시 실패일 경우 서버에서 전달하는 에러코드값. eg)CDR1100</value>\n </property>\n <property name=\"error_text\" type=\"string\">\n <value>bizMOB Server통신시 실패일 경우 서버에서 전달하는 에러메세지. eg)카드잔액부족</value>\n </property>\n <property name=\"i",
     "metadata": {
       "source_file": "data/source/guides/api-docs/bizMOB-Network.mdx",
       "file_name": "bizMOB-Network.mdx",
       "file_type": "mdx",
       "chunk_index": 0,
-      "total_chunks": 2,
+      "total_chunks": 3,
       "chunk_strategy": "guides/api-docs",
-      "chunk_size": 500,
+      "chunk_size": 300,
       "overlap": 0,
       "original_metadata": {
         "word_count": 320,
@@ -17,21 +17,21 @@
       },
       "position": {}
     },
-    "tokens": 458,
-    "char_count": 1498,
-    "created_at": "2025-08-01T16:17:10.712Z"
+    "tokens": 302,
+    "char_count": 958,
+    "created_at": "2025-08-01T17:03:08.884Z"
   },
   {
     "id": "1dce56e8_0001",
-    "content": "ilder에 정의된 전문 json구조에 맞게 값을 설정.\n </parameter>\n <parameter name=\"_bMock\" type=\"boolean\" Optional version=\"4.x\">\n true 또는 false. 개발환경에서 Server에 전문이 개발되지 않아 Front에서 직접 호출이 불가능 할경우 mock data내 정의된 값을 return하여 Front에서 처리로직을 개발하고 싶을 경우 true로 설정하여 사용.\n </parameter>\n <parameter name=\"_bProgressEnable\" Optional type=\"boolean\">\n true 또는 false. bizMOB Server 통신시 Native app에서 프로그래스바를 표시할지 여부.\n <case _bProgressEnable=\"true\">기본값. 서버전문 요청시 Native App에서 Progress bar창을 보여준다..사용자가 두번터치하여 중복요청하는 경우를 방지하기 위해 기본값은 true로 설정되어 있다.</case>\n <case _bProgressEnable=\"false\">Native App에서 Progress bar창을 보여주지 않는다. 백그라운드로 데이터를 받아 저장해야 할경우 같은 비동기 데이터 처리에 사용할 때 설정한다.</case>\n </parameter>\n <parameter name=\"_fCallback\" type=\"function\" version=\"3.x\">bizMOB Server 통신 후 Front에서 response data를 받아처리할 callback 함수</parameter>\n </request>\n <response>\n <type>JSON</type>\n <value>호출한 전문의 body필드내 response data와 프로젝트에서 정의한 header필드의 json데이터</value>\n </response>\n <example>\n ```js\n bizMOB.Network.requestTr({\n \"_sTrcode\" : \"DM0002\",\n \"_oHeader\" : {\"userGrade\" : \"chief\"},\n \"_oBody\" : {\n \"startIndex\" : 0,\n \"endIndex\" : 9\n },\n \"_fCallback\" : function(resDM0002){\n bizMOB.logger.log(JSON.stringify(resDM0002));\n }\n });\n ```\n </example>\n </method>",
+    "content": "nfo_text\" type=\"string\">\n <value>bizMOB Server통신 후 서버에서 보넬 추가 메세지</value>\n </property>\n <property name=\"message_version\" type=\"string\">\n <value>bizMOB Server통신 프로토콜 버전</value>\n </property>\n <property name=\"login_session_id\" type=\"string\">\n <value>bizMOB Server통신시 요청한 세션 id. 서버에 생성된 session값이 자동으로 설정됨</value>\n </property>\n <property name=\"trcode\" type=\"string\">\n <value>bizMOB Server 전문 코드(TrCode). xross Core에서 자동으로 설정.</value>\n </property>\n </parameter>\n <parameter name=\"_oBody\" type=\"Object\" Optional>\n Server 전문 코드(TrCode). Service Builder에 정의된 전문 json구조에 맞게 값을 설정.\n </parameter>\n <parameter name=\"_bMock\" type=\"boolean\" Optional version=\"4.x\">\n true 또는 false. 개발환경에서 Server에 전문이 개발되지 않아 Front에서 직접 호출이 불가능 할경우 mock data내 정의된 값을 return하여 Front에서 처리로직을 개발하고 싶을 경우 true로 설정하여 사용.\n </parameter>\n <parameter name=\"_bProgressEnable\" Optional type=\"boolean\">\n true 또는 false. bizMOB Server 통신시 Native app에서 프로그래스바를 표시할지 여부.\n <case _bProgressEnable=\"true\">기본값. 서",
     "metadata": {
       "source_file": "data/source/guides/api-docs/bizMOB-Network.mdx",
       "file_name": "bizMOB-Network.mdx",
       "file_type": "mdx",
       "chunk_index": 1,
-      "total_chunks": 2,
+      "total_chunks": 3,
       "chunk_strategy": "guides/api-docs",
-      "chunk_size": 500,
+      "chunk_size": 300,
       "overlap": 0,
       "original_metadata": {
         "word_count": 320,
@@ -39,8 +39,30 @@
       },
       "position": {}
     },
-    "tokens": 376,
-    "char_count": 1207,
-    "created_at": "2025-08-01T16:17:10.712Z"
+    "tokens": 292,
+    "char_count": 960,
+    "created_at": "2025-08-01T17:03:08.884Z"
+  },
+  {
+    "id": "1dce56e8_0002",
+    "content": "버전문 요청시 Native App에서 Progress bar창을 보여준다..사용자가 두번터치하여 중복요청하는 경우를 방지하기 위해 기본값은 true로 설정되어 있다.</case>\n <case _bProgressEnable=\"false\">Native App에서 Progress bar창을 보여주지 않는다. 백그라운드로 데이터를 받아 저장해야 할경우 같은 비동기 데이터 처리에 사용할 때 설정한다.</case>\n </parameter>\n <parameter name=\"_fCallback\" type=\"function\" version=\"3.x\">bizMOB Server 통신 후 Front에서 response data를 받아처리할 callback 함수</parameter>\n </request>\n <response>\n <type>JSON</type>\n <value>호출한 전문의 body필드내 response data와 프로젝트에서 정의한 header필드의 json데이터</value>\n </response>\n <example>\n ```js\n bizMOB.Network.requestTr({\n \"_sTrcode\" : \"DM0002\",\n \"_oHeader\" : {\"userGrade\" : \"chief\"},\n \"_oBody\" : {\n \"startIndex\" : 0,\n \"endIndex\" : 9\n },\n \"_fCallback\" : function(resDM0002){\n bizMOB.logger.log(JSON.stringify(resDM0002));\n }\n });\n ```\n </example>\n </method>",
+    "metadata": {
+      "source_file": "data/source/guides/api-docs/bizMOB-Network.mdx",
+      "file_name": "bizMOB-Network.mdx",
+      "file_type": "mdx",
+      "chunk_index": 2,
+      "total_chunks": 3,
+      "chunk_strategy": "guides/api-docs",
+      "chunk_size": 300,
+      "overlap": 0,
+      "original_metadata": {
+        "word_count": 320,
+        "parsed_at": "2025-08-01T07:01:15.352029"
+      },
+      "position": {}
+    },
+    "tokens": 243,
+    "char_count": 787,
+    "created_at": "2025-08-01T17:03:08.884Z"
   }
 ]
