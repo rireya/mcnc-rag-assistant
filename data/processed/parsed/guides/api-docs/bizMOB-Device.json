@@ -1,0 +1,15 @@
+{
+  "content": "<product>xross</product>\n<language>javascript</language>\n<Namespace>bizMOB</Namespace>\n\n<class name=\"Device\">\n  <description>\n    Front화면 개발시 Native 앱 또는 디바이스 정보를 제공하는 Class.\n    디바이스/앱 정보는 bizMOB Native app에서 직접 이 Class내 프로퍼트로 저장합니다.\n    저장 시점은 3.x에서는 웹뷰 생성시마다 loading complete 또는 Resume 이벤트시에 저장되며,\n    4.x에서는 SPA방식의 환경으로 loading complete 초기1회만 정보를 저장합니다.\n  </description>\n  <method name=\"isIOS\">\n    <description>실행환경이 iOS인지 아닌지 유무 내용을 제공</description>\n    <request />\n    <response>\n      <type>boolean</type>\n      <response>iOS 환경 여부를 나타내는 Boolean 값</response>\n      <value>\n        <case condition=\"iOS 환경\">true</case>\n        <case condition=\"기타 환경\">false</case>\n      </value>\n      <example>true</example>\n    </response>\n    <example>\n    ```js\n      if (bizMOB.Device.isIOS()) {\n        requestTr.bioType = \"face\";\n      } else {\n        requestTr.bioType = \"finger\";\n      }\n    ```\n    </example>\n  </method>\n</class>",
+  "tables": [],
+  "images": [],
+  "metadata": {
+    "word_count": 92,
+    "char_count": 931,
+    "file_type": "mdx"
+  },
+  "file_path": "data/source/guides/api-docs/bizMOB-Device.mdx",
+  "file_name": "bizMOB-Device.mdx",
+  "parsing_method": "github_actions_python",
+  "parsed_at": "2025-08-01T07:01:15.352524",
+  "file_hash": "65526b7a55a92826c9231b44632b1588"
+}

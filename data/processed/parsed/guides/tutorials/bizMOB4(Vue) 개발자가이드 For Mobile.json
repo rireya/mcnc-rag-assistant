@@ -1,0 +1,4436 @@
+{
+  "content": "\n--- 페이지 1 ---\n bizMOB4(Vue) 개발자가이드\nFor Mobile\nInnovative Mobile & Fintech Solutions, Ready to Provide\nSam Kim\n\n--- 페이지 2 ---\nbizMOB4(Vue)\n\n--- 페이지 3 ---\n3\nI. Mobile Platform\nbizMOB4 Vue\n\n--- 페이지 4 ---\n4\nbizMOB4 Vue – Mobile Platform\n✔\nPlatform 의 필요성\nWith Platform\nWithout Platform\n개발 기간\n개발 툴 및 기반 SW 제공으로 짧게 걸림\n無에서 새로 개발해야 하므로 길게 걸림\n품질 보증\n이미 검증된 플랫폼 사용하므로 보증가능\n개발 결과물의 품질 보증할 수 없음\n운영 및 관리 환경\n플랫폼에서 운영 및 관리 환경 제공\n별도로 개발해야 함\n서비스 확장\n플랫폼 기반으로 손쉽게 확장 가능\n기존 시스템 수정해야 하므로 어려움\n유지 보수\n플랫폼 제공 업체에서 정기적 패치 적용\n개발된 업무 컨텐츠만 유지 보수하면 됨\n전체 시스템 소스를 잘 알고 있는 \n개발자만 유지보수 가능\n개발 비용\n플랫폼 라이선스가 따로 필요하나,\n개발비 감소로 전체 비용은 작음\n라이선스는 따로 없으나, 개발비용이 커서\n전체 비용은 큼\n개발자 수준\n주요 기술은 플랫폼에서 제공하므로, 필요한\n개발자 수준이 아주 높지 않음\n모든 것을 새로 구현해야 하므로 필요한 \n개발자 수준이 아주 높아야 함\n위험 관리\n플랫폼에 위험 관리 경험과 기술이 축적되어\n예상치 못한 상황에 대한 대처가 쉬움\n예상치 못한 상황 발생시 위험 부담 큼\n다양한 단말 대응\n다양한 OS와 해상도의 단말에 대한 방안이\n플랫폼에 녹아 있어 쉽게 대응 가능\n다양한 단말에 일일이 대응하여 개발 해야 함\n보안\n플랫폼에서 보안 정책 제공\n보안을 위한 정책 및 SW 별도 개발해야 함\n플랫폼을 사용하여 App을 제작하는 것이 다양한 측면에서 월등한 이점을 가지고 있습니다.\n\n--- 페이지 5 ---\n5\nbizMOB4 Vue – Mobile Platform\n✔\nMobile 플랫폼 Client - 개발기술비교\n개발방법\nNative App\nMobile Web\nHybrid App, Web\n개요\n• OS에서 제공하는 기능/UI개발가능 \n• 성능이 최적화 가능  \n• 디바이스 기능 사용 유리\n• 숙련된 개발자 적고 러닝커브가 길다. \n유지 보수 시 상이한 개발 기술자 \n(안드로이드/아이폰/윈도우 모바일) \n• WEB Site 개발 방식과 동일 \n• 웹 개발자 수급 용이\n• 개발 리소스 절약 (One source multiplatform) \n• OS에 맞는UI개발 불가능 \n• 보안취약 \n• 웹 기능외 디바이스 기능 일부 사용\n• 배포 시 서비스 중단\n• UI는 웹 기술을 이용\n• 디바이스 기능은 자바스크립트 API를 \n이용하여 네이티브 전체기능 사용가능\n• 자바스크립트 API는 하이브리드 \n프레임워크에 의해 제공\n•  모바일 웹의 장점인 개발 리소스는 절약됨\nUI\nNative UI Component\n( OS Vender provided )\n Web ( HTML, CSS, JS )\nNative UI Component(OS Vender Provided) \n                    + \nWeb Component ( HTML, CSS, JS )\nCommunication \nProtocol\n Socket 기반\n( HTTP, SOAP, etc )\n HTTP\n Javascript API + Socket 기반\n( HTTP, SOAP, etc )\nData type \ntext or binary preferred, xml, json \nHTML , JSON\nHTML, JSON\n\n--- 페이지 6 ---\n6\nbizMOB4 Vue – Mobile Platform\n✔\nMobile 플랫폼 Client  - 개발 방식 비교 \nNative 방식 개발\nWeb App 방식 개발\nHybrid 방식 개발\nWP\nContainer\nAndroid \nContainer\niPhone \nContainer\nConcept\n장점\n단점\n단일 WebKit (HTML, css, JS)\nWP\nContainer\nAndroid \nContainer\niPhone \nContainer\nConcept\nOS 특화된 UI Container\n단일 Web App(HTML)\n장점\nApp 개발시 Web의 장점(UI)과\nNative의 장점(기능) 사용\n개발인력 多\n단점\n중간 성능\nConcept\nHTML표준으로 Web 구현\nAny Browser 상에서 구동\n장점\nOS 상관없이 Web 표준으로 \nPC/모바일 전체 사용가능\n단점\n낮은 성능, 보안, \n단말기능 사용제한\nHTML, CSS, JS\nWeb Browser\n각 OS에 맞게 전용 App 개발\n최적화된 성능, 보안\n개발 및 유지보수 고비용\n숙련된 개발자 수급 힘듬\n\n--- 페이지 7 ---\n7\nbizMOB4 Vue – Mobile Platform\n✔\nMobile 플랫폼 Client  -  특장점 비교\n구분\nNative App 방식\nWeb Browsing 방식\nHybrid App 방식\n어플리케이션타입\n 바이너리( OS 별 )\n 웹 어플리케이션 배포파일\n App+ Web\n배포방법\n 어플리케이션 배포\n 필요 없음\n 최초App은 배포\n업그레이드\n 어플리케이션 업그레이드\n 웹 서버에 어플리케이션 배포\n 어플리케이션 업그레이드 + \n Web Application Update\nUI 수준(난이도)\n 상\n 하\n 하\nGraphic Performance\n상\n하\n중\n어플리케이션개발자\n App 개발자( OS별 )\n ( Window : C, Android : Java, iOS : Obj.C)\n웹 개발자\n App 개발자+ 웹 개발자\n개발 편의성\n 웹 지식필요\n  플랫폼에 대한 지식필요\nApp + Web 지식\n원격삭제\n 수용가능\n 불가능\n 수용가능\n복사제어\n 가능\n 어려움\n 가능\n파일다운로드제어\n 가능\n 어려움\n 가능\n단말원격제어\n 가능\n 어려움\n 가능\nPush 서비스\n 가능\n 어려움\n 가능\n로컬자원활용\n 일부가능\n 어려움\n 일부 가능\n멀티 플랫폼 지원\n어려움\n쉬움.\n중간\nOffline Mode\n기본지원\n불가능\n가능\n다중 사용자 공동작업\n어려움\n쉬움\n쉬움\n키보드Customizing\n 가능\n 불가능\n 가능\n단점\n OS별 Application 개발\n Device Control 제한\n Security, Privacy Manage 불가\n OS 별 최소의App 개발,재활용성 높음\n\n--- 페이지 8 ---\n8\nbizMOB4 Vue – Mobile Platform\n구분\nCordova\nPlatform\n개요\nApp Framwork\nApp 개발 및 관리/배포/운영/통계 기능 포함\n보안\n버전 별 취약점 존재 ( 일부 버전 오픈마켓 제약 )\nCordova 기반 제품 : 버전별 취약점 존재\n비 Cordova : 개발사 기준\n보안 패치\nCordova 공식 Update 기준\nCordova 기반 제품 : Cordova 공식 Update 기준\n비 Cordova : 즉시 지원\n배포형태\nApp내 웹 컨텐츠 포함. \nNative방식과 동일한 App Update통한 배포\n개발사 기준\n개발도구\n각 OS 별 개발 도구(Visual Studio, Eclipse 등) 기반에Cordova SDK 설치\nEclipse , IntelliJ등 일반 개발 도구의 플러그인 설치 ( 개발사 기준 )\n개발실행환경\n각 OS별 개발 도구에 따른 Runtime\n각 제조사별 Emulator\n기능수정\nPlugIn 형태의 추가 개발\n전체 소스 수정 가능\n서버모듈\n없음\nClient 통신 Protocol과 상응하는 Server군 필요\n✔\nFramework VS Platform - Cordova 와 플랫폼 비교\n\n--- 페이지 9 ---\n9\nbizMOB Platform\nbizMOB4 Vue\n\n--- 페이지 10 ---\n10\nbizMOB4 Vue – Mobile Platform\nApplication Level\n( HTML5, CSS, TypeScript, Vue , Ionic )\nContainer Service Level\n( Native API )\nBase\nBase\nExt\nCore Level\n( Service Manager )\nApplication Level\n( Java )\nCore Level\n( Service Manager )\nbizMOB™ Server Platform\nProvided \nLevel\nHidden\nLevel\nWeb\nApplication\n• 프로젝트 요건에 따른 Application Source \n   ( Html, CSS, TypeScript, Vue , Ionic )\nProvided \nLevel\nHidden\nLevel\nContainer\n• Mobile Base Plug-In ( Push,  Camera,, GPS, etc )\n• Project Extends Plug-In\nCore\n• Navigation Management\n• Session Management\n• Window Stack Management\n• Base Plug-In, Process Control\n• Event Management\nApplication\n• 프로젝트 요건에 따른 Application Source \n  ( Java Adapter )\nCore\n• Data, Thread, Interface control\n• Device , User Monitoring\n• General Aspect\n• Client Support Service\n✔\nbizMOB Platform – 계층 모델 \nbizMOB™ Client Platform\n\n--- 페이지 11 ---\n11\nbizMOB4 Vue – Mobile Platform\n✔\nbizMOB Client Architecture\nWeb App(HTML5, CSS, TypeScript, Vue, Ionic )\nAndroid\nContainer\niOS\nContainer\nWindows\nPhone\nContainer\nPlug-in\nPlug-in\nPlug-in\nPlug-in\nPlug-in\nPlug-in\nAndroid\niOS\nWinodws\nPhone(*)\nOnce-source Multi-use\nHTML, CSS, JS로 업무 UI를 개발하여 각 OS별 Container 상에서 \n동일에서 동작.\n1\n4\n2\n3\n단말 및 OS에 특화된 Container\nOS 별 : Android, iOS\n화면 사이즈별 : 스마트폰, 패드\nPlug-in을 통한 기능 확장\nBase Plug-in : 서버통신, 전화, 카메라, 파일시스템, 전화번호부 등\nCustom Plug-in : 외부기기 연동, 외부 라이브러리 연동 등\nOS 버전 업그레이드에 대한 기술 대응\n새로운 OS나 버전이 나올 때, 시장의 상황에 맞게 Container \n업그레이드 제공\n\n--- 페이지 12 ---\n12\nbizMOB4 Vue – Mobile Platform\n✔\nbizMOB Mobile Platform  - Hybrid 구성 방식\nbizMOB™ Hybrid App은 HTML UI 템플릿을 단말의 안전한 저장소에 보관하며, 서버에서는 데이터만 가져 옵니다. 이를 통해  \nTransaction 속도를 향상시킬 수 있으며, 강력한 보안 및 버전 관리가 가능합니다.\nApp 영역(Native)\nApp 영역(Native)\n* bizMOB™ 플랫폼은 이 방식도 \n지원합니다.\nUI 리소스를 제외한 최소의 데이터 Transaction 수행, 속도 \n향상\n전송되는 데이터에 대한 암호화 등 보안 처리 \n탁월\n2\nClient 소스는 앱실행시 강제 업데이트 다운로드로 최신버전 \n보장\n3\nbizMOB™ Hybrid App – 샌드박스 방식\n일반적인 Hybrid Web – 웹캐싱 방식\nJSON : 일반업무 \nBinary : 업그레이드\n             첨부파일        \n             (보안채널 \n지원)\n Storage\n웹브라우져 캐시\n보안취약,저장용량 한계\n최신 버전 보장 불가\nWeb Cache\n1\nHTML(WebView) 영역\nHTML(WebView) 영역\nHTML/HTTP(S)\n웹서버기반의 \n버전관리\n매번 캐싱 여부 체크\n캐싱된 데이터 \n해킹가능\n앱 변경 없이 \n관리자 포탈에서 \n변경된 템플릿을\n압축 전송하여 \n업그레이드\n\n--- 페이지 13 ---\n13\nbizMOB4 Vue – Mobile Platform\n✔\n앱 배포 및 업데이트\nbizMOB™ 하이브리드 앱의 배포는 관리자 포탈과 앱스토어 서버를 통해 이루어지며, 초기 배포 후에는 2단계로 분리된 자동 \n업데이트 메커니즘을 통해 픽스 및 업그레이드 패치가 이루어집니다. B2C용 앱 초기 배포는 Open Market( Google Play store와 \napple appStore ) 을 통해 이루어 집니다. \n초기 \n하이브리드 \n앱\n초기 앱 등록 및 배포\n관리자 \n포탈\n앱스토어 \n서버\n등록\n등록\n접속/다운로드/설치\n자동 업데이트\nUI 업데이트\n(HTML)\n관리자 \n포탈\n등록\n컨테이너(앱) \n업데이트\n(Native)\n앱스토어 \n서버\n등록\n로그인 시 업데이트 \n체크\n업데이트 있으면 \n자동 업데이트 \n진행\n1\n1\n2\n1\n1\n2\n3\n\n--- 페이지 14 ---\n14\nbizMOB4 Vue – Mobile Platform\n✔\nbizMOB Platform 제품군 - Service Builder(개발 환경 제품)\nService Builder 는 클라이언트(모바일)와 서버간의 전문 설계/관리 툴로, 전문의 생성, 수정, 테스트 기능을 제공하며, 개발자간에 \n전문 공유를 쉽게 제공하여 변경된 전문을 바로 확인을 할 수 있도록 합니다.\n구  분\n특   징\nJSON 타입 사용 \n웹에서 널리 쓰이는 JSON 타입은 파싱과 빌드를 위한 오픈 라이브러리를 사용할 수 있어,\n 어느 개발자나 쉽게 개발할 수 있음. 이를 통해 생산성을 크게 높임.\n스키마 파일의 생성\nJSON 스키마를 생성하여 서버와 클라이언트간에 주고 받는 데이터를 validation을 할 수 있도록 하여 \n전문의 안전성을 확보.\n전문 테스트\n생성한 전문을 테스트 하는 기능을 제공하여 전문에 대한 입력값과 결과값을 확인\n사용자 편의성\n개발자가 쉽게 사용 가능한 UI를 제공하여 빠르게 전문 생성\n개발자가 전문마다 중복으로 작성하는 소스 코드를 자동 생성\n하나의 서비스에 대해 클라이언트 화면UI에서부터 레거시 \n어댑터까지 서비스 흐름을 한눈에 확인\n개발 생산성\n개발 용이성\n\n--- 페이지 15 ---\n15\nbizMOB4 Vue – Mobile Platform\n✔\nbizMOB Platform 제품군 - Service Builder\n< HE003 전문 >\n개별 POJO 클래스 생성 \n전문1개에 Java 패키지 1개 \nClient 전문 요청\n\n--- 페이지 16 ---\n16\nbizMOB4 Vue – Mobile Platform\n✔\nbizMOB Platform 제품군 - Admin Portal\n회사 관리\n1\n단말기 관리\n2\n어플리케이션 관리\n3\n사용자 관리\n4\n통계 관리\n5\n모니터링\n6\n로그 관리\n7\n• 지원 단말 리스트\n• 지원 단말 등록, 삭제\n• 지원 단말 세부 정보\n• 기업용 어플리케이션 리스트\n• 기업용 어플리케이션 등록, 삭제 \n• 기업용 어플리케이션 세부 정보\n• 사용자 리스트\n• 사용자 등록, 삭제\n• 사용자 세부 정보\n• 등록 단말기 리스트\n• 기간별 접속 현황\n• 기간별 사용 현황\n• 업무별 사용 현황\n• 서버 자원 모니터링\n• 서버 상세 정보\n• 포탈 로그\n• 어플리케이션 사용 로그\n• 회사 리스트\n• 회사 정보\n• 회사 등록, 삭제\n\n--- 페이지 17 ---\n17\nbizMOB4 Vue – Mobile Platform\nNative PlugIn 연동 개발 시에  Front 화면에서 API 호출에 의한 간편하게 Native기능을 구현 할 수 있습니다.\nbizMOB™ Developer Site, Sample App을 통해 이슈, Forum, API 등 다양한 정보를 제공 하고 있습니다.\n[Sample App \nExamples]\n[ API WebSite \n]\n✔\nbizMOB Platform 제품군 - Xross 와 Core ( Javascript API )\n\n--- 페이지 18 ---\n18\nbizMOB4 Vue – Mobile Platform\n항목\n설명\n대표기능\nApp\nApp(bizMOB) 관련 API\n앱 종료,  앱 타임아웃\nDevice\n단말기 관련 API\n단말기 정보\nSystem\nOS 제공 기능 API\n전화, 문자, 지도\nContacts\n연락처 관련 API\n연락처목록 검색\nNetwork\n네트워크 관련 API\nbizMOB 서버 통신\nFile\n파일 관련 API\n파일 정보, 복사, 삭제, 압축, 다운로드,  업로드\nProperties\n영구 저장소 관련 API\n영구 데이터 저장, 삭제\nStorage\n휘발성 저장소 관련 API\n휘발성 데이터 저장, 삭제\nDataBase\n컨테이너 SQLite DB 관련 API\nDB 연결, CRUD\nLogger\nWeb Application 로깅 관련 기능\n로그 기록\n✔\nbizMOB Platform 제품군 - bizMOB Xross 와 Core ( Javascript API )\n\n--- 페이지 19 ---\n19\nbizMOB4 Vue – Mobile Platform\n✔\nbizMOB Client Architecture – Xross, Core\nContainer Core\nBase PlugIn\nCustom\nPlugIn\nbizMOB Container Framework\nXross\nCore\nbizMOB Web Framework\nMobile Device ( OS )\nWeb\nApplicatio\nn\nHTTP\nJSON\nNetwork\nProperties\nStorage\nEtc\nClass\nProperties\nNetwork\nStorage\nEtc\nInterface\nNetwork\n\n--- 페이지 20 ---\n20\nbizMOB4 Vue – Mobile Platform\n✔\nbizMOB Client Architecture – Event\nContainer Core\nBase PlugIn\nCustom\nPlugIn\nbizMOB Container Framework\nXross\nCore\nbizMOB Web Framework\nMobile Device ( OS )\nWeb\nApplicatio\nn\nEvent\nJSON\nEventManager\nNetwork\naddEvent\nStorage\nEtc\nInterface\nEvent\nHandler\nEvent\nHandler\nRespon\nser\nEvent\nJSON\n\n--- 페이지 21 ---\n21\nbizMOB4 Vue – Mobile Platform\n✔\nbizMOB Client Architecture – Callback\nContainer Core\nBase PlugIn\nCustom\nPlugIn\nbizMOB Container Framework\nXross\nCore\nbizMOB Web Framework\nMobile Device ( OS )\nWeb\nApplicatio\nn\nCallback\nJSON\nCallbackManager\nNetwork\nEtc\nInterface\nUser\nCallback\nUser\nCallback\nCallback\nJSON\nNetwork\nNetwork\nStore\nResponser\n\n--- 페이지 22 ---\n22\nbizMOB4 Vue – Mobile Platform\n✔\nbizMOB Client Architecture - \n통신프로토콜\n모바일 클라이언트 <-> 모바일 서버\n     - JSON 전문 over HTTP\n     - 보안을 강화하기 위해서 SSL을 적용한 HTTPS 사용 가능\nbizMOB Server\n( Switch , Web Server 연동)\nLegacy Server\nbizMOB Container\nRequest over HTTP(S)\nSocket, HTTP, UDP, \netc\n-URI\n   > 전문번호\n-Parameter\n   > JSON 전문\n- Defined Protocol\n- Defined Message\nResponse over \nHTTP(S)\n-By-pass\nbizMOB Web\nRequest over HTTP\n-URI\n   > 전문번호\n-Parameter\n   > JSON 전문\nResponse over \nHTTP(S)\n- javascript Function Call\n  > Callback ID\n- Parameter\n  > JSON 전문\nSocket, HTTP, UDP, \netc\n- Defined Protocol\n- Defined Message\n\n--- 페이지 23 ---\n23\nbizMOB4 신규/변경 기능\nbizMOB4 Vue\n\n--- 페이지 24 ---\n24\nbizMOB4 Vue - Directory Structures 1/2\n프로젝트 폴더 구성\n폴더/파일 명\nDescription\n/dist\n프로젝트 배포시에 빌드된 컨텐츠 파일이 생성되는 폴더. 해당 폴더 아래 환경설정 이름을 가진 폴더가 생성되고 그 \n하위에 배포 컨텐츠가 생성된다.\n/node_module\nPackage.json에 정의된 설치한 모든 플러그인 파일들이 생성된다. \n주의) 용량이 매우 크므로 svn에 저장하지 않는다.\n/public\n정적인 Resource를 저장하는 공간으로 폰트, 외부JS lib와 같은 것들만 저장한다.\n/public/bizMOB\nNative API script lib  주의) 수정 금지.\n/public/mock\n서버 전문이 정의되고 서버 개발이 완료되기 전까지 사용하기 위한 mock데이터를 정의한 json파일 폴더\n/public/extlib\n외부 javascript lib 파일 저장 폴더\n/public/fonts\n특정 폰트 사용시 저장 폴더. Default : Google NotoSans Font\nIndex.html\nWelcome 파일\n/src\n프로젝트 소스 폴더\n/src/assets\n프로젝트 리소스파일 저장 폴더 css, image 파일들을 저장한다.\n/src/locales\n다국어 설정시 언어팩 저장 폴더\n/src/router\nView Rounting 설정 폴더\n/src/shared\n프로젝트 공통 기능 class 정의폴더. bizMOB, constants(상수선언), project( 프로젝트 공통 ) 으로 분류\n주의) bizMOB 폴더내 파일은 수정 금지.\n/src/store\n공유 데이터 사용 Vuex plugin 폴더 주의) 수정 금지.\n/src/views\nView Screen 저장 폴더\n\n--- 페이지 25 ---\n25\nbizMOB4 Vue - Directory Structures 2/2\n프로젝트 폴더 구성\n폴더/파일 명\nDescription\n/src/App.vue\nBootstraping vue 파일. \n주의) 어플리케이션 초기화 관련 로직 외에는 코딩하지 않는다.\n/src/main.ts\nBootstraping Class 파일. \n주의) 어플리케이션 초기화 관련 로직 외에는 코딩하지 않는다.\n/env\n/env.xxxxxxx\n어플리케이션 환경변수 정의 파일\n/package.json\n/package-lock.json\n설치한 npm 플러그인 정보 파일\n주의) 플러그인 설치시 cli를 통해서만 설치/삭제 한다.\n/vue.config.js\nVue framework 설정 파일\n\n--- 페이지 26 ---\n26\nbizMOB4 Vue – 화면제어\nVue Router Class를 활용하여 화면을 제어하며 bizMOB3.x 의 WebView 스택이 중첩되는 구조가 아님. \nOpen\nClose\nReplace\n새로운 화면을  생성\n- 이전 화면의 상태를 보존이 필요할 경우 ( 화면 목록 )\n- 일반적인 게시판 목록/상세 구조 개발 시 사용\nSample Project ( Vue3 – Navigator 참조 )\ne.g ) this.$route.push(“/bbs/detail”);\n다른 화면으로 이동\n- History Back시 이전 화면으로 돌아가기 \n- 화면의 스텝이 단계별로 진행되는 경우 사용 ( 단계별 화면 이동 \n설계시 )\nSample Project ( Vue3 – Navigator 참조 )\ne.g ) this.$route.replace(“/bbs/step2”);\n\n--- 페이지 27 ---\n27\nbizMOB4 Vue – 환경 설정\napp.config – 앱 구동 설정, 환경별로 설정 추가 가능\n/public/bizMOB/app.config\n-\n기본적으로 Production(운영), UAT(staging), SIT(개발환경)\n을 제공한다.\n-\n추가 환경설정이 필요할 경우 Native팀과 협의하여 추가 \n가능하다.\nDepth 1\nDepth 2\nDepth 3\nDescription\n설정값\nVERSION                 \nNATIVE\n앱 버전 정보\n4.0 ( 임의 설정 금지 )\nFRONT\n프론트 버전 정보\n4.0 ( 임의 설정 금지 )\nSETTINGS\nTYPE\n앱 타입 \nB2B , B2C\nAPPLICATION_TYPE\n앱 모드 \nMOBILE , WEB\nNOTICE_USE\n공지기능 사용 여부\ntrue, false\nSECURITY\nCONTENTS_INTEGRIT\nY\nContents 위변조검사 실행 여부\ntrue, false\nINACTIVITY_SECOND\nS\n앱 미사용 시간 설정(초단위)\n0 (Unlimited), 1 이상 정수\nSTATUSBAR\nMODE\n표시 모드 설정\nDEFAULT , EXTEND , FULL\nBGCOLOR\n배경색\nRGB 값.\nTEXT_BLIGHT\n야간모드 설정\nBLACK/WHITE\nWEBVIEW\nBACKGROUNDCOLOR\nNORMAL\n웹뷰 배경색\naRGB 값.\nDIALOG\n팝업 창 배경색\naRGB 값.\nNETWORK\nFILE\nCONNECT\n파일 업로드/다운로드시 서버 Connection Timeout 시간설정\n(초단위)\n1 이상 정수\nREAD\n파일 업로드/다운로드시 서버 ReadTimeout시간설정(초단위)\n1 이상 정수\nAPI\nCONNECT\n전문 통신시서버 Connection Timeout시간설정(초단위)\n1 이상 정수\nREAD\n전문 통신시 서버 ReadTimeout시간설정(초단위)\n1 이상 정수\nPUSH\nURL\nbizPush 서버 URL\nURL String\n앱 설정 세부항목\n\n--- 페이지 28 ---\n28\nbizMOB4 Vue \nII. LifeCycle Hooking\n\n--- 페이지 29 ---\n29\nbizMOB4 Vue  – LifeCycle\n개요\n일반 웹 파일이 렌더링 되는 과정처럼 Vue프레임워크에서는 각 Vue Component들이 생성/삭제 될때 마다 각 과정별로 Event Handler \n인터페이스를 제공한다. Component 의 전체 lifecycle은 오른쪽 그럼과 같다.\nDescription\nHooking Method\nDescription\nsetup()\n렌더링 엔진이 Component를 로드 했을때 발생하는 이벤트. Composition API인 setup 메소드로 정의 할 \n수 있다.\nbeforeCreate()\n렌더링 엔진이 Component instance 생성/초기화 한 직후에 발생하는 이벤트.\ncreated()\nComponent instance의 전체 Options API를 실행한 직후에 호출되는 이벤트\nbeforeMount()\n생성된 Component instance를 DOM에 삽입 직전에 호출되는 이벤트\nmounted()\nDOM에 로드 후 호출되는 이벤트. Window Object의 load 이벤트와 동일하다.\nbeforeUpdate()\nComponent내 Re-rendering/painting 되기 직전에 호출되는 이벤트\nupdate()\nComponent내 Re-rendering/painting 된 후에 호출되는 이벤트\nBeforeUnmount()\nComponent가 DOM에서 삭제되기 전에 발생하는 이벤트\nunmounted()\nComponent가 DOM에서 삭제 된 후 발생하는 이벤트\n\n--- 페이지 30 ---\n30\nbizMOB4 Vue \n 코딩 가이드\n\n--- 페이지 31 ---\n31\nbizMOB4 Vue – 코딩 준수사항\nbizMOB에서 javascript Library 수정 금지 ( Xross, Core )\n    /public/bizMOB 하위 javascript Library에 대한 재정의 금지, 개선사항 및 버그가 존재하는 경우 담당자에게 수정을 요청\nshared 폴더내 Service Classes 수정 금지\n    /src/shared/bizMOB 하위 typescript services에 대한 수정 금지. 개선사항 및 버그가 존재하는 경우 담당자에게 수정을 요청\n변수, 함수 명명\n  의미있는 이름으로 부여\n  변수 및 함수는 Camel Casing(소문자를 기본으로, 구분되는 단어의 첫글자를 대문자로) 규약 적용\n  올바른 예) userName(사용자명), orderDate(주문일)\n  잘못된 예) a, num1, Value, tmp\n  상수는 대문자를 기본으로 하고 구분되는 단어 사이에 ‘_’  삽입\n     ex) GRADE_A(A등급)\n  bizMOB 전문의 request는 ‘req’ + 전문코드 선언\n  bizMOB 전문의 response는 ‘res’ + 전문코드 선언\nCode Format\n  제어문(if, for 등)에서 {} 생략없이 사용하고 {}는 줄바꿈을 사용하여 코딩\n  String을 선언할 경우 ‘ 대신 “ 사용\n  조건문/반복문에 사용되는 비교값은 하드코딩하지 않고 상수로 선언하여 사용\n  상수 변수는 대문자로 단어의 구분은 “_”를 사용하고 Page변수내 선언하거나 공통파일( ex : common.js )을 생성하여 관리.\n준수사항\n\n--- 페이지 32 ---\n32\nbizMOB4 Vue – 코딩 준수 사항\n조건/반복문\n  분기하는 사유 또는 조건을 설명. 비교값은 변수명을 의미있게 부여하여 사용한다.\nStatic Resource\n  정적인 리소스들은 반드시 public 폴더 하위에 두어 사용합니다. \n   > bizMOB  : bizMOB Framework 관련 파일들\n   > extLib : 외부 JS library 를 위한 폴더\n   > fonts : 앱에서 사용할 font 파일. 기본 폰트로 Google NotoSans 폰트가 있다. ( 다국어 프로젝트일 경우는 필수 )\n   > mock : 서버 전문 통신시 mock data를 활용하기 위한 response json 설정 파일 폴더\n준수사항\n1.\n //Correct Case\n2.\n// 선택된 제품이 사용자가 선택할 수 있는 제한 갯수를 넘을 경우\n3.\n if(productCheckList.length > \nbizMOB.Constant.MAXIMUM_COUNT)\n4.\n {\n5.\n }\n1.\n// Bad Case\n2.\n // 선택된 제품이 사용자가 선택할 수 있는 제한 갯수를 넘을 경우\n3.\n if(productCheckList.length > 10 )\n4.\n {\n5.\n }\n\n--- 페이지 33 ---\n33\nbizMOB4 Vue – Vuex 활용하기\nVuex를 사용하는 이유\n기본적으로 vue 생태계에서 컴포넌트 간 여러 정보들을 관리하려면 부모-자식 관계로 데이터들을 넘겨주고 받아야한다. 하지만 현실적으로 복잡한 컴포넌트 관계속에서 \n계속 주고 받으려면 여러 컴포넌트 파일에서 data 속성을 관리해주어야 하는 단점이 있다.\n따라서 여러 컴포넌트에서 공유해야할 데이터가 있다면 Vuex를 활용하여 데이터를 주고 받으면 편리하다.\nState VS WebStorage\nWeb 어플리케이션 개발시 대표적인 데이터 공유 Storage 기능으로 브라우져의 Web Storage 기능이 있다.\n스토리지는 Local/Session 두가지 종류의 스토리지 기능을 제공 하지만 몇가지 차이점을 이해 해야한다.\nVuex(state)\n  LifeCycle : State는 어플리케이션 종료시( Framework Reload 또는 브라우져 새로 고침 ) 데이터가 초기화\n  Data 공유 : 실시간으로 Component간에 공유된다.\n  적용대상 : Application 전체 및 여러 Component끼리 실시간으로 공유되어야 하며 Application 시작시 \n                데이터 갱신이 필요한 경우 e.g ) 로그인 후 사용자 정보, 사용자별 메뉴 권한\nLocalStorage\n  LifeCycle : 영구.\n  Data 공유 : 각 Component에서 매번 데이터를 호출하여 갱신하여야 한다..\n  적용대상 : Application 전체 및 고정 데이터로서 여러 Component에서 공유할 데이터가 필요한 경우\n \nSessionStorage\n  LifeCycle : 브라우져 종료시\n  Data 공유 : 각 Component에서 매번 데이터를 호출하여 갱신하여야 한다..\n  적용대상 : Application 전체 및 고정 데이터로서 여러 Component에서 공유할 데이터가 필요한 경우\n\n--- 페이지 34 ---\n34\nbizMOB4 Vue – Vuex 활용하기\nService로 사용하기\nbizMOB GlobalSharedService 를 import 합니다. setup composition API내 서비스를 생성합니다.\nimport GlobalSharedService from “@/shared/bizMOB/GlobalDataService”;\nsetup(){\n    const { getGlobalDataByKey,removeGlobalDataByKey, setGlobalDataByKey } = GlobalSharedService();\n    return {   getGlobalDataByKey,removeGlobalDataByKey, setGlobalDataByKey   }\n}\n제공된 mutations를 사용하여 데이터를 사용합니다. 저장할 데이터 Type은 원하는 형태로 지정시 자동으로 \n저장됩니다.\nmounted(){\n    this.setGlobalDataByKey(\"mydata1\",\"Composition String\");\n    this.setGlobalDataByKey(\"mydata2\",{data1:\"Composition JSON\"} );\n},\nClass로 사용하기\nbizMOB GlobalDataUtil Class를 import 합니다. setup composition API내 인스턴스를 생성합니다\nimport GlobalDataUtil from '@/shared/bizMOB/GlobalDataUtil';\n setup() {\n    const gdu = new GlobalDataUtil();\n    return { gdu }\n  },\n제공된 methods를 사용하여 데이터를 사용합니다. 저장할 데이터 Type은 원하는 형태로 지정시 자동으로 \n저장됩니다.\n this.gdu.setGlobalDataByKey(\"Function1\",\"Function String\" );\n this.gdu.setGlobalDataByKey(\"Function2\",{data1:\"Function JSON\"} );\n1. Custom state 사용을 원할 경우 ProjectSharedModule.ts를 수정하여 \n직접 구현할 수 있습니다.\n2.별도 모듈 생성시에는 등록과정이 필요합니다.\n\n--- 페이지 35 ---\n35\nbizMOB4 Vue – mock 데이터 활용하기\nmock data 정의\n  프로젝트 초기 Server 전문이 미 완성일 경우 Service Builder에 정의된 내용을 기반으로 bizMOB 전문 프로토콜의 Response Object를 정의하여 사용한다.\n    mock data file 생성                                                                                      component 내 사용 예시\n1.\n// 기본 포맷\n2.\n{\n3.\n    \"header\": {\n4.\n\"result\": true,\n5.\n\"error_code\": \"\",\n6.\n\"error_text\": \"\",\n7.\n\"trcode\": \" HAL0010\", // Service Builder에 정의된 TrCode\n8.\n\"trcodeName\": \"\"\n9.\n    },\n10.\n    \"body\": {\n11.\n             // Service Builder에 정의된 내용 작성\n12.\n    }\n13.\n}\n1.\nthis.$bizMOB.Network.requestTr({\n2.\n          _bMock: true ,  // true로 설정시 정의한 mock데이터를 \n리턴\n3.\n          _sTrcode: \"HAL0010\",\n4.\n          _oBody: {\n5.\n                   // Service Builder에 정의된 내용 작성 \n6.\n           },\n7.\n          _fCallback: (res: any) => {\n8.\n               // json에 정의된 mock data가 parameter로 전달\n9.\n           } \n10.\n});\n\n--- 페이지 36 ---\n36\nbizMOB4 Vue – Component\n개요\n컴포넌트를 생성하기 위한 html, vue 파일 기본 설정을 따라 생성한다.\nComponent 폴더 생성\n프로젝트 내 메뉴 또는 기능에 맞게 폴더를 생성하여 하위에 Templet, Vue파일을 생성한다. 파일명은 UX설계서에 정의된 화면 ID를 기준으로 생성한다.\n ( 그림 1-1 )\nTemplet 파일 생성\n퍼블리싱 된 html파일을 복사하여 Templet파일에 붙여 놓고 저장한다. ( 그림 1-2 )\nVue 파일 생성\nVue 파일을 생성하고 Component에서 사용할 Templet 파일을 지정한다. ( 그림 1-3 )\n그림1-1\n그림 1-2 ( Intro.html )\n그림 1-3( Intro.vue )\n\n--- 페이지 37 ---\n37\nbizMOB4 Vue – Routes\n개요\n각 컴포넌트를 호출하기 위한 라우팅 정보를 세팅한다. \nDescription\nrouter/index.ts\n라우터 클래스를 로딩하여 선언할 수 있는 최상위 Root Router class이며 프로젝트에서 생성한\n라우팅 클래스를 import하여 설정 할 수 있다. ( 그림 1-1 그림 참조 )\nrouter/xxxx.ts ( Routes Class )\n라우터 폴더 내에 생성하고 모든 컴포넌트에 대하여 라우팅 정보를 생성한다.\n선언시 아래 Properties를 사용 하여 정의 한다. ( 그림 1-2 그림 참조 )\nProperies\nDescription\npath\n컴포넌트 호출시 URI로 호출할 경우에 대한 path 설정을 지정한다. 기본값은 \"/“(root)\n로 설정되어 있다.\ncomponent\nPath 설정과 매핑할 Component을 import한 후 class명을 설정한다.\nredirectTo\n특정 uri를 redirect 시키고 싶을때 설정한다.\n그림1-1\n그림 1-2\n\n--- 페이지 38 ---\n38\nbizMOB4 Vue - Component Communication\n컴포넌트간 데이터 공유를 위한 글로벌 공유 데이터 설정하기\n개요\nDescription\nService Import \nGlobal Data 설정을 위한 Service Class를 import합니다.\nimport GlobalSharedService from '@/shared/bizMOB/GlobalDataService’;\nsetup API에서 instance를 생성한다.\nconst { getGlobalDataByKey,removeGlobalDataByKey, setGlobalDataByKey } = GlobalSharedService();\nreturn { getGlobalDataByKey, setGlobalDataByKey, removeGlobalDataByKey, gdu }\nbizMOB API \n데이터 저장/삭제/조회는 API에서 제공하는 메서드를 통해 사용합니다.\nMethods\nDescription\nsetGlobalDataByKey\n데이터 저장, 데이터는 Script에서 제공하는 기본 데이터 \n타입으로 Key, Value 를 인자로 사용한다. (그림 1-1 참조)\ngetGlobalDataByKey\n데이터 조회, 저장시 지정한 Key값으로 조회한다. (그림 1-1 \n참조)\nremoveGlobalDataByKey\n데이터 삭제, 저장시 지정한 Key값으로 삭제한다. (그림 1-1 \n참조)\n그림 1-1\n\n--- 페이지 39 ---\n39\nbizMOB4 Vue - 다국어설정 ( i18n Module )\n {lang code}.json\n개요\n다국어 지원은 i18n Module을 사용합니다.\n참조 ) \n https://vue-i18n.intlify.dev/\nDescription\n지원 언어팩 생성하기\n/src/locale/ 폴더 하위에 lang cd값(ISO 639-1 codes 2digit)을 이름으로 하여 파일을 \n생성합니다.\n언어팩 설정\n생성한 언어팩 파일 내에 Project 규칙에 맞게 json 형태로 데이터를 작성합니다.\n{\n  \"intro\": {\n    \"title\": \"bizMOB sample project\"\n  },\n    \"main\": {\n      \"greeting\": \"Wellcome\",\n      \"name_greeting\": \"Hello {name}\"\n    }\n}\n모듈 문법 활용\nhttps://vue-i18n.intlify.dev/api/general.html#createi18n\n\n--- 페이지 40 ---\n40\nbizMOB4 Vue - 다국어 설정( 서비스등록 )\n다국어 프로젝트의 경우 서비스를 별도로 등록해야 동작을 하며 프로젝트 기본값은 서비스가 시작되지 않습니다.\n개요\nService import\nbizMOB LocalService Class를 import 합니다. setup Composition API를 활용하여 서비스를 \n생성합니다.\nsetup(){\n    const localSvc = new LocaleService();\n    \n    return {   localSvc   }\n}\nService 등록\nApp.vue 파일을 열고 LocalService를 시작합니다. mounted Composition API를 활용하여 \n서비스를 등록합니다.\nmounted(){\n    this.localSvc.initLocale();  \n},\n언어변경 설정\n사용자/어플리케이션내에서 언어변경시 감지를 위한 이벤트 및 LocalService의 이벤트 \n핸들러를 등록해 줍니다.\n watch: {\n    '$i18n.locale': function(newLocaleCd) {\n      this.localSvc.changeLocale(newLocaleCd);\n    },\n  },\n\n--- 페이지 41 ---\n41\nbizMOB4 Vue  - Logger\n어플리케이션 퍼포먼스를 위해서 로그 레벨을 환경별로 자동으로 조정되는 별도 Log Class를 사용합니다.\n개요\nlogger Class\nGlobal 사용등록된 로거 클래스를 바로 사용할 수 있습니다.\nthis.$logger\nMethods\nLog level에 맞게 각 로그 메소드를 사용합니다.\nMethods\nDescription\nlog\n개발시 필요한 정보를 표시합니다.\nInfo\n구간별 데이터 정보를 표시합니다.\nwarn\n예외처리에 대한 별도 로그를 표시합니다.\nerror\n에러 발생시 로그를 표시합니다.\n\n--- 페이지 42 ---\n42\nbizMOB 신규/ 변경 Native PlugIn\n\n--- 페이지 43 ---\n43\nbizMOB4 Vue – 신규/변경 Native PlugIns\n개요\n전체 네이티브 플러그인 사용 API정보는 아래 사이트를 참조 하십시오.\nhttps://developers.mcnc.co.kr/\nDescription\nClass\nbizMOB.Localization\n-\n다국어 정보 처리 \nMethods\nOptions\nreturn\nDescription\nsetLocale(options)\n_fCallback : 콜백 함수\nVoid\n현재 언어 정보를 저장합니다.\ngetLocale(options)\n_sLocaleCd : 설정 언어코드\n_fCallback : 콜백 함수\n{ locale : 설정값 }\n현재 설정된 언어정보를 가져옵니다.\n\n--- 페이지 44 ---\n44\nbizMOB4 Vue – 신규/변경 Native PlugIns\nDescription\nClass\nbizMOB.Network\n-\nbizMOB Server 통신 플러그인\nMethods\nOptions\nreturn\nDescription\nchangeLocale(options)\n_sLocaleCd : 설정 언어코드\nVoid\n통신시 요청할 언어 정보를 설정합니다.\nrequestLogin (options)\n_bMock : mock data 사용여부\n_sUserId : 인증 받을 사용자 아이디입니다.\n_sPassword : 인증 받을 사용자 패스워드입니다.\n_sTrcode : 전문코드입니다.\n_oHeader : 전문 Header 객체입니다.\n_oBody : bizMOB전문 Body 객체입니다.\n_bProgressEnable(default:true)  : 서버에 요청 통신 \n중일때 화면에 progress 를 표시할지에 대한 \n여부입니다.\n_fCallback : 서버와 통신 후 실행될 callback \n함수입니다.\n{\n    \"header\" : Object(전문 통신의 Header),\n    \"body\" : Object(전문 통신의 Body)\n}\nbizMOB 서버에 사용자 정보 인증을 요청\n합니다.\nrequestTr (options)\n_bMock : mock data 사용여부\n_sTrcode : 전문코드입니다.\n_oHeader : 전문 Header 객체입니다.\n_oBody : bizMOB전문 Body 객체입니다.\n_bProgressEnable(default:true)  : 서버에 요청 통신 \n중일때 화면에 progress 를 표시할지에 대한 \n여부입니다.\n_fCallback : 서버와 통신 후 실행될 callback \n함수입니다.\n{\n    \"header\" : Object(전문 통신의 Header),\n    \"body\" : Object(전문 통신의 Body)\n}\nbizMOB 서버와 전문 통신을 합니다. \n(post방식)\n\n--- 페이지 45 ---\n45\nbizMOB4 Vue – 신규/변경 Native PlugIns\nDescription\nClass\nbizMOB.Push\n-\nbizMOB Push Server 통신 플러그인\nMethods\nOptions\nreturn\nDescription\nregisterToServer\n(options)\n _sUserId\n : 사용자 ID\n_fCallback : 실행 후 호출될 callback \n함수입니다.\n{\n    \"result\" : Boolean(true : 성공, false : 실패),\n    \"resultCode\" : String(결과 코드),\n    \"resultMessage\" : String(결과 메세지)\n}\n푸시서버에 사용자 등록 \n후 결과 값을 반환합니다. _fCallback의 파라미터\n로 반환됩니다.\n\n--- 페이지 46 ---\n46\nbizMOB4 Vue – Native PlugIns\nDescription\nClass\nbizMOB.App\n-\nbizMOB Native App 제어 플러그인\nMethods\nOptions\nreturn\nDescription\nexit\n(options)\n_sType(Default : kill) : 어플리케이션 \n종료 유형입니다. \nkill : 어플리케이션 종료, \nlogout : 어플리케이션 재시작.\nVoid\n어플리케이션을 종료합니다.\ncallPlugIn\n(options)\nId: 커스텀 플러그인의 id\nParam :  커스텀 플러그인에서 사용할 \n파라미터\n{플러그인 리턴값}\n커스텀 플러그인을 호출합니다.\n\n--- 페이지 47 ---\nThank \nYou\n135-010 서울시 강남구 학동로 158(논현동 127) 율암빌딩 2층\nT.02-563-5325, F.02-568-9534\n",
+  "tables": [
+    {
+      "page": 2,
+      "table_index": 1,
+      "data": [
+        [
+          "",
+          "bizMOB4(Vue)",
+          ""
+        ]
+      ],
+      "row_count": 1,
+      "col_count": 3
+    },
+    {
+      "page": 3,
+      "table_index": 1,
+      "data": [
+        [
+          "bizMOB4 Vue",
+          null,
+          null
+        ],
+        [
+          null,
+          "bizMOB4 Vue",
+          ""
+        ]
+      ],
+      "row_count": 2,
+      "col_count": 3
+    },
+    {
+      "page": 4,
+      "table_index": 1,
+      "data": [
+        [
+          "bizMOB4 Vue – Mobile Platform",
+          null,
+          null
+        ],
+        [
+          null,
+          "bizMOB4 Vue – Mobile Platform",
+          ""
+        ]
+      ],
+      "row_count": 2,
+      "col_count": 3
+    },
+    {
+      "page": 4,
+      "table_index": 2,
+      "data": [
+        [
+          "With Platform",
+          null,
+          null,
+          null,
+          null,
+          "Without Platform",
+          null,
+          null,
+          null
+        ],
+        [
+          "개발 툴 및 기반 SW 제공으로 짧게 걸림",
+          null,
+          null,
+          null,
+          null,
+          "無에서 새로 개발해야 하므로 길게 걸림",
+          null,
+          null,
+          null
+        ],
+        [
+          "개발 툴 및 기반 SW 제공으로 짧게 걸림",
+          null,
+          null,
+          null,
+          null,
+          "無에서 새로 개발해야 하므로 길게 걸림",
+          null,
+          null,
+          null
+        ],
+        [
+          "이미 검증된 플랫폼 사용하므로 보증가능",
+          null,
+          null,
+          null,
+          "",
+          "개발 결과물의 품질 보증할 수 없음",
+          null,
+          null,
+          null
+        ],
+        [
+          "이미 검증된 플랫폼 사용하므로 보증가능",
+          null,
+          null,
+          null,
+          null,
+          "개발 결과물의 품질 보증할 수 없음",
+          null,
+          null,
+          null
+        ],
+        [
+          "플랫폼에서 운영 및 관리 환경 제공",
+          null,
+          null,
+          null,
+          "",
+          "별도로 개발해야 함",
+          null,
+          null,
+          null
+        ],
+        [
+          "플랫폼에서 운영 및 관리 환경 제공",
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          "플랫폼 기반으로 손쉽게 확장 가능",
+          null,
+          null,
+          null,
+          "",
+          "기존 시스템 수정해야 하므로 어려움",
+          null,
+          null,
+          null
+        ],
+        [
+          "플랫폼 기반으로 손쉽게 확장 가능",
+          null,
+          null,
+          null,
+          null,
+          "기존 시스템 수정해야 하므로 어려움",
+          null,
+          null,
+          null
+        ],
+        [
+          "플랫폼 제공 업체에서 정기적 패치 적용\n개발된 업무 컨텐츠만 유지 보수하면 됨",
+          null,
+          "",
+          null,
+          "",
+          "전체 시스템 소스를 잘 알고 있는\n개발자만 유지보수 가능",
+          "",
+          null,
+          null
+        ],
+        [
+          "플랫폼 라이선스가 따로 필요하나,\n개발비 감소로 전체 비용은 작음",
+          "",
+          null,
+          null,
+          "",
+          "라이선스는 따로 없으나, 개발비용이 커서\n전체 비용은 큼",
+          null,
+          null,
+          ""
+        ],
+        [
+          "",
+          null,
+          null,
+          null,
+          "",
+          "",
+          null,
+          "",
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          "모든 것을 새로 구현해야 하므로 필요한\n개발자 수준이 아주 높아야 함",
+          null,
+          null,
+          null
+        ],
+        [
+          "플랫폼에 위험 관리 경험과 기술이 축적되어\n예상치 못한 상황에 대한 대처가 쉬움",
+          null,
+          null,
+          null,
+          "",
+          "예상치 못한 상황 발생시 위험 부담 큼",
+          null,
+          null,
+          null
+        ],
+        [
+          "다양한 OS와 해상도의 단말에 대한 방안이\n플랫폼에 녹아 있어 쉽게 대응 가능",
+          null,
+          null,
+          "",
+          "",
+          "다양한 단말에 일일이 대응하여 개발 해야 함",
+          null,
+          null,
+          null
+        ],
+        [
+          "플랫폼에서 보안 정책 제공",
+          null,
+          null,
+          null,
+          "",
+          "보안을 위한 정책 및 SW 별도 개발해야 함",
+          null,
+          null,
+          null
+        ]
+      ],
+      "row_count": 16,
+      "col_count": 9
+    },
+    {
+      "page": 5,
+      "table_index": 1,
+      "data": [
+        [
+          "bizMOB4 Vue – Mobile Platform",
+          null,
+          null
+        ],
+        [
+          null,
+          "bizMOB4 Vue – Mobile Platform",
+          ""
+        ]
+      ],
+      "row_count": 2,
+      "col_count": 3
+    },
+    {
+      "page": 5,
+      "table_index": 2,
+      "data": [
+        [
+          "개발방법 Native App Mobile Web\n• WEB Site 개발 방식과 동일\n• OS에서 제공하는 기능/UI개발가능\n• 웹 개발자 수급 용이 • UI는 웹\n• 성능이 최적화 가능\n• 개발 리소스 절약 (One source multiplatform) • 디바이스\n• 디바이스 기능 사용 유리\n개요 • OS에 맞는UI개발 불가능 이용하여\n• 숙련된 개발자 적고 러닝커브가 길다.\n• 보안취약 • 자바스크\n유지 보수 시 상이한 개발 기술자\n• 웹 기능외 디바이스 기능 일부 사용 프레임워\n(안드로이드/아이폰/윈도우 모바일)\n• 배포 시 서비스 중단 • 모바일\nNative UI\nNative UI Component\nUI Web ( HTML, CSS, JS )\n( OS Vender provided )\nWeb Com\nCommunication Socket 기반 Javascri\nHTTP\nProtocol ( HTTP, SOAP, etc ) ( HTTP, S",
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          null,
+          "개발방법",
+          "Native App",
+          "Mobile Web",
+          "",
+          "Hybrid App, Web"
+        ],
+        [
+          null,
+          "개요",
+          "• OS에서 제공하는 기능/UI개발가능\n• 성능이 최적화 가능\n• 디바이스 기능 사용 유리\n• 숙련된 개발자 적고 러닝커브가 길다.\n유지 보수 시 상이한 개발 기술자\n(안드로이드/아이폰/윈도우 모바일)",
+          "• WEB Site 개발 방식과 동일\n• 웹 개발자 수급 용이\n• 개발 리소스 절약 (One source multiplatform)\n• OS에 맞는UI개발 불가능\n• 보안취약\n• 웹 기능외 디바이스 기능 일부 사용\n• 배포 시 서비스 중단",
+          "• UI는 웹\n• 디바이스\n이용하여\n• 자바스크\n프레임워\n• 모바일",
+          null
+        ],
+        [
+          null,
+          "UI",
+          "Native UI Component\n( OS Vender provided )",
+          "Web ( HTML, CSS, JS )",
+          "Native UI\nWeb Com",
+          null
+        ],
+        [
+          null,
+          "Communication\nProtocol",
+          "Socket 기반\n( HTTP, SOAP, etc )",
+          "HTTP",
+          "Javascri\n( HTTP, S",
+          null
+        ],
+        [
+          null,
+          "",
+          "",
+          "",
+          "",
+          null
+        ],
+        [
+          null,
+          "Data type",
+          "text or binary preferred, xml, json",
+          "HTML , JSON",
+          null,
+          null
+        ]
+      ],
+      "row_count": 7,
+      "col_count": 6
+    },
+    {
+      "page": 6,
+      "table_index": 1,
+      "data": [
+        [
+          "bizMOB4 Vue – Mobile Platform",
+          null,
+          null
+        ],
+        [
+          null,
+          "bizMOB4 Vue – Mobile Platform",
+          ""
+        ]
+      ],
+      "row_count": 2,
+      "col_count": 3
+    },
+    {
+      "page": 6,
+      "table_index": 2,
+      "data": [
+        [
+          "WP\nContainer",
+          "Android\nContainer",
+          "iPhone\nContainer"
+        ],
+        [
+          "",
+          "",
+          ""
+        ],
+        [
+          "",
+          "",
+          ""
+        ],
+        [
+          null,
+          null,
+          ""
+        ]
+      ],
+      "row_count": 4,
+      "col_count": 3
+    },
+    {
+      "page": 6,
+      "table_index": 3,
+      "data": [
+        [
+          "",
+          null,
+          "",
+          null
+        ],
+        [
+          "WP\nContainer",
+          "",
+          "Android\nContainer",
+          "iPhone\nContainer"
+        ],
+        [
+          "",
+          "",
+          "",
+          ""
+        ],
+        [
+          "",
+          "",
+          "",
+          ""
+        ],
+        [
+          null,
+          null,
+          null,
+          ""
+        ]
+      ],
+      "row_count": 5,
+      "col_count": 4
+    },
+    {
+      "page": 7,
+      "table_index": 1,
+      "data": [
+        [
+          "bizMOB4 Vue – Mobile Platform",
+          null,
+          null
+        ],
+        [
+          null,
+          "bizMOB4 Vue – Mobile Platform",
+          ""
+        ]
+      ],
+      "row_count": 2,
+      "col_count": 3
+    },
+    {
+      "page": 7,
+      "table_index": 2,
+      "data": [
+        [
+          "구분",
+          "Native App 방식",
+          "Web Browsing 방식",
+          "Hybrid App 방식"
+        ],
+        [
+          "어플리케이션타입",
+          "바이너리( OS 별 )",
+          "웹 어플리케이션 배포파일",
+          "App+ Web"
+        ],
+        [
+          "배포방법",
+          "어플리케이션 배포",
+          "필요 없음",
+          "최초App은 배포"
+        ],
+        [
+          "업그레이드",
+          "어플리케이션 업그레이드",
+          "웹 서버에 어플리케이션 배포",
+          "어플리케이션 업그레이드 +\nWeb Application Update"
+        ],
+        [
+          "UI 수준(난이도)",
+          "상",
+          "하",
+          "하"
+        ],
+        [
+          "Graphic Performance",
+          "상",
+          "하",
+          "중"
+        ],
+        [
+          "어플리케이션개발자",
+          "App 개발자( OS별 )\n( Window : C, Android : Java, iOS : Obj.C)",
+          "웹 개발자",
+          "App 개발자+ 웹 개발자"
+        ],
+        [
+          "개발 편의성",
+          "",
+          "웹 지식필요",
+          "플랫폼에 대한 지식필요\nApp + Web 지식"
+        ],
+        [
+          "원격삭제",
+          "수용가능",
+          "불가능",
+          "수용가능"
+        ],
+        [
+          "복사제어",
+          "가능",
+          "어려움",
+          "가능"
+        ],
+        [
+          "파일다운로드제어",
+          "가능",
+          "어려움",
+          "가능"
+        ],
+        [
+          "단말원격제어",
+          "가능",
+          "어려움",
+          "가능"
+        ],
+        [
+          "Push 서비스",
+          "가능",
+          "어려움",
+          "가능"
+        ],
+        [
+          "로컬자원활용",
+          "일부가능",
+          "어려움",
+          null
+        ],
+        [
+          "멀티 플랫폼 지원",
+          "어려움",
+          "쉬움.",
+          null
+        ],
+        [
+          "Offline Mode",
+          "기본지원",
+          "불가능",
+          null
+        ],
+        [
+          "다중 사용자 공동작업",
+          "어려움",
+          "쉬움",
+          null
+        ],
+        [
+          "키보드Customizing",
+          "가능",
+          "불가능",
+          null
+        ],
+        [
+          "단점",
+          "OS별 Application 개발",
+          "Device Control 제한\nSecurity, Privacy Manage 불가",
+          null
+        ]
+      ],
+      "row_count": 19,
+      "col_count": 4
+    },
+    {
+      "page": 8,
+      "table_index": 1,
+      "data": [
+        [
+          "bizMOB4 Vue – Mobile Platform",
+          null,
+          null
+        ],
+        [
+          null,
+          "bizMOB4 Vue – Mobile Platform",
+          ""
+        ]
+      ],
+      "row_count": 2,
+      "col_count": 3
+    },
+    {
+      "page": 8,
+      "table_index": 2,
+      "data": [
+        [
+          "구분",
+          "Cordova",
+          "Platform"
+        ],
+        [
+          "개요",
+          "App Framwork",
+          "App 개발 및 관리/배포/운영/통계 기능 포함"
+        ],
+        [
+          "보안",
+          "버전 별 취약점 존재 ( 일부 버전 오픈마켓 제약 )",
+          "Cordova 기반 제품 : 버전별 취약점 존재\n비 Cordova : 개발사 기준"
+        ],
+        [
+          "보안 패치",
+          "Cordova 공식 Update 기준",
+          "Cordova 기반 제품 : Cordova 공식 Update 기준\n비 Cordova : 즉시 지원"
+        ],
+        [
+          "배포형태",
+          "App내 웹 컨텐츠 포함.\nNative방식과 동일한 App Update통한 배포",
+          "개발사 기준"
+        ],
+        [
+          "개발도구",
+          "각 OS 별 개발 도구(Visual Studio, Eclipse 등) 기반에Cordova SDK 설치",
+          "Eclipse , IntelliJ등 일반 개발 도구의 플러그인 설치 ( 개발사 기준 )"
+        ],
+        [
+          "개발실행환경",
+          "각 OS별 개발 도구에 따른 Runtime",
+          "각 제조사별 Emulator"
+        ],
+        [
+          "기능수정",
+          "PlugIn 형태의 추가 개발",
+          "전체 소스 수정 가능"
+        ],
+        [
+          "서버모듈",
+          "없음",
+          "Client 통신 Protocol과 상응하는 Server군 필요"
+        ]
+      ],
+      "row_count": 9,
+      "col_count": 3
+    },
+    {
+      "page": 9,
+      "table_index": 1,
+      "data": [
+        [
+          "bizMOB4 Vue",
+          null,
+          null
+        ],
+        [
+          null,
+          "bizMOB4 Vue",
+          ""
+        ]
+      ],
+      "row_count": 2,
+      "col_count": 3
+    },
+    {
+      "page": 10,
+      "table_index": 1,
+      "data": [
+        [
+          "bizMOB4 Vue – Mobile Platform",
+          null,
+          null
+        ],
+        [
+          null,
+          "bizMOB4 Vue – Mobile Platform",
+          ""
+        ]
+      ],
+      "row_count": 2,
+      "col_count": 3
+    },
+    {
+      "page": 10,
+      "table_index": 2,
+      "data": [
+        [
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          ""
+        ],
+        [
+          null,
+          "",
+          null,
+          "",
+          null,
+          "",
+          null
+        ],
+        [
+          null,
+          "Base",
+          null,
+          "Base",
+          null,
+          "Ext",
+          null
+        ]
+      ],
+      "row_count": 3,
+      "col_count": 7
+    },
+    {
+      "page": 11,
+      "table_index": 1,
+      "data": [
+        [
+          "bizMOB4 Vue – Mobile Platform",
+          null,
+          null
+        ],
+        [
+          null,
+          "bizMOB4 Vue – Mobile Platform",
+          ""
+        ]
+      ],
+      "row_count": 2,
+      "col_count": 3
+    },
+    {
+      "page": 11,
+      "table_index": 2,
+      "data": [
+        [
+          "Android\nContainer",
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          "Windows\nPhone\nContainer",
+          null,
+          null,
+          null
+        ],
+        [
+          "P",
+          "",
+          "P",
+          "",
+          "",
+          "",
+          "P",
+          "",
+          "P",
+          "",
+          "P",
+          "",
+          "P",
+          ""
+        ],
+        [
+          "lug-in",
+          null,
+          "lug-in",
+          null,
+          "",
+          null,
+          "lug-in",
+          null,
+          "lug-in",
+          null,
+          "lug-in",
+          null,
+          "lug-in",
+          null
+        ],
+        [
+          "",
+          null,
+          "",
+          null,
+          null,
+          null,
+          "",
+          null,
+          "",
+          null,
+          "",
+          null,
+          "",
+          null
+        ]
+      ],
+      "row_count": 4,
+      "col_count": 14
+    },
+    {
+      "page": 12,
+      "table_index": 1,
+      "data": [
+        [
+          "bizMOB4 Vue – Mobile Platform",
+          null,
+          null
+        ],
+        [
+          null,
+          "bizMOB4 Vue – Mobile Platform",
+          ""
+        ]
+      ],
+      "row_count": 2,
+      "col_count": 3
+    },
+    {
+      "page": 12,
+      "table_index": 2,
+      "data": [
+        [
+          null,
+          ""
+        ],
+        [
+          "JSON : 일반업무\nBinary : 업그레이드\n첨부파일\n(보안채널",
+          ""
+        ]
+      ],
+      "row_count": 2,
+      "col_count": 2
+    },
+    {
+      "page": 12,
+      "table_index": 3,
+      "data": [
+        [
+          "HTML/HTTP(S)",
+          ""
+        ]
+      ],
+      "row_count": 1,
+      "col_count": 2
+    },
+    {
+      "page": 12,
+      "table_index": 4,
+      "data": [
+        [
+          "HT",
+          "ML(WebView) 영역"
+        ]
+      ],
+      "row_count": 1,
+      "col_count": 2
+    },
+    {
+      "page": 12,
+      "table_index": 5,
+      "data": [
+        [
+          "H",
+          "TML(WebView) 영역"
+        ]
+      ],
+      "row_count": 1,
+      "col_count": 2
+    },
+    {
+      "page": 12,
+      "table_index": 6,
+      "data": [
+        [
+          "Web Cache",
+          ""
+        ]
+      ],
+      "row_count": 1,
+      "col_count": 2
+    },
+    {
+      "page": 13,
+      "table_index": 1,
+      "data": [
+        [
+          "bizMOB4 Vue – Mobile Platform",
+          null,
+          null
+        ],
+        [
+          null,
+          "bizMOB4 Vue – Mobile Platform",
+          ""
+        ]
+      ],
+      "row_count": 2,
+      "col_count": 3
+    },
+    {
+      "page": 13,
+      "table_index": 2,
+      "data": [
+        [
+          "등록",
+          ""
+        ],
+        [
+          null,
+          ""
+        ],
+        [
+          "",
+          null
+        ]
+      ],
+      "row_count": 3,
+      "col_count": 2
+    },
+    {
+      "page": 14,
+      "table_index": 1,
+      "data": [
+        [
+          "bizMOB4 Vue – Mobile Platform",
+          null,
+          null
+        ],
+        [
+          null,
+          "bizMOB4 Vue – Mobile Platform",
+          ""
+        ]
+      ],
+      "row_count": 2,
+      "col_count": 3
+    },
+    {
+      "page": 14,
+      "table_index": 2,
+      "data": [
+        [
+          "JSON 타입 사용",
+          "웹에서 널리 쓰이는 JSON 타입은 파싱과 빌드를 위한 오픈 라이브러리를 사용할 수 있어,\n어느 개발자나 쉽게 개발할 수 있음. 이를 통해 생산성을 크게 높임."
+        ]
+      ],
+      "row_count": 1,
+      "col_count": 2
+    },
+    {
+      "page": 14,
+      "table_index": 3,
+      "data": [
+        [
+          "전문 테스트",
+          "생성한 전문을 테스트 하는 기능을 제공하여 전문에 대한 입력값과 결과값을 확인"
+        ]
+      ],
+      "row_count": 1,
+      "col_count": 2
+    },
+    {
+      "page": 15,
+      "table_index": 1,
+      "data": [
+        [
+          "bizMOB4 Vue – Mobile Platform",
+          null,
+          null
+        ],
+        [
+          null,
+          "bizMOB4 Vue – Mobile Platform",
+          ""
+        ]
+      ],
+      "row_count": 2,
+      "col_count": 3
+    },
+    {
+      "page": 16,
+      "table_index": 1,
+      "data": [
+        [
+          "bizMOB4 Vue – Mobile Platform",
+          null,
+          null
+        ],
+        [
+          null,
+          "bizMOB4 Vue – Mobile Platform",
+          ""
+        ]
+      ],
+      "row_count": 2,
+      "col_count": 3
+    },
+    {
+      "page": 17,
+      "table_index": 1,
+      "data": [
+        [
+          "bizMOB4 Vue – Mobile Platform",
+          null,
+          null
+        ],
+        [
+          null,
+          "bizMOB4 Vue – Mobile Platform",
+          ""
+        ]
+      ],
+      "row_count": 2,
+      "col_count": 3
+    },
+    {
+      "page": 18,
+      "table_index": 1,
+      "data": [
+        [
+          "bizMOB4 Vue – Mobile Platform",
+          null,
+          null
+        ],
+        [
+          null,
+          "bizMOB4 Vue – Mobile Platform",
+          ""
+        ]
+      ],
+      "row_count": 2,
+      "col_count": 3
+    },
+    {
+      "page": 18,
+      "table_index": 2,
+      "data": [
+        [
+          "항목",
+          "설명",
+          "대표기능"
+        ],
+        [
+          "App",
+          "App(bizMOB) 관련 API",
+          "앱 종료, 앱 타임아웃"
+        ],
+        [
+          "Device",
+          "단말기 관련 API",
+          "단말기 정보"
+        ],
+        [
+          "System",
+          "OS 제공 기능 API",
+          "전화, 문자, 지도"
+        ],
+        [
+          "Contacts",
+          "연락처 관련 API",
+          "연락처목록 검색"
+        ],
+        [
+          "Network",
+          "네트워크 관련 API",
+          "bizMOB 서버 통신"
+        ],
+        [
+          "File",
+          "파일 관련 API",
+          "파일 정보, 복사, 삭제, 압축, 다운로드, 업로드"
+        ],
+        [
+          "Properties",
+          "영구 저장소 관련 API",
+          "영구 데이터 저장, 삭제"
+        ],
+        [
+          "Storage",
+          "휘발성 저장소 관련 API",
+          "휘발성 데이터 저장, 삭제"
+        ],
+        [
+          "DataBase",
+          "컨테이너 SQLite DB 관련 API",
+          "DB 연결, CRUD"
+        ],
+        [
+          "Logger",
+          "Web Application 로깅 관련 기능",
+          "로그 기록"
+        ]
+      ],
+      "row_count": 11,
+      "col_count": 3
+    },
+    {
+      "page": 19,
+      "table_index": 1,
+      "data": [
+        [
+          "bizMOB4 Vue – Mobile Platform",
+          null,
+          null
+        ],
+        [
+          null,
+          "bizMOB4 Vue – Mobile Platform",
+          ""
+        ]
+      ],
+      "row_count": 2,
+      "col_count": 3
+    },
+    {
+      "page": 20,
+      "table_index": 1,
+      "data": [
+        [
+          "bizMOB4 Vue – Mobile Platform",
+          null,
+          null
+        ],
+        [
+          null,
+          "bizMOB4 Vue – Mobile Platform",
+          ""
+        ]
+      ],
+      "row_count": 2,
+      "col_count": 3
+    },
+    {
+      "page": 21,
+      "table_index": 1,
+      "data": [
+        [
+          "bizMOB4 Vue – Mobile Platform",
+          null,
+          null
+        ],
+        [
+          null,
+          "bizMOB4 Vue – Mobile Platform",
+          ""
+        ]
+      ],
+      "row_count": 2,
+      "col_count": 3
+    },
+    {
+      "page": 21,
+      "table_index": 2,
+      "data": [
+        [
+          "bizMOB Container Framew",
+          "ork"
+        ]
+      ],
+      "row_count": 1,
+      "col_count": 2
+    },
+    {
+      "page": 22,
+      "table_index": 1,
+      "data": [
+        [
+          "bizMOB4 Vue – Mobile Platform",
+          null,
+          null
+        ],
+        [
+          null,
+          "bizMOB4 Vue – Mobile Platform",
+          ""
+        ]
+      ],
+      "row_count": 2,
+      "col_count": 3
+    },
+    {
+      "page": 23,
+      "table_index": 1,
+      "data": [
+        [
+          "bizMOB4 Vue",
+          null,
+          null
+        ],
+        [
+          null,
+          "bizMOB4 Vue",
+          ""
+        ]
+      ],
+      "row_count": 2,
+      "col_count": 3
+    },
+    {
+      "page": 24,
+      "table_index": 1,
+      "data": [
+        [
+          "bizMOB4 Vue - Directory Structures 1/2",
+          null,
+          null
+        ],
+        [
+          null,
+          "bizMOB4 Vue - Directory Structures 1/2",
+          ""
+        ]
+      ],
+      "row_count": 2,
+      "col_count": 3
+    },
+    {
+      "page": 24,
+      "table_index": 2,
+      "data": [
+        [
+          "폴더/파일 명",
+          "Description"
+        ],
+        [
+          "/dist",
+          "프로젝트 배포시에 빌드된 컨텐츠 파일이 생성되는 폴더. 해당 폴더 아래 환경설정 이름을 가진 폴더가 생성되고\n하위에 배포 컨텐츠가 생성된다."
+        ],
+        [
+          "/node_module",
+          "Package.json에 정의된 설치한 모든 플러그인 파일들이 생성된다.\n주의) 용량이 매우 크므로 svn에 저장하지 않는다."
+        ],
+        [
+          "/public",
+          "정적인 Resource를 저장하는 공간으로 폰트, 외부JS lib와 같은 것들만 저장한다."
+        ],
+        [
+          "/public/bizMOB",
+          "Native API script lib 주의) 수정 금지."
+        ],
+        [
+          "/public/mock",
+          "서버 전문이 정의되고 서버 개발이 완료되기 전까지 사용하기 위한 mock데이터를 정의한 json파일 폴더"
+        ],
+        [
+          "/public/extlib",
+          "외부 javascript lib 파일 저장 폴더"
+        ],
+        [
+          "/public/fonts",
+          "특정 폰트 사용시 저장 폴더. Default : Google NotoSans Font"
+        ],
+        [
+          "Index.html",
+          "Welcome 파일"
+        ],
+        [
+          "/src",
+          "프로젝트 소스 폴더"
+        ],
+        [
+          "/src/assets",
+          "프로젝트 리소스파일 저장 폴더 css, image 파일들을 저장한다."
+        ],
+        [
+          "/src/locales",
+          "다국어 설정시 언어팩 저장 폴더"
+        ],
+        [
+          "/src/router",
+          "View Rounting 설정 폴더"
+        ],
+        [
+          "/src/shared",
+          "프로젝트 공통 기능 class 정의폴더. bizMOB, constants(상수선언), project( 프로젝트 공통 ) 으로 분류\n주의) bizMOB 폴더내 파일은 수정 금지."
+        ],
+        [
+          "/src/store",
+          "공유 데이터 사용 Vuex plugin 폴더 주의) 수정 금지."
+        ],
+        [
+          "/src/views",
+          "View Screen 저장 폴더"
+        ]
+      ],
+      "row_count": 16,
+      "col_count": 2
+    },
+    {
+      "page": 25,
+      "table_index": 1,
+      "data": [
+        [
+          "bizMOB4 Vue - Directory Structures 2/2",
+          null,
+          null
+        ],
+        [
+          null,
+          "bizMOB4 Vue - Directory Structures 2/2",
+          ""
+        ]
+      ],
+      "row_count": 2,
+      "col_count": 3
+    },
+    {
+      "page": 25,
+      "table_index": 2,
+      "data": [
+        [
+          "폴더/파일 명",
+          "Description"
+        ],
+        [
+          "/src/App.vue",
+          "Bootstraping vue 파일.\n주의) 어플리케이션 초기화 관련 로직 외에는 코딩하지 않는다."
+        ],
+        [
+          "/src/main.ts",
+          "Bootstraping Class 파일.\n주의) 어플리케이션 초기화 관련 로직 외에는 코딩하지 않는다."
+        ],
+        [
+          "/env\n/env.xxxxxxx",
+          "어플리케이션 환경변수 정의 파일"
+        ],
+        [
+          "/package.json\n/package-lock.json",
+          "설치한 npm 플러그인 정보 파일\n주의) 플러그인 설치시 cli를 통해서만 설치/삭제 한다."
+        ],
+        [
+          "/vue.config.js",
+          "Vue framework 설정 파일"
+        ],
+        [
+          "",
+          ""
+        ],
+        [
+          "",
+          ""
+        ],
+        [
+          "",
+          ""
+        ],
+        [
+          "",
+          ""
+        ],
+        [
+          "",
+          ""
+        ],
+        [
+          "",
+          ""
+        ],
+        [
+          "",
+          ""
+        ],
+        [
+          "",
+          ""
+        ],
+        [
+          "",
+          ""
+        ],
+        [
+          "",
+          ""
+        ]
+      ],
+      "row_count": 16,
+      "col_count": 2
+    },
+    {
+      "page": 26,
+      "table_index": 1,
+      "data": [
+        [
+          "bizMOB4 Vue – 화면제어",
+          null,
+          null
+        ],
+        [
+          null,
+          "bizMOB4 Vue – 화면제어",
+          ""
+        ]
+      ],
+      "row_count": 2,
+      "col_count": 3
+    },
+    {
+      "page": 26,
+      "table_index": 2,
+      "data": [
+        [
+          null,
+          "",
+          null,
+          null
+        ],
+        [
+          "",
+          "Re",
+          "place",
+          ""
+        ],
+        [
+          null,
+          "",
+          null,
+          null
+        ]
+      ],
+      "row_count": 3,
+      "col_count": 4
+    },
+    {
+      "page": 26,
+      "table_index": 3,
+      "data": [
+        [
+          "Re",
+          "place"
+        ],
+        [
+          null,
+          ""
+        ]
+      ],
+      "row_count": 2,
+      "col_count": 2
+    },
+    {
+      "page": 27,
+      "table_index": 1,
+      "data": [
+        [
+          "bizMOB4 Vue – 환경 설정",
+          null,
+          null
+        ],
+        [
+          null,
+          "bizMOB4 Vue – 환경 설정",
+          ""
+        ]
+      ],
+      "row_count": 2,
+      "col_count": 3
+    },
+    {
+      "page": 27,
+      "table_index": 2,
+      "data": [
+        [
+          "Depth 1",
+          "Depth 2",
+          "Depth 3",
+          "Description",
+          "설정값"
+        ],
+        [
+          "VERSION",
+          "N A T I VE",
+          "",
+          "앱 버전 정보",
+          "4.0 ( 임의 설정 금지 )"
+        ],
+        [
+          "",
+          "FRONT",
+          "",
+          "프론트 버전 정보",
+          "4.0 ( 임의 설정 금지 )"
+        ],
+        [
+          "SETTINGS",
+          "TYPE",
+          "",
+          "앱 타입",
+          "B2B , B2C"
+        ],
+        [
+          "",
+          "APPLICATION_TYPE",
+          "",
+          "앱 모드",
+          "MOBILE , WEB"
+        ],
+        [
+          "",
+          "NOTICE_USE",
+          "",
+          "공지기능 사용 여부",
+          "true, false"
+        ],
+        [
+          "SECURITY",
+          "CONTENTS_INTEGRIT\nY",
+          "",
+          "Contents 위변조검사 실행 여부",
+          "true, false"
+        ],
+        [
+          "",
+          "INACTIVITY_SECOND\nS",
+          "",
+          "앱 미사용 시간 설정(초단위)",
+          "0 (Unlimited), 1 이상 정수"
+        ],
+        [
+          "STATUSBAR",
+          "MODE",
+          "",
+          "표시 모드 설정",
+          "DEFAULT , EXTEND , FULL"
+        ],
+        [
+          "",
+          "BGCOLOR",
+          "",
+          "배경색",
+          "RGB 값."
+        ],
+        [
+          "",
+          "TEXT_BLIGHT",
+          "",
+          "야간모드 설정",
+          "BLACK/WHITE"
+        ],
+        [
+          "WEBVIEW",
+          "BACKGROUNDCOLOR",
+          "NORMAL",
+          "웹뷰 배경색",
+          "aRGB 값."
+        ],
+        [
+          "",
+          "",
+          "DIALOG",
+          "팝업 창 배경색",
+          "aRGB 값."
+        ],
+        [
+          "NETWORK",
+          "FILE",
+          "CONNECT",
+          "파일 업로드/다운로드시 서버 Connection Timeout 시간설정\n(초단위)",
+          "1 이상 정수"
+        ],
+        [
+          "",
+          "",
+          "READ",
+          "파일 업로드/다운로드시 서버 ReadTimeout시간설정(초단위)",
+          "1 이상 정수"
+        ],
+        [
+          "",
+          "API",
+          "CONNECT",
+          "전문 통신시서버 Connection Timeout시간설정(초단위)",
+          "1 이상 정수"
+        ],
+        [
+          "",
+          "",
+          "READ",
+          "전문 통신시 서버 ReadTimeout시간설정(초단위)",
+          "1 이상 정수"
+        ],
+        [
+          "PUSH",
+          "URL",
+          "",
+          "bizPush 서버 URL",
+          "URL String"
+        ]
+      ],
+      "row_count": 18,
+      "col_count": 5
+    },
+    {
+      "page": 28,
+      "table_index": 1,
+      "data": [
+        [
+          "bizMOB4 Vue",
+          null,
+          null
+        ],
+        [
+          null,
+          "bizMOB4 Vue",
+          ""
+        ]
+      ],
+      "row_count": 2,
+      "col_count": 3
+    },
+    {
+      "page": 29,
+      "table_index": 1,
+      "data": [
+        [
+          "bizMOB4 Vue – LifeCycle",
+          null,
+          ""
+        ],
+        [
+          null,
+          "bizMOB4 Vue – LifeCycle",
+          ""
+        ],
+        [
+          "개요\n일반 웹 파일이 렌더링 되는 과정처럼 Vue프레임워크에서는 각 Vue Component들이 생성/삭제 될때 마다 각 과정별로 Event Handler\n인터페이스를 제공한다. Component 의 전체 lifecycle은 오른쪽 그럼과 같다.\nDescription\nHooking Method Description\n렌더링 엔진이 Component를 로드 했을때 발생하는 이벤트. Composition API인 setup 메소드로 정의 할\nsetup()\n수 있다.\nbeforeCreate() 렌더링 엔진이 Component instance 생성/초기화 한 직후에 발생하는 이벤트.\ncreated() Component instance의 전체 Options API를 실행한 직후에 호출되는 이벤트\nbeforeMount() 생성된 Component instance를 DOM에 삽입 직전에 호출되는 이벤트\nmounted() DOM에 로드 후 호출되는 이벤트. Window Object의 load 이벤트와 동일하다.\nbeforeUpdate() Component내 Re-rendering/painting 되기 직전에 호출되는 이벤트\nupdate() Component내 Re-rendering/painting 된 후에 호출되는 이벤트\nBeforeUnmount() Component가 DOM에서 삭제되기 전에 발생하는 이벤트\nunmounted() Component가 DOM에서 삭제 된 후 발생하는 이벤트",
+          null,
+          null
+        ],
+        [
+          "29",
+          null,
+          null
+        ]
+      ],
+      "row_count": 4,
+      "col_count": 3
+    },
+    {
+      "page": 29,
+      "table_index": 2,
+      "data": [
+        [
+          "Hooking Method",
+          "Description"
+        ],
+        [
+          "setup()",
+          "렌더링 엔진이 Component를 로드 했을때 발생하는 이벤트. Composition API인 setup 메소드로 정의 할\n수 있다."
+        ],
+        [
+          "beforeCreate()",
+          "렌더링 엔진이 Component instance 생성/초기화 한 직후에 발생하는 이벤트."
+        ],
+        [
+          "created()",
+          "Component instance의 전체 Options API를 실행한 직후에 호출되는 이벤트"
+        ],
+        [
+          "beforeMount()",
+          "생성된 Component instance를 DOM에 삽입 직전에 호출되는 이벤트"
+        ],
+        [
+          "mounted()",
+          "DOM에 로드 후 호출되는 이벤트. Window Object의 load 이벤트와 동일하다."
+        ],
+        [
+          "beforeUpdate()",
+          "Component내 Re-rendering/painting 되기 직전에 호출되는 이벤트"
+        ],
+        [
+          "update()",
+          "Component내 Re-rendering/painting 된 후에 호출되는 이벤트"
+        ],
+        [
+          "BeforeUnmount()",
+          "Component가 DOM에서 삭제되기 전에 발생하는 이벤트"
+        ],
+        [
+          "unmounted()",
+          "Component가 DOM에서 삭제 된 후 발생하는 이벤트"
+        ]
+      ],
+      "row_count": 10,
+      "col_count": 2
+    },
+    {
+      "page": 30,
+      "table_index": 1,
+      "data": [
+        [
+          "bizMOB4 Vue",
+          null,
+          null
+        ],
+        [
+          null,
+          "bizMOB4 Vue",
+          ""
+        ]
+      ],
+      "row_count": 2,
+      "col_count": 3
+    },
+    {
+      "page": 31,
+      "table_index": 1,
+      "data": [
+        [
+          "bizMOB4 Vue – 코딩 준수사항",
+          null,
+          null
+        ],
+        [
+          null,
+          "bizMOB4 Vue – 코딩 준수사항",
+          ""
+        ]
+      ],
+      "row_count": 2,
+      "col_count": 3
+    },
+    {
+      "page": 32,
+      "table_index": 1,
+      "data": [
+        [
+          "bizMOB4 Vue – 코딩 준수 사항",
+          null,
+          null
+        ],
+        [
+          null,
+          "bizMOB4 Vue – 코딩 준수 사항",
+          ""
+        ]
+      ],
+      "row_count": 2,
+      "col_count": 3
+    },
+    {
+      "page": 33,
+      "table_index": 1,
+      "data": [
+        [
+          "bizMOB4 Vue – Vuex 활용하기",
+          null,
+          null
+        ],
+        [
+          null,
+          "bizMOB4 Vue – Vuex 활용하기",
+          ""
+        ]
+      ],
+      "row_count": 2,
+      "col_count": 3
+    },
+    {
+      "page": 34,
+      "table_index": 1,
+      "data": [
+        [
+          "bizMOB4 Vue – Vuex 활용하기",
+          null,
+          null
+        ],
+        [
+          null,
+          "bizMOB4 Vue – Vuex 활용하기",
+          ""
+        ]
+      ],
+      "row_count": 2,
+      "col_count": 3
+    },
+    {
+      "page": 35,
+      "table_index": 1,
+      "data": [
+        [
+          "bizMOB4 Vue – mock 데이터 활용하기",
+          null,
+          null
+        ],
+        [
+          null,
+          "bizMOB4 Vue – mock 데이터 활용하기",
+          ""
+        ]
+      ],
+      "row_count": 2,
+      "col_count": 3
+    },
+    {
+      "page": 36,
+      "table_index": 1,
+      "data": [
+        [
+          "bizMOB4 Vue – Component",
+          null,
+          null
+        ],
+        [
+          null,
+          "bizMOB4 Vue – Component",
+          ""
+        ]
+      ],
+      "row_count": 2,
+      "col_count": 3
+    },
+    {
+      "page": 37,
+      "table_index": 1,
+      "data": [
+        [
+          "bizMOB4 Vue – Routes",
+          null,
+          null
+        ],
+        [
+          null,
+          "bizMOB4 Vue – Routes",
+          ""
+        ]
+      ],
+      "row_count": 2,
+      "col_count": 3
+    },
+    {
+      "page": 37,
+      "table_index": 2,
+      "data": [
+        [
+          "Properies",
+          "Description"
+        ],
+        [
+          "path",
+          "컴포넌트 호출시 URI로 호출할 경우에 대한 path 설정을 지정한다. 기본값은 \"/“(root)\n로 설정되어 있다."
+        ],
+        [
+          "component",
+          "Path 설정과 매핑할 Component을 import한 후 class명을 설정한다."
+        ],
+        [
+          "redirectTo",
+          "특정 uri를 redirect 시키고 싶을때 설정한다."
+        ]
+      ],
+      "row_count": 4,
+      "col_count": 2
+    },
+    {
+      "page": 38,
+      "table_index": 1,
+      "data": [
+        [
+          "bizMOB4 Vue - Component Communication",
+          null,
+          null
+        ],
+        [
+          null,
+          "bizMOB4 Vue - Component Communication",
+          ""
+        ]
+      ],
+      "row_count": 2,
+      "col_count": 3
+    },
+    {
+      "page": 38,
+      "table_index": 2,
+      "data": [
+        [
+          "",
+          null,
+          null
+        ],
+        [
+          null,
+          "",
+          "Description"
+        ]
+      ],
+      "row_count": 2,
+      "col_count": 3
+    },
+    {
+      "page": 38,
+      "table_index": 3,
+      "data": [
+        [
+          "Methods",
+          "Description"
+        ],
+        [
+          "setGlobalDataByKey",
+          "데이터 저장, 데이터는 Script에서 제공하는 기본 데이터\n타입으로 Key, Value 를 인자로 사용한다. (그림 1-1 참조)"
+        ],
+        [
+          "getGlobalDataByKey",
+          "데이터 조회, 저장시 지정한 Key값으로 조회한다. (그림 1-1\n참조)"
+        ],
+        [
+          "removeGlobalDataByKey",
+          "데이터 삭제, 저장시 지정한 Key값으로 삭제한다. (그림 1-1\n참조)"
+        ]
+      ],
+      "row_count": 4,
+      "col_count": 2
+    },
+    {
+      "page": 39,
+      "table_index": 1,
+      "data": [
+        [
+          "bizMOB4 Vue - 다국어설정 ( i18n Module )",
+          null,
+          null
+        ],
+        [
+          null,
+          "bizMOB4 Vue - 다국어설정 ( i18n Module )",
+          ""
+        ]
+      ],
+      "row_count": 2,
+      "col_count": 3
+    },
+    {
+      "page": 40,
+      "table_index": 1,
+      "data": [
+        [
+          "bizMOB4 Vue - 다국어 설정( 서비스등록 )",
+          null,
+          null
+        ],
+        [
+          null,
+          "bizMOB4 Vue - 다국어 설정( 서비스등록 )",
+          ""
+        ]
+      ],
+      "row_count": 2,
+      "col_count": 3
+    },
+    {
+      "page": 41,
+      "table_index": 1,
+      "data": [
+        [
+          "bizMOB4 Vue - Logger",
+          null,
+          null
+        ],
+        [
+          null,
+          "bizMOB4 Vue - Logger",
+          ""
+        ]
+      ],
+      "row_count": 2,
+      "col_count": 3
+    },
+    {
+      "page": 41,
+      "table_index": 2,
+      "data": [
+        [
+          "Methods",
+          "Description"
+        ],
+        [
+          "log",
+          "개발시 필요한 정보를 표시합니다."
+        ],
+        [
+          "Info",
+          "구간별 데이터 정보를 표시합니다."
+        ],
+        [
+          "warn",
+          "예외처리에 대한 별도 로그를 표시합니다."
+        ],
+        [
+          "error",
+          "에러 발생시 로그를 표시합니다."
+        ]
+      ],
+      "row_count": 5,
+      "col_count": 2
+    },
+    {
+      "page": 43,
+      "table_index": 1,
+      "data": [
+        [
+          "bizMOB4 Vue – 신규/변경 Native PlugIns",
+          null,
+          null
+        ],
+        [
+          null,
+          "bizMOB4 Vue – 신규/변경 Native PlugIns",
+          ""
+        ]
+      ],
+      "row_count": 2,
+      "col_count": 3
+    },
+    {
+      "page": 43,
+      "table_index": 2,
+      "data": [
+        [
+          "Methods",
+          "Options",
+          "return",
+          "Description"
+        ],
+        [
+          "setLocale(options)",
+          "_fCallback : 콜백 함수",
+          "Void",
+          "현재 언어 정보를 저장합니다."
+        ],
+        [
+          "getLocale(options)",
+          "_sLocaleCd : 설정 언어코드\n_fCallback : 콜백 함수",
+          "{ locale : 설정값 }",
+          "현재 설정된 언어정보를 가져옵니다."
+        ],
+        [
+          "",
+          "",
+          "",
+          ""
+        ],
+        [
+          "",
+          "",
+          "",
+          ""
+        ]
+      ],
+      "row_count": 5,
+      "col_count": 4
+    },
+    {
+      "page": 44,
+      "table_index": 1,
+      "data": [
+        [
+          "bizMOB4 Vue – 신규/변경 Native PlugIns",
+          null,
+          null
+        ],
+        [
+          null,
+          "bizMOB4 Vue – 신규/변경 Native PlugIns",
+          ""
+        ]
+      ],
+      "row_count": 2,
+      "col_count": 3
+    },
+    {
+      "page": 44,
+      "table_index": 2,
+      "data": [
+        [
+          "Methods",
+          "Options",
+          "return",
+          "Description"
+        ],
+        [
+          "changeLocale(options)",
+          "_sLocaleCd : 설정 언어코드",
+          "Void",
+          "통신시 요청할 언어 정보를 설정합니다."
+        ],
+        [
+          "requestLogin (options)",
+          "_bMock : mock data 사용여부\n_sUserId : 인증 받을 사용자 아이디입니다.\n_sPassword : 인증 받을 사용자 패스워드입니다.\n_sTrcode : 전문코드입니다.\n_oHeader : 전문 Header 객체입니다.\n_oBody : bizMOB전문 Body 객체입니다.\n_bProgressEnable(default:true) : 서버에 요청 통신\n중일때 화면에 progress 를 표시할지에 대한\n여부입니다.\n_fCallback : 서버와 통신 후 실행될 callback\n함수입니다.",
+          "{\n\"header\" : Object(전문 통신의 Header),\n\"body\" : Object(전문 통신의 Body)\n}",
+          "bizMOB 서버에 사용자 정보 인증을 요청\n합니다."
+        ],
+        [
+          "requestTr (options)",
+          "_bMock : mock data 사용여부\n_sTrcode : 전문코드입니다.\n_oHeader : 전문 Header 객체입니다.\n_oBody : bizMOB전문 Body 객체입니다.\n_bProgressEnable(default:true) : 서버에 요청 통신\n중일때 화면에 progress 를 표시할지에 대한\n여부입니다.\n_fCallback : 서버와 통신 후 실행될 callback\n함수입니다.",
+          "{\n\"header\" : Object(전문 통신의 Header),\n\"body\" : Object(전문 통신의 Body)\n}",
+          "bizMOB 서버와 전문 통신을 합니다.\n(post방식)"
+        ],
+        [
+          "",
+          "",
+          "",
+          ""
+        ],
+        [
+          "",
+          "",
+          "",
+          ""
+        ]
+      ],
+      "row_count": 6,
+      "col_count": 4
+    },
+    {
+      "page": 45,
+      "table_index": 1,
+      "data": [
+        [
+          "bizMOB4 Vue – 신규/변경 Native PlugIns",
+          null,
+          null
+        ],
+        [
+          null,
+          "bizMOB4 Vue – 신규/변경 Native PlugIns",
+          ""
+        ]
+      ],
+      "row_count": 2,
+      "col_count": 3
+    },
+    {
+      "page": 45,
+      "table_index": 2,
+      "data": [
+        [
+          "Methods",
+          "Options",
+          "return",
+          "Description"
+        ],
+        [
+          "registerToServer\n(options)",
+          "_sUserId\n: 사용자 ID\n_fCallback : 실행 후 호출될 callback\n함수입니다.",
+          "{\n\"result\" : Boolean(true : 성공, false : 실패),\n\"resultCode\" : String(결과 코드),\n\"resultMessage\" : String(결과 메세지)\n}",
+          "푸시서버에 사용자 등록\n후 결과 값을 반환합니다. _fCallback의 파라미터\n로 반환됩니다."
+        ],
+        [
+          "",
+          "",
+          "",
+          ""
+        ],
+        [
+          "",
+          "",
+          "",
+          ""
+        ],
+        [
+          "",
+          "",
+          "",
+          ""
+        ]
+      ],
+      "row_count": 5,
+      "col_count": 4
+    },
+    {
+      "page": 46,
+      "table_index": 1,
+      "data": [
+        [
+          "bizMOB4 Vue – Native PlugIns",
+          null,
+          null
+        ],
+        [
+          null,
+          "bizMOB4 Vue – Native PlugIns",
+          ""
+        ]
+      ],
+      "row_count": 2,
+      "col_count": 3
+    },
+    {
+      "page": 46,
+      "table_index": 2,
+      "data": [
+        [
+          "Methods",
+          "Options",
+          "return",
+          "Description"
+        ],
+        [
+          "exit\n(options)",
+          "_sType(Default : kill) : 어플리케이션\n종료 유형입니다.\nkill : 어플리케이션 종료,\nlogout : 어플리케이션 재시작.",
+          "Void",
+          "어플리케이션을 종료합니다."
+        ],
+        [
+          "callPlugIn\n(options)",
+          "Id: 커스텀 플러그인의 id\nParam : 커스텀 플러그인에서 사용할\n파라미터",
+          "{플러그인 리턴값}",
+          "커스텀 플러그인을 호출합니다."
+        ],
+        [
+          "",
+          "",
+          "",
+          ""
+        ],
+        [
+          "",
+          "",
+          "",
+          ""
+        ]
+      ],
+      "row_count": 5,
+      "col_count": 4
+    }
+  ],
+  "images": [
+    {
+      "page": 1,
+      "image_index": 1,
+      "xref": 15,
+      "bbox": [
+        16,
+        283,
+        262,
+        8
+      ]
+    },
+    {
+      "page": 3,
+      "image_index": 1,
+      "xref": 31,
+      "bbox": [
+        34,
+        217,
+        47,
+        8
+      ]
+    },
+    {
+      "page": 3,
+      "image_index": 2,
+      "xref": 32,
+      "bbox": [
+        36,
+        143,
+        32,
+        8
+      ]
+    },
+    {
+      "page": 3,
+      "image_index": 3,
+      "xref": 33,
+      "bbox": [
+        38,
+        100,
+        50,
+        8
+      ]
+    },
+    {
+      "page": 4,
+      "image_index": 1,
+      "xref": 31,
+      "bbox": [
+        34,
+        217,
+        47,
+        8
+      ]
+    },
+    {
+      "page": 4,
+      "image_index": 2,
+      "xref": 32,
+      "bbox": [
+        36,
+        143,
+        32,
+        8
+      ]
+    },
+    {
+      "page": 4,
+      "image_index": 3,
+      "xref": 33,
+      "bbox": [
+        38,
+        100,
+        50,
+        8
+      ]
+    },
+    {
+      "page": 5,
+      "image_index": 1,
+      "xref": 31,
+      "bbox": [
+        34,
+        217,
+        47,
+        8
+      ]
+    },
+    {
+      "page": 5,
+      "image_index": 2,
+      "xref": 32,
+      "bbox": [
+        36,
+        143,
+        32,
+        8
+      ]
+    },
+    {
+      "page": 5,
+      "image_index": 3,
+      "xref": 33,
+      "bbox": [
+        38,
+        100,
+        50,
+        8
+      ]
+    },
+    {
+      "page": 6,
+      "image_index": 1,
+      "xref": 31,
+      "bbox": [
+        34,
+        217,
+        47,
+        8
+      ]
+    },
+    {
+      "page": 6,
+      "image_index": 2,
+      "xref": 32,
+      "bbox": [
+        36,
+        143,
+        32,
+        8
+      ]
+    },
+    {
+      "page": 6,
+      "image_index": 3,
+      "xref": 33,
+      "bbox": [
+        38,
+        100,
+        50,
+        8
+      ]
+    },
+    {
+      "page": 6,
+      "image_index": 4,
+      "xref": 61,
+      "bbox": [
+        82,
+        838,
+        185,
+        8
+      ]
+    },
+    {
+      "page": 6,
+      "image_index": 5,
+      "xref": 63,
+      "bbox": [
+        85,
+        820,
+        185,
+        8
+      ]
+    },
+    {
+      "page": 6,
+      "image_index": 6,
+      "xref": 65,
+      "bbox": [
+        88,
+        826,
+        185,
+        8
+      ]
+    },
+    {
+      "page": 6,
+      "image_index": 7,
+      "xref": 67,
+      "bbox": [
+        0,
+        107,
+        87,
+        8
+      ]
+    },
+    {
+      "page": 6,
+      "image_index": 8,
+      "xref": 68,
+      "bbox": [
+        0,
+        150,
+        140,
+        8
+      ]
+    },
+    {
+      "page": 6,
+      "image_index": 9,
+      "xref": 69,
+      "bbox": [
+        0,
+        153,
+        55,
+        8
+      ]
+    },
+    {
+      "page": 6,
+      "image_index": 10,
+      "xref": 70,
+      "bbox": [
+        94,
+        304,
+        146,
+        8
+      ]
+    },
+    {
+      "page": 6,
+      "image_index": 11,
+      "xref": 71,
+      "bbox": [
+        96,
+        304,
+        146,
+        8
+      ]
+    },
+    {
+      "page": 6,
+      "image_index": 12,
+      "xref": 72,
+      "bbox": [
+        98,
+        304,
+        146,
+        8
+      ]
+    },
+    {
+      "page": 6,
+      "image_index": 13,
+      "xref": 73,
+      "bbox": [
+        0,
+        107,
+        87,
+        8
+      ]
+    },
+    {
+      "page": 6,
+      "image_index": 14,
+      "xref": 74,
+      "bbox": [
+        0,
+        150,
+        140,
+        8
+      ]
+    },
+    {
+      "page": 6,
+      "image_index": 15,
+      "xref": 75,
+      "bbox": [
+        0,
+        153,
+        55,
+        8
+      ]
+    },
+    {
+      "page": 6,
+      "image_index": 16,
+      "xref": 76,
+      "bbox": [
+        103,
+        304,
+        146,
+        8
+      ]
+    },
+    {
+      "page": 6,
+      "image_index": 17,
+      "xref": 77,
+      "bbox": [
+        105,
+        304,
+        146,
+        8
+      ]
+    },
+    {
+      "page": 6,
+      "image_index": 18,
+      "xref": 78,
+      "bbox": [
+        107,
+        304,
+        146,
+        8
+      ]
+    },
+    {
+      "page": 6,
+      "image_index": 19,
+      "xref": 79,
+      "bbox": [
+        109,
+        305,
+        145,
+        8
+      ]
+    },
+    {
+      "page": 6,
+      "image_index": 20,
+      "xref": 80,
+      "bbox": [
+        111,
+        305,
+        146,
+        8
+      ]
+    },
+    {
+      "page": 6,
+      "image_index": 21,
+      "xref": 81,
+      "bbox": [
+        113,
+        305,
+        146,
+        8
+      ]
+    },
+    {
+      "page": 7,
+      "image_index": 1,
+      "xref": 31,
+      "bbox": [
+        34,
+        217,
+        47,
+        8
+      ]
+    },
+    {
+      "page": 7,
+      "image_index": 2,
+      "xref": 32,
+      "bbox": [
+        36,
+        143,
+        32,
+        8
+      ]
+    },
+    {
+      "page": 7,
+      "image_index": 3,
+      "xref": 33,
+      "bbox": [
+        38,
+        100,
+        50,
+        8
+      ]
+    },
+    {
+      "page": 8,
+      "image_index": 1,
+      "xref": 31,
+      "bbox": [
+        34,
+        217,
+        47,
+        8
+      ]
+    },
+    {
+      "page": 8,
+      "image_index": 2,
+      "xref": 32,
+      "bbox": [
+        36,
+        143,
+        32,
+        8
+      ]
+    },
+    {
+      "page": 8,
+      "image_index": 3,
+      "xref": 33,
+      "bbox": [
+        38,
+        100,
+        50,
+        8
+      ]
+    },
+    {
+      "page": 9,
+      "image_index": 1,
+      "xref": 31,
+      "bbox": [
+        34,
+        217,
+        47,
+        8
+      ]
+    },
+    {
+      "page": 9,
+      "image_index": 2,
+      "xref": 32,
+      "bbox": [
+        36,
+        143,
+        32,
+        8
+      ]
+    },
+    {
+      "page": 9,
+      "image_index": 3,
+      "xref": 33,
+      "bbox": [
+        38,
+        100,
+        50,
+        8
+      ]
+    },
+    {
+      "page": 10,
+      "image_index": 1,
+      "xref": 31,
+      "bbox": [
+        34,
+        217,
+        47,
+        8
+      ]
+    },
+    {
+      "page": 10,
+      "image_index": 2,
+      "xref": 32,
+      "bbox": [
+        36,
+        143,
+        32,
+        8
+      ]
+    },
+    {
+      "page": 10,
+      "image_index": 3,
+      "xref": 33,
+      "bbox": [
+        38,
+        100,
+        50,
+        8
+      ]
+    },
+    {
+      "page": 11,
+      "image_index": 1,
+      "xref": 31,
+      "bbox": [
+        34,
+        217,
+        47,
+        8
+      ]
+    },
+    {
+      "page": 11,
+      "image_index": 2,
+      "xref": 32,
+      "bbox": [
+        36,
+        143,
+        32,
+        8
+      ]
+    },
+    {
+      "page": 11,
+      "image_index": 3,
+      "xref": 33,
+      "bbox": [
+        38,
+        100,
+        50,
+        8
+      ]
+    },
+    {
+      "page": 12,
+      "image_index": 1,
+      "xref": 31,
+      "bbox": [
+        34,
+        217,
+        47,
+        8
+      ]
+    },
+    {
+      "page": 12,
+      "image_index": 2,
+      "xref": 32,
+      "bbox": [
+        36,
+        143,
+        32,
+        8
+      ]
+    },
+    {
+      "page": 12,
+      "image_index": 3,
+      "xref": 33,
+      "bbox": [
+        38,
+        100,
+        50,
+        8
+      ]
+    },
+    {
+      "page": 12,
+      "image_index": 4,
+      "xref": 157,
+      "bbox": [
+        165,
+        1844,
+        542,
+        8
+      ]
+    },
+    {
+      "page": 12,
+      "image_index": 5,
+      "xref": 158,
+      "bbox": [
+        167,
+        274,
+        203,
+        8
+      ]
+    },
+    {
+      "page": 12,
+      "image_index": 6,
+      "xref": 159,
+      "bbox": [
+        0,
+        364,
+        594,
+        8
+      ]
+    },
+    {
+      "page": 12,
+      "image_index": 7,
+      "xref": 160,
+      "bbox": [
+        0,
+        138,
+        230,
+        8
+      ]
+    },
+    {
+      "page": 12,
+      "image_index": 8,
+      "xref": 161,
+      "bbox": [
+        0,
+        144,
+        240,
+        8
+      ]
+    },
+    {
+      "page": 12,
+      "image_index": 9,
+      "xref": 162,
+      "bbox": [
+        0,
+        364,
+        607,
+        8
+      ]
+    },
+    {
+      "page": 12,
+      "image_index": 10,
+      "xref": 163,
+      "bbox": [
+        173,
+        99,
+        158,
+        8
+      ]
+    },
+    {
+      "page": 12,
+      "image_index": 11,
+      "xref": 164,
+      "bbox": [
+        175,
+        99,
+        158,
+        8
+      ]
+    },
+    {
+      "page": 13,
+      "image_index": 1,
+      "xref": 31,
+      "bbox": [
+        34,
+        217,
+        47,
+        8
+      ]
+    },
+    {
+      "page": 13,
+      "image_index": 2,
+      "xref": 32,
+      "bbox": [
+        36,
+        143,
+        32,
+        8
+      ]
+    },
+    {
+      "page": 13,
+      "image_index": 3,
+      "xref": 33,
+      "bbox": [
+        38,
+        100,
+        50,
+        8
+      ]
+    },
+    {
+      "page": 13,
+      "image_index": 4,
+      "xref": 186,
+      "bbox": [
+        0,
+        433,
+        290,
+        8
+      ]
+    },
+    {
+      "page": 13,
+      "image_index": 5,
+      "xref": 187,
+      "bbox": [
+        195,
+        872,
+        129,
+        8
+      ]
+    },
+    {
+      "page": 13,
+      "image_index": 6,
+      "xref": 188,
+      "bbox": [
+        0,
+        195,
+        260,
+        8
+      ]
+    },
+    {
+      "page": 13,
+      "image_index": 7,
+      "xref": 189,
+      "bbox": [
+        198,
+        872,
+        129,
+        8
+      ]
+    },
+    {
+      "page": 13,
+      "image_index": 8,
+      "xref": 190,
+      "bbox": [
+        0,
+        433,
+        290,
+        8
+      ]
+    },
+    {
+      "page": 13,
+      "image_index": 9,
+      "xref": 191,
+      "bbox": [
+        0,
+        195,
+        260,
+        8
+      ]
+    },
+    {
+      "page": 13,
+      "image_index": 10,
+      "xref": 192,
+      "bbox": [
+        0,
+        156,
+        266,
+        8
+      ]
+    },
+    {
+      "page": 13,
+      "image_index": 11,
+      "xref": 193,
+      "bbox": [
+        203,
+        99,
+        158,
+        8
+      ]
+    },
+    {
+      "page": 14,
+      "image_index": 1,
+      "xref": 31,
+      "bbox": [
+        34,
+        217,
+        47,
+        8
+      ]
+    },
+    {
+      "page": 14,
+      "image_index": 2,
+      "xref": 32,
+      "bbox": [
+        36,
+        143,
+        32,
+        8
+      ]
+    },
+    {
+      "page": 14,
+      "image_index": 3,
+      "xref": 33,
+      "bbox": [
+        38,
+        100,
+        50,
+        8
+      ]
+    },
+    {
+      "page": 15,
+      "image_index": 1,
+      "xref": 31,
+      "bbox": [
+        34,
+        217,
+        47,
+        8
+      ]
+    },
+    {
+      "page": 15,
+      "image_index": 2,
+      "xref": 32,
+      "bbox": [
+        36,
+        143,
+        32,
+        8
+      ]
+    },
+    {
+      "page": 15,
+      "image_index": 3,
+      "xref": 33,
+      "bbox": [
+        38,
+        100,
+        50,
+        8
+      ]
+    },
+    {
+      "page": 15,
+      "image_index": 4,
+      "xref": 219,
+      "bbox": [
+        0,
+        230,
+        73,
+        8
+      ]
+    },
+    {
+      "page": 15,
+      "image_index": 5,
+      "xref": 220,
+      "bbox": [
+        0,
+        231,
+        619,
+        8
+      ]
+    },
+    {
+      "page": 15,
+      "image_index": 6,
+      "xref": 221,
+      "bbox": [
+        0,
+        344,
+        263,
+        8
+      ]
+    },
+    {
+      "page": 15,
+      "image_index": 7,
+      "xref": 222,
+      "bbox": [
+        0,
+        345,
+        275,
+        8
+      ]
+    },
+    {
+      "page": 16,
+      "image_index": 1,
+      "xref": 31,
+      "bbox": [
+        34,
+        217,
+        47,
+        8
+      ]
+    },
+    {
+      "page": 16,
+      "image_index": 2,
+      "xref": 32,
+      "bbox": [
+        36,
+        143,
+        32,
+        8
+      ]
+    },
+    {
+      "page": 16,
+      "image_index": 3,
+      "xref": 33,
+      "bbox": [
+        38,
+        100,
+        50,
+        8
+      ]
+    },
+    {
+      "page": 16,
+      "image_index": 4,
+      "xref": 232,
+      "bbox": [
+        0,
+        1194,
+        800,
+        8
+      ]
+    },
+    {
+      "page": 17,
+      "image_index": 1,
+      "xref": 31,
+      "bbox": [
+        34,
+        217,
+        47,
+        8
+      ]
+    },
+    {
+      "page": 17,
+      "image_index": 2,
+      "xref": 32,
+      "bbox": [
+        36,
+        143,
+        32,
+        8
+      ]
+    },
+    {
+      "page": 17,
+      "image_index": 3,
+      "xref": 33,
+      "bbox": [
+        38,
+        100,
+        50,
+        8
+      ]
+    },
+    {
+      "page": 17,
+      "image_index": 4,
+      "xref": 239,
+      "bbox": [
+        0,
+        825,
+        619,
+        8
+      ]
+    },
+    {
+      "page": 17,
+      "image_index": 5,
+      "xref": 240,
+      "bbox": [
+        0,
+        841,
+        869,
+        8
+      ]
+    },
+    {
+      "page": 17,
+      "image_index": 6,
+      "xref": 241,
+      "bbox": [
+        0,
+        364,
+        606,
+        8
+      ]
+    },
+    {
+      "page": 18,
+      "image_index": 1,
+      "xref": 31,
+      "bbox": [
+        34,
+        217,
+        47,
+        8
+      ]
+    },
+    {
+      "page": 18,
+      "image_index": 2,
+      "xref": 32,
+      "bbox": [
+        36,
+        143,
+        32,
+        8
+      ]
+    },
+    {
+      "page": 18,
+      "image_index": 3,
+      "xref": 33,
+      "bbox": [
+        38,
+        100,
+        50,
+        8
+      ]
+    },
+    {
+      "page": 19,
+      "image_index": 1,
+      "xref": 31,
+      "bbox": [
+        34,
+        217,
+        47,
+        8
+      ]
+    },
+    {
+      "page": 19,
+      "image_index": 2,
+      "xref": 32,
+      "bbox": [
+        36,
+        143,
+        32,
+        8
+      ]
+    },
+    {
+      "page": 19,
+      "image_index": 3,
+      "xref": 33,
+      "bbox": [
+        38,
+        100,
+        50,
+        8
+      ]
+    },
+    {
+      "page": 20,
+      "image_index": 1,
+      "xref": 31,
+      "bbox": [
+        34,
+        217,
+        47,
+        8
+      ]
+    },
+    {
+      "page": 20,
+      "image_index": 2,
+      "xref": 32,
+      "bbox": [
+        36,
+        143,
+        32,
+        8
+      ]
+    },
+    {
+      "page": 20,
+      "image_index": 3,
+      "xref": 33,
+      "bbox": [
+        38,
+        100,
+        50,
+        8
+      ]
+    },
+    {
+      "page": 21,
+      "image_index": 1,
+      "xref": 31,
+      "bbox": [
+        34,
+        217,
+        47,
+        8
+      ]
+    },
+    {
+      "page": 21,
+      "image_index": 2,
+      "xref": 32,
+      "bbox": [
+        36,
+        143,
+        32,
+        8
+      ]
+    },
+    {
+      "page": 21,
+      "image_index": 3,
+      "xref": 33,
+      "bbox": [
+        38,
+        100,
+        50,
+        8
+      ]
+    },
+    {
+      "page": 22,
+      "image_index": 1,
+      "xref": 31,
+      "bbox": [
+        34,
+        217,
+        47,
+        8
+      ]
+    },
+    {
+      "page": 22,
+      "image_index": 2,
+      "xref": 32,
+      "bbox": [
+        36,
+        143,
+        32,
+        8
+      ]
+    },
+    {
+      "page": 22,
+      "image_index": 3,
+      "xref": 33,
+      "bbox": [
+        38,
+        100,
+        50,
+        8
+      ]
+    },
+    {
+      "page": 22,
+      "image_index": 4,
+      "xref": 270,
+      "bbox": [
+        279,
+        771,
+        179,
+        8
+      ]
+    },
+    {
+      "page": 22,
+      "image_index": 5,
+      "xref": 272,
+      "bbox": [
+        282,
+        550,
+        179,
+        8
+      ]
+    },
+    {
+      "page": 22,
+      "image_index": 6,
+      "xref": 274,
+      "bbox": [
+        285,
+        550,
+        179,
+        8
+      ]
+    },
+    {
+      "page": 22,
+      "image_index": 7,
+      "xref": 277,
+      "bbox": [
+        288,
+        550,
+        179,
+        8
+      ]
+    },
+    {
+      "page": 23,
+      "image_index": 1,
+      "xref": 31,
+      "bbox": [
+        34,
+        217,
+        47,
+        8
+      ]
+    },
+    {
+      "page": 23,
+      "image_index": 2,
+      "xref": 32,
+      "bbox": [
+        36,
+        143,
+        32,
+        8
+      ]
+    },
+    {
+      "page": 23,
+      "image_index": 3,
+      "xref": 33,
+      "bbox": [
+        38,
+        100,
+        50,
+        8
+      ]
+    },
+    {
+      "page": 24,
+      "image_index": 1,
+      "xref": 31,
+      "bbox": [
+        34,
+        217,
+        47,
+        8
+      ]
+    },
+    {
+      "page": 24,
+      "image_index": 2,
+      "xref": 32,
+      "bbox": [
+        36,
+        143,
+        32,
+        8
+      ]
+    },
+    {
+      "page": 24,
+      "image_index": 3,
+      "xref": 33,
+      "bbox": [
+        38,
+        100,
+        50,
+        8
+      ]
+    },
+    {
+      "page": 24,
+      "image_index": 4,
+      "xref": 305,
+      "bbox": [
+        0,
+        294,
+        842,
+        8
+      ]
+    },
+    {
+      "page": 25,
+      "image_index": 1,
+      "xref": 31,
+      "bbox": [
+        34,
+        217,
+        47,
+        8
+      ]
+    },
+    {
+      "page": 25,
+      "image_index": 2,
+      "xref": 32,
+      "bbox": [
+        36,
+        143,
+        32,
+        8
+      ]
+    },
+    {
+      "page": 25,
+      "image_index": 3,
+      "xref": 33,
+      "bbox": [
+        38,
+        100,
+        50,
+        8
+      ]
+    },
+    {
+      "page": 25,
+      "image_index": 4,
+      "xref": 312,
+      "bbox": [
+        0,
+        294,
+        842,
+        8
+      ]
+    },
+    {
+      "page": 26,
+      "image_index": 1,
+      "xref": 31,
+      "bbox": [
+        34,
+        217,
+        47,
+        8
+      ]
+    },
+    {
+      "page": 26,
+      "image_index": 2,
+      "xref": 32,
+      "bbox": [
+        36,
+        143,
+        32,
+        8
+      ]
+    },
+    {
+      "page": 26,
+      "image_index": 3,
+      "xref": 33,
+      "bbox": [
+        38,
+        100,
+        50,
+        8
+      ]
+    },
+    {
+      "page": 26,
+      "image_index": 4,
+      "xref": 319,
+      "bbox": [
+        0,
+        291,
+        465,
+        8
+      ]
+    },
+    {
+      "page": 26,
+      "image_index": 5,
+      "xref": 320,
+      "bbox": [
+        0,
+        291,
+        465,
+        8
+      ]
+    },
+    {
+      "page": 26,
+      "image_index": 6,
+      "xref": 321,
+      "bbox": [
+        0,
+        291,
+        465,
+        8
+      ]
+    },
+    {
+      "page": 26,
+      "image_index": 7,
+      "xref": 326,
+      "bbox": [
+        0,
+        177,
+        237,
+        8
+      ]
+    },
+    {
+      "page": 26,
+      "image_index": 8,
+      "xref": 327,
+      "bbox": [
+        0,
+        179,
+        240,
+        8
+      ]
+    },
+    {
+      "page": 27,
+      "image_index": 1,
+      "xref": 31,
+      "bbox": [
+        34,
+        217,
+        47,
+        8
+      ]
+    },
+    {
+      "page": 27,
+      "image_index": 2,
+      "xref": 32,
+      "bbox": [
+        36,
+        143,
+        32,
+        8
+      ]
+    },
+    {
+      "page": 27,
+      "image_index": 3,
+      "xref": 33,
+      "bbox": [
+        38,
+        100,
+        50,
+        8
+      ]
+    },
+    {
+      "page": 27,
+      "image_index": 4,
+      "xref": 344,
+      "bbox": [
+        0,
+        340,
+        268,
+        8
+      ]
+    },
+    {
+      "page": 28,
+      "image_index": 1,
+      "xref": 31,
+      "bbox": [
+        34,
+        217,
+        47,
+        8
+      ]
+    },
+    {
+      "page": 28,
+      "image_index": 2,
+      "xref": 32,
+      "bbox": [
+        36,
+        143,
+        32,
+        8
+      ]
+    },
+    {
+      "page": 28,
+      "image_index": 3,
+      "xref": 33,
+      "bbox": [
+        38,
+        100,
+        50,
+        8
+      ]
+    },
+    {
+      "page": 29,
+      "image_index": 1,
+      "xref": 31,
+      "bbox": [
+        34,
+        217,
+        47,
+        8
+      ]
+    },
+    {
+      "page": 29,
+      "image_index": 2,
+      "xref": 32,
+      "bbox": [
+        36,
+        143,
+        32,
+        8
+      ]
+    },
+    {
+      "page": 29,
+      "image_index": 3,
+      "xref": 33,
+      "bbox": [
+        38,
+        100,
+        50,
+        8
+      ]
+    },
+    {
+      "page": 29,
+      "image_index": 4,
+      "xref": 356,
+      "bbox": [
+        357,
+        1266,
+        2002,
+        8
+      ]
+    },
+    {
+      "page": 30,
+      "image_index": 1,
+      "xref": 31,
+      "bbox": [
+        34,
+        217,
+        47,
+        8
+      ]
+    },
+    {
+      "page": 30,
+      "image_index": 2,
+      "xref": 32,
+      "bbox": [
+        36,
+        143,
+        32,
+        8
+      ]
+    },
+    {
+      "page": 30,
+      "image_index": 3,
+      "xref": 33,
+      "bbox": [
+        38,
+        100,
+        50,
+        8
+      ]
+    },
+    {
+      "page": 31,
+      "image_index": 1,
+      "xref": 31,
+      "bbox": [
+        34,
+        217,
+        47,
+        8
+      ]
+    },
+    {
+      "page": 31,
+      "image_index": 2,
+      "xref": 32,
+      "bbox": [
+        36,
+        143,
+        32,
+        8
+      ]
+    },
+    {
+      "page": 31,
+      "image_index": 3,
+      "xref": 33,
+      "bbox": [
+        38,
+        100,
+        50,
+        8
+      ]
+    },
+    {
+      "page": 32,
+      "image_index": 1,
+      "xref": 31,
+      "bbox": [
+        34,
+        217,
+        47,
+        8
+      ]
+    },
+    {
+      "page": 32,
+      "image_index": 2,
+      "xref": 32,
+      "bbox": [
+        36,
+        143,
+        32,
+        8
+      ]
+    },
+    {
+      "page": 32,
+      "image_index": 3,
+      "xref": 33,
+      "bbox": [
+        38,
+        100,
+        50,
+        8
+      ]
+    },
+    {
+      "page": 33,
+      "image_index": 1,
+      "xref": 31,
+      "bbox": [
+        34,
+        217,
+        47,
+        8
+      ]
+    },
+    {
+      "page": 33,
+      "image_index": 2,
+      "xref": 32,
+      "bbox": [
+        36,
+        143,
+        32,
+        8
+      ]
+    },
+    {
+      "page": 33,
+      "image_index": 3,
+      "xref": 33,
+      "bbox": [
+        38,
+        100,
+        50,
+        8
+      ]
+    },
+    {
+      "page": 33,
+      "image_index": 4,
+      "xref": 380,
+      "bbox": [
+        0,
+        843,
+        755,
+        8
+      ]
+    },
+    {
+      "page": 34,
+      "image_index": 1,
+      "xref": 31,
+      "bbox": [
+        34,
+        217,
+        47,
+        8
+      ]
+    },
+    {
+      "page": 34,
+      "image_index": 2,
+      "xref": 32,
+      "bbox": [
+        36,
+        143,
+        32,
+        8
+      ]
+    },
+    {
+      "page": 34,
+      "image_index": 3,
+      "xref": 33,
+      "bbox": [
+        38,
+        100,
+        50,
+        8
+      ]
+    },
+    {
+      "page": 34,
+      "image_index": 4,
+      "xref": 387,
+      "bbox": [
+        0,
+        242,
+        123,
+        8
+      ]
+    },
+    {
+      "page": 35,
+      "image_index": 1,
+      "xref": 31,
+      "bbox": [
+        34,
+        217,
+        47,
+        8
+      ]
+    },
+    {
+      "page": 35,
+      "image_index": 2,
+      "xref": 32,
+      "bbox": [
+        36,
+        143,
+        32,
+        8
+      ]
+    },
+    {
+      "page": 35,
+      "image_index": 3,
+      "xref": 33,
+      "bbox": [
+        38,
+        100,
+        50,
+        8
+      ]
+    },
+    {
+      "page": 36,
+      "image_index": 1,
+      "xref": 31,
+      "bbox": [
+        34,
+        217,
+        47,
+        8
+      ]
+    },
+    {
+      "page": 36,
+      "image_index": 2,
+      "xref": 32,
+      "bbox": [
+        36,
+        143,
+        32,
+        8
+      ]
+    },
+    {
+      "page": 36,
+      "image_index": 3,
+      "xref": 33,
+      "bbox": [
+        38,
+        100,
+        50,
+        8
+      ]
+    },
+    {
+      "page": 36,
+      "image_index": 4,
+      "xref": 399,
+      "bbox": [
+        0,
+        1305,
+        394,
+        8
+      ]
+    },
+    {
+      "page": 36,
+      "image_index": 5,
+      "xref": 400,
+      "bbox": [
+        0,
+        945,
+        346,
+        8
+      ]
+    },
+    {
+      "page": 36,
+      "image_index": 6,
+      "xref": 401,
+      "bbox": [
+        0,
+        149,
+        149,
+        8
+      ]
+    },
+    {
+      "page": 37,
+      "image_index": 1,
+      "xref": 31,
+      "bbox": [
+        34,
+        217,
+        47,
+        8
+      ]
+    },
+    {
+      "page": 37,
+      "image_index": 2,
+      "xref": 32,
+      "bbox": [
+        36,
+        143,
+        32,
+        8
+      ]
+    },
+    {
+      "page": 37,
+      "image_index": 3,
+      "xref": 33,
+      "bbox": [
+        38,
+        100,
+        50,
+        8
+      ]
+    },
+    {
+      "page": 37,
+      "image_index": 4,
+      "xref": 410,
+      "bbox": [
+        0,
+        548,
+        297,
+        8
+      ]
+    },
+    {
+      "page": 37,
+      "image_index": 5,
+      "xref": 411,
+      "bbox": [
+        0,
+        985,
+        234,
+        8
+      ]
+    },
+    {
+      "page": 38,
+      "image_index": 1,
+      "xref": 31,
+      "bbox": [
+        34,
+        217,
+        47,
+        8
+      ]
+    },
+    {
+      "page": 38,
+      "image_index": 2,
+      "xref": 32,
+      "bbox": [
+        36,
+        143,
+        32,
+        8
+      ]
+    },
+    {
+      "page": 38,
+      "image_index": 3,
+      "xref": 33,
+      "bbox": [
+        38,
+        100,
+        50,
+        8
+      ]
+    },
+    {
+      "page": 38,
+      "image_index": 4,
+      "xref": 420,
+      "bbox": [
+        0,
+        1121,
+        583,
+        8
+      ]
+    },
+    {
+      "page": 39,
+      "image_index": 1,
+      "xref": 31,
+      "bbox": [
+        34,
+        217,
+        47,
+        8
+      ]
+    },
+    {
+      "page": 39,
+      "image_index": 2,
+      "xref": 32,
+      "bbox": [
+        36,
+        143,
+        32,
+        8
+      ]
+    },
+    {
+      "page": 39,
+      "image_index": 3,
+      "xref": 33,
+      "bbox": [
+        38,
+        100,
+        50,
+        8
+      ]
+    },
+    {
+      "page": 39,
+      "image_index": 4,
+      "xref": 428,
+      "bbox": [
+        0,
+        288,
+        120,
+        8
+      ]
+    },
+    {
+      "page": 39,
+      "image_index": 5,
+      "xref": 429,
+      "bbox": [
+        0,
+        449,
+        236,
+        8
+      ]
+    },
+    {
+      "page": 40,
+      "image_index": 1,
+      "xref": 31,
+      "bbox": [
+        34,
+        217,
+        47,
+        8
+      ]
+    },
+    {
+      "page": 40,
+      "image_index": 2,
+      "xref": 32,
+      "bbox": [
+        36,
+        143,
+        32,
+        8
+      ]
+    },
+    {
+      "page": 40,
+      "image_index": 3,
+      "xref": 33,
+      "bbox": [
+        38,
+        100,
+        50,
+        8
+      ]
+    },
+    {
+      "page": 40,
+      "image_index": 4,
+      "xref": 437,
+      "bbox": [
+        0,
+        678,
+        583,
+        8
+      ]
+    },
+    {
+      "page": 41,
+      "image_index": 1,
+      "xref": 31,
+      "bbox": [
+        34,
+        217,
+        47,
+        8
+      ]
+    },
+    {
+      "page": 41,
+      "image_index": 2,
+      "xref": 32,
+      "bbox": [
+        36,
+        143,
+        32,
+        8
+      ]
+    },
+    {
+      "page": 41,
+      "image_index": 3,
+      "xref": 33,
+      "bbox": [
+        38,
+        100,
+        50,
+        8
+      ]
+    },
+    {
+      "page": 41,
+      "image_index": 4,
+      "xref": 444,
+      "bbox": [
+        0,
+        477,
+        102,
+        8
+      ]
+    },
+    {
+      "page": 42,
+      "image_index": 1,
+      "xref": 31,
+      "bbox": [
+        34,
+        217,
+        47,
+        8
+      ]
+    },
+    {
+      "page": 42,
+      "image_index": 2,
+      "xref": 32,
+      "bbox": [
+        36,
+        143,
+        32,
+        8
+      ]
+    },
+    {
+      "page": 42,
+      "image_index": 3,
+      "xref": 33,
+      "bbox": [
+        38,
+        100,
+        50,
+        8
+      ]
+    },
+    {
+      "page": 43,
+      "image_index": 1,
+      "xref": 31,
+      "bbox": [
+        34,
+        217,
+        47,
+        8
+      ]
+    },
+    {
+      "page": 43,
+      "image_index": 2,
+      "xref": 32,
+      "bbox": [
+        36,
+        143,
+        32,
+        8
+      ]
+    },
+    {
+      "page": 43,
+      "image_index": 3,
+      "xref": 33,
+      "bbox": [
+        38,
+        100,
+        50,
+        8
+      ]
+    },
+    {
+      "page": 44,
+      "image_index": 1,
+      "xref": 31,
+      "bbox": [
+        34,
+        217,
+        47,
+        8
+      ]
+    },
+    {
+      "page": 44,
+      "image_index": 2,
+      "xref": 32,
+      "bbox": [
+        36,
+        143,
+        32,
+        8
+      ]
+    },
+    {
+      "page": 44,
+      "image_index": 3,
+      "xref": 33,
+      "bbox": [
+        38,
+        100,
+        50,
+        8
+      ]
+    },
+    {
+      "page": 45,
+      "image_index": 1,
+      "xref": 31,
+      "bbox": [
+        34,
+        217,
+        47,
+        8
+      ]
+    },
+    {
+      "page": 45,
+      "image_index": 2,
+      "xref": 32,
+      "bbox": [
+        36,
+        143,
+        32,
+        8
+      ]
+    },
+    {
+      "page": 45,
+      "image_index": 3,
+      "xref": 33,
+      "bbox": [
+        38,
+        100,
+        50,
+        8
+      ]
+    },
+    {
+      "page": 46,
+      "image_index": 1,
+      "xref": 31,
+      "bbox": [
+        34,
+        217,
+        47,
+        8
+      ]
+    },
+    {
+      "page": 46,
+      "image_index": 2,
+      "xref": 32,
+      "bbox": [
+        36,
+        143,
+        32,
+        8
+      ]
+    },
+    {
+      "page": 46,
+      "image_index": 3,
+      "xref": 33,
+      "bbox": [
+        38,
+        100,
+        50,
+        8
+      ]
+    },
+    {
+      "page": 47,
+      "image_index": 1,
+      "xref": 476,
+      "bbox": [
+        478,
+        378,
+        82,
+        8
+      ]
+    },
+    {
+      "page": 47,
+      "image_index": 2,
+      "xref": 477,
+      "bbox": [
+        480,
+        154,
+        26,
+        8
+      ]
+    }
+  ],
+  "metadata": {
+    "pages": 47,
+    "title": "bizMOB4Vue 모바일 개발자 가이드.v.1.0",
+    "author": "",
+    "subject": ""
+  },
+  "file_path": "data/source/guides/tutorials/bizMOB4(Vue) 개발자가이드 For Mobile.pdf",
+  "file_name": "bizMOB4(Vue) 개발자가이드 For Mobile.pdf",
+  "parsing_method": "github_actions_python",
+  "parsed_at": "2025-08-01T07:01:17.020819",
+  "file_hash": "93dd682945523bf55233cfa219839d1f"
+}
