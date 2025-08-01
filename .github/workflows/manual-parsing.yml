@@ -1,5 +1,6 @@
 # .github/workflows/manual-parsing.yml
 name: Manual Document Parsing
+
 on:
   workflow_dispatch:
     inputs:
@@ -12,6 +13,11 @@ on:
         type: string
         required: false
 
+# 권한 설정 추가
+permissions:
+  contents: write  # 파일 읽기/쓰기 권한
+  actions: read    # Actions 읽기 권한
+
 jobs:
   parse:
     runs-on: ubuntu-latest
@@ -19,6 +25,10 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          # 토큰 설정 추가 (더 안전한 방법)
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0  # 전체 히스토리 가져오기
 
       - name: Setup Python
         uses: actions/setup-python@v4
@@ -48,3 +58,9 @@ jobs:
         with:
           commit_message: 'Parsed documents [skip ci]'
           file_pattern: 'data/processed/**'
+          # 추가 설정
+          commit_user_name: github-actions[bot]
+          commit_user_email: 41898282+github-actions[bot]@users.noreply.github.com
+          commit_author: GitHub Actions <actions@github.com>
+          skip_dirty_check: false
+          skip_fetch: false
