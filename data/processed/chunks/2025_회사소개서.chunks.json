@@ -23,13 +23,14 @@
         "pages": [
           1,
           2,
+          3,
           4
         ]
       }
     },
     "tokens": 228,
     "char_count": 649,
-    "created_at": "2025-08-02T07:35:04.637Z",
+    "created_at": "2025-08-02T07:56:39.513Z",
     "enrichments": {
       "images": [
         {
@@ -90,7 +91,7 @@
     },
     "tokens": 579,
     "char_count": 1453,
-    "created_at": "2025-08-02T07:35:04.638Z",
+    "created_at": "2025-08-02T07:56:39.514Z",
     "enrichments": {
       "images": [
         {
@@ -520,13 +521,15 @@
         "end_char": 1269,
         "pages": [
           7,
-          8
+          8,
+          9,
+          10
         ]
       }
     },
     "tokens": 527,
     "char_count": 1270,
-    "created_at": "2025-08-02T07:35:04.639Z",
+    "created_at": "2025-08-02T07:56:39.514Z",
     "enrichments": {
       "images": [
         {
@@ -628,6 +631,56 @@
               8
             ]
           }
+        },
+        {
+          "image_id": "i_9_1",
+          "page": 9,
+          "image_index": 1,
+          "xref": 88,
+          "position": "within",
+          "context": "페이지 9의 이미지",
+          "bbox": [
+            0,
+            1269,
+            681,
+            8
+          ],
+          "original_metadata": {
+            "page": 9,
+            "image_index": 1,
+            "xref": 88,
+            "bbox": [
+              0,
+              1269,
+              681,
+              8
+            ]
+          }
+        },
+        {
+          "image_id": "i_9_2",
+          "page": 9,
+          "image_index": 2,
+          "xref": 89,
+          "position": "within",
+          "context": "페이지 9의 이미지",
+          "bbox": [
+            0,
+            378,
+            144,
+            8
+          ],
+          "original_metadata": {
+            "page": 9,
+            "image_index": 2,
+            "xref": 89,
+            "bbox": [
+              0,
+              378,
+              144,
+              8
+            ]
+          }
         }
       ],
       "tables": [
@@ -704,14 +757,15 @@
         "start_char": -1,
         "end_char": 1212,
         "pages": [
+          9,
+          10,
           11
-        ],
-        "page": 11
+        ]
       }
     },
     "tokens": 421,
     "char_count": 1213,
-    "created_at": "2025-08-02T07:35:04.639Z",
+    "created_at": "2025-08-02T07:56:39.514Z",
     "enrichments": {
       "images": [
         {
@@ -872,7 +926,7 @@
     },
     "tokens": 282,
     "char_count": 838,
-    "created_at": "2025-08-02T07:35:04.639Z",
+    "created_at": "2025-08-02T07:56:39.514Z",
     "enrichments": {
       "images": [
         {
@@ -1233,7 +1287,7 @@
     },
     "tokens": 368,
     "char_count": 1246,
-    "created_at": "2025-08-02T07:35:04.640Z",
+    "created_at": "2025-08-02T07:56:39.514Z",
     "enrichments": {
       "images": [
         {
@@ -1794,7 +1848,7 @@
     },
     "tokens": 599,
     "char_count": 1478,
-    "created_at": "2025-08-02T07:35:04.640Z",
+    "created_at": "2025-08-02T07:56:39.514Z",
     "enrichments": {
       "images": [
         {
@@ -2039,13 +2093,14 @@
         "pages": [
           17,
           18,
-          19
+          19,
+          20
         ]
       }
     },
     "tokens": 314,
     "char_count": 940,
-    "created_at": "2025-08-02T07:35:04.640Z",
+    "created_at": "2025-08-02T07:56:39.514Z",
     "enrichments": {
       "images": [
         {
@@ -2625,13 +2680,14 @@
         "end_char": 1143,
         "pages": [
           19,
+          20,
           21
         ]
       }
     },
     "tokens": 331,
     "char_count": 1144,
-    "created_at": "2025-08-02T07:35:04.641Z",
+    "created_at": "2025-08-02T07:56:39.515Z",
     "enrichments": {
       "images": [
         {
@@ -2792,7 +2848,7 @@
     },
     "tokens": 280,
     "char_count": 788,
-    "created_at": "2025-08-02T07:35:04.641Z",
+    "created_at": "2025-08-02T07:56:39.515Z",
     "enrichments": {
       "images": [
         {
@@ -2953,7 +3009,7 @@
     },
     "tokens": 539,
     "char_count": 1321,
-    "created_at": "2025-08-02T07:35:04.642Z",
+    "created_at": "2025-08-02T07:56:39.515Z",
     "enrichments": {
       "images": [
         {
@@ -3471,13 +3527,14 @@
         "pages": [
           24,
           25,
-          26
+          26,
+          27
         ]
       }
     },
     "tokens": 497,
     "char_count": 1216,
-    "created_at": "2025-08-02T07:35:04.643Z",
+    "created_at": "2025-08-02T07:56:39.515Z",
     "enrichments": {
       "images": [
         {
@@ -3843,6 +3900,7 @@
         "start_char": -1,
         "end_char": 1296,
         "pages": [
+          27,
           28,
           29,
           30
@@ -3851,7 +3909,7 @@
     },
     "tokens": 498,
     "char_count": 1297,
-    "created_at": "2025-08-02T07:35:04.643Z",
+    "created_at": "2025-08-02T07:56:39.515Z",
     "enrichments": {
       "images": [
         {
@@ -4998,7 +5056,7 @@
     },
     "tokens": 559,
     "char_count": 1429,
-    "created_at": "2025-08-02T07:35:04.643Z",
+    "created_at": "2025-08-02T07:56:39.515Z",
     "enrichments": {
       "images": [
         {
@@ -6336,7 +6394,7 @@
     },
     "tokens": 570,
     "char_count": 1443,
-    "created_at": "2025-08-02T07:35:04.643Z",
+    "created_at": "2025-08-02T07:56:39.515Z",
     "enrichments": {
       "images": [
         {
@@ -7493,13 +7551,14 @@
           39,
           40,
           41,
+          42,
           43
         ]
       }
     },
     "tokens": 556,
     "char_count": 1459,
-    "created_at": "2025-08-02T07:35:04.644Z",
+    "created_at": "2025-08-02T07:56:39.516Z",
     "enrichments": {
       "images": [
         {
@@ -8593,7 +8652,7 @@
     },
     "tokens": 485,
     "char_count": 1419,
-    "created_at": "2025-08-02T07:35:04.644Z",
+    "created_at": "2025-08-02T07:56:39.516Z",
     "enrichments": {
       "images": [
         {
@@ -9146,7 +9205,7 @@
     },
     "tokens": 351,
     "char_count": 860,
-    "created_at": "2025-08-02T07:35:04.644Z",
+    "created_at": "2025-08-02T07:56:39.516Z",
     "enrichments": {
       "images": [
         {
@@ -9532,7 +9591,7 @@
     },
     "tokens": 449,
     "char_count": 1326,
-    "created_at": "2025-08-02T07:35:04.644Z",
+    "created_at": "2025-08-02T07:56:39.516Z",
     "enrichments": {
       "images": [
         {
@@ -10068,7 +10127,7 @@
     },
     "tokens": 217,
     "char_count": 566,
-    "created_at": "2025-08-02T07:35:04.644Z",
+    "created_at": "2025-08-02T07:56:39.516Z",
     "enrichments": {
       "images": [
         {

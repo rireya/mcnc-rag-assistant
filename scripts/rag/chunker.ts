@@ -47,12 +47,6 @@ export class TextChunker {
     const chunkSizeInChars = Math.floor(strategy.chunkSize * avgCharsPerToken);
     const overlapInChars = Math.floor(strategy.overlap * avgCharsPerToken);
 
-    console.log(`Strategy: ${strategyName}`);
-    console.log(`  - Token to char ratio: ${avgCharsPerToken}`);
-    console.log(`  - Chunk size: ${strategy.chunkSize} tokens → ${chunkSizeInChars} chars`);
-    console.log(`  - Overlap: ${strategy.overlap} tokens → ${overlapInChars} chars`);
-    console.log(`  - Preprocessor: ${strategy.preprocessor || 'none'}`);
-
     // RecursiveCharacterTextSplitter 인스턴스 생성
     this.splitter = new RecursiveCharacterTextSplitter({
       chunkSize: chunkSizeInChars,
@@ -65,15 +59,12 @@ export class TextChunker {
    */
   public async chunkText(text: string): Promise<string[]> {
     if (!text || text.trim().length === 0) {
-      console.log('Empty text provided, returning empty chunks');
       return [];
     }
 
     // 전처리 적용
     const preprocessedText = this.preprocessText(text);
     const normalizedText = normalizeText(preprocessedText);
-
-    console.log(`Chunking text: ${normalizedText.length} characters`);
 
     try {
       // LangChain Document 생성
@@ -82,9 +73,7 @@ export class TextChunker {
       })];
 
       // RecursiveCharacterTextSplitter로 분할
-      const startTime = Date.now();
       const chunks = await this.splitter.splitDocuments(documents);
-      const processingTime = Date.now() - startTime;
 
       // 텍스트 추출 및 필터링
       let textChunks = chunks
@@ -97,7 +86,6 @@ export class TextChunker {
       textChunks = textChunks.map(chunk => {
         const tokens = estimateTokenCount(chunk);
         if (tokens > maxTokens) {
-          console.log(`Chunk exceeds token limit (${tokens} > ${maxTokens}), truncating...`);
           return truncateToTokenLimit(chunk, maxTokens);
         }
         return chunk;
@@ -110,8 +98,6 @@ export class TextChunker {
 
       // 중복 제거
       const deduplicatedChunks = this.removeDuplicates(textChunks);
-
-      console.log(`Chunking complete for ${this.strategyName}: ${chunks.length} → ${textChunks.length} → ${deduplicatedChunks.length} chunks (${processingTime}ms)`);
 
       return deduplicatedChunks;
 
@@ -135,13 +121,11 @@ export class TextChunker {
       case 'removePage':
         // 페이지 구분자 완전 제거
         processedText = text.replace(/\n--- 페이지 \d+ ---\n/g, '\n\n');
-        console.log('Preprocessor: Removed page separators');
         break;
 
       case 'weakenPage':
         // 페이지 구분자를 약한 마커로 변경
         processedText = text.replace(/\n--- 페이지 (\d+) ---\n/g, '\n\n<<PAGE_BOUNDARY_$1>>\n\n');
-        console.log('Preprocessor: Weakened page separators');
         break;
     }
 
@@ -172,8 +156,6 @@ export class TextChunker {
 
       if (!isDuplicate) {
         uniqueChunks.push(chunk);
-      } else {
-        console.log(`Removed duplicate chunk: ${chunk.substring(0, 50)}...`);
       }
     }
 
@@ -198,11 +180,7 @@ export class DocumentChunker {
     const strategyName = getStrategyNameFromPath(document.file_path);
     const strategy = getChunkingStrategy(document.file_path);
 
-    console.log(`Processing ${document.file_name} with strategy: ${strategyName}`);
-
-    // 페이지 경계 정보 추출 (선택적 - 디버깅용)
-    // const pageBoundaries = this.extractPageBoundaries(document.content);
-    // console.log(`Found ${pageBoundaries.length} page boundaries`);
+    console.log(`Processing: ${document.file_name} [${strategyName}]`);
 
     // 텍스트 청킹
     const chunker = new TextChunker(strategy, strategyName);
@@ -225,25 +203,8 @@ export class DocumentChunker {
       const endChar = startChar + content.length;
       currentPosition = endChar;
 
-      // 청크가 포함하는 페이지 번호들 계산 - 실제 텍스트 기반
+      // 청크가 포함하는 페이지 번호들 계산 - 모든 페이지 마커 포함
       const pagesInChunk = this.getPagesFromChunkContent(content);
-
-      // 디버깅을 위한 상세 로그
-      if (i < 10) { // 처음 10개 청크만 상세 로그
-        const chunkPreview = content.substring(0, 100).replace(/\n/g, '\\n');
-        const chunkEnd = content.substring(Math.max(0, content.length - 100)).replace(/\n/g, '\\n');
-        console.log(`\nChunk ${i}:`);
-        console.log(`  Position: ${startChar}-${endChar} (${endChar - startChar} chars)`);
-        console.log(`  Pages: [${pagesInChunk.join(', ')}]`);
-        console.log(`  Start: "${chunkPreview}..."`);
-        console.log(`  End: "...${chunkEnd}"`);
-
-        // 페이지 마커 확인
-        const pageMarkers = content.match(/--- (페이지|슬라이드) \d+ ---/g);
-        if (pageMarkers) {
-          console.log(`  Page markers found: ${pageMarkers.join(', ')}`);
-        }
-      }
 
       const chunkData: EnhancedChunkData = {
         id: generateChunkId(document.file_path, i),
@@ -264,7 +225,7 @@ export class DocumentChunker {
         enrichments: {}  // 초기화
       };
 
-      // 메타데이터 보강 (해당 페이지의 데이터만)
+      // 메타데이터 보강 (실제 내용이 있는 페이지의 데이터만)
       this.enrichChunkWithMetadata(chunkData, document, startChar, endChar, pagesInChunk);
 
       chunks.push(chunkData);
@@ -274,15 +235,8 @@ export class DocumentChunker {
     this.validateAndRecoverStructuredData(document, chunks);
 
     const processingTime = Date.now() - startTime;
-    const avgTokens = chunks.length > 0 ? Math.round(totalTokens / chunks.length) : 0;
 
-    console.log(`Chunking complete for ${document.file_name}:`);
-    console.log(`  - Chunks created: ${chunks.length}`);
-    console.log(`  - Total tokens: ${totalTokens.toLocaleString()}`);
-    console.log(`  - Average tokens/chunk: ${avgTokens}`);
-    console.log(`  - Tables preserved: ${document.tables?.length || 0}`);
-    console.log(`  - Images preserved: ${document.images?.length || 0}`);
-    console.log(`  - Processing time: ${processingTime}ms`);
+    console.log(`✓ ${document.file_name}: ${chunks.length} chunks, ${totalTokens.toLocaleString()} tokens (${processingTime}ms)`);
 
     return {
       chunks,
@@ -337,8 +291,6 @@ export class DocumentChunker {
       if (next && next.pageNum > current.pageNum + 1) {
         // 중간에 마커가 없는 페이지들 추가
         for (let missingPage = current.pageNum + 1; missingPage < next.pageNum; missingPage++) {
-          console.log(`  Warning: Page ${missingPage} has no explicit marker, inferring boundaries`);
-
           // 페이지 내용을 균등하게 분할
           const totalPages = next.pageNum - current.pageNum;
           const contentLength = next.index - pageStart;
@@ -372,23 +324,18 @@ export class DocumentChunker {
     // 페이지 번호순 정렬
     boundaries.sort((a, b) => a.page - b.page);
 
-    console.log(`Page boundaries extracted: ${boundaries.length} pages`);
-    boundaries.forEach(b => {
-      const preview = content.substring(b.startPos, Math.min(b.startPos + 50, b.endPos)).replace(/\n/g, ' ');
-      console.log(`  Page ${b.page}: ${b.startPos}-${b.endPos} "${preview}..."`);
-    });
-
     return boundaries;
   }
 
   /**
    * 청크 텍스트를 분석하여 포함된 페이지 번호 추출
+   * 마지막 페이지 마커는 오버랩으로 간주하여 제외
    */
   private getPagesFromChunkContent(content: string): number[] {
     const pages = new Set<number>();
     const pagePattern = /--- (페이지|슬라이드) (\d+) ---/g;
 
-    // 청크 내의 모든 페이지 마커와 위치 찾기
+    // 청크 내의 모든 페이지 마커 찾기
     const markers: Array<{ page: number; position: number }> = [];
     let match;
     while ((match = pagePattern.exec(content)) !== null) {
@@ -403,56 +350,61 @@ export class DocumentChunker {
       return [1];
     }
 
-    // 각 페이지 마커 이후의 내용 길이 확인
-    const MIN_CONTENT_LENGTH = 50; // 최소 50자 이상의 내용이 있어야 해당 페이지 포함
+    // 마지막 마커 처리를 위한 청크 끝부분 확인
+    const lastMarker = markers[markers.length - 1];
+    const contentAfterLastMarker = content.substring(lastMarker.position + 20).trim(); // 마커 길이 약 20자
+    const MIN_TRAILING_CONTENT = 30; // 마지막 페이지로 인정하기 위한 최소 내용
 
-    for (let i = 0; i < markers.length; i++) {
-      const current = markers[i];
-      const next = markers[i + 1];
+    // 각 마커 처리
+    markers.forEach((marker, index) => {
+      const isLastMarker = index === markers.length - 1;
 
-      // 현재 마커부터 다음 마커(또는 청크 끝)까지의 내용 길이
-      const contentStart = current.position + 20; // 마커 길이 대략 20자
-      const contentEnd = next ? next.position : content.length;
-      const contentLength = contentEnd - contentStart;
-
-      // 충분한 내용이 있으면 해당 페이지 포함
-      if (contentLength >= MIN_CONTENT_LENGTH) {
-        pages.add(current.page);
-
-        // 다음 페이지 마커까지 거리가 멀면 중간 페이지도 포함
-        if (next && next.page > current.page + 1) {
-          // 예: 5페이지 다음이 7페이지면 6페이지도 포함
-          for (let page = current.page + 1; page < next.page; page++) {
-            pages.add(page);
-          }
-        }
-      } else {
-        console.log(`  Page ${current.page} marker found but insufficient content (${contentLength} chars), excluding`);
+      if (isLastMarker && contentAfterLastMarker.length < MIN_TRAILING_CONTENT) {
+        // 마지막 마커이고 그 이후 내용이 충분하지 않으면 제외 (오버랩으로 간주)
+        return;
       }
-    }
 
-    // 청크 시작 부분 확인 - 페이지 마커 없이 시작하는 경우
-    if (markers.length > 0) {
-      const firstMarkerPos = markers[0].position;
-      if (firstMarkerPos > MIN_CONTENT_LENGTH) {
-        // 첫 마커 이전에 충분한 내용이 있다면 이전 페이지도 포함
-        const firstPage = markers[0].page;
-        if (firstPage > 1) {
-          pages.add(firstPage - 1);
+      pages.add(marker.page);
+
+      // 다음 페이지 마커까지 거리가 멀면 중간 페이지도 포함
+      const nextMarker = markers[index + 1];
+      if (nextMarker && nextMarker.page > marker.page + 1) {
+        // 예: 5페이지 다음이 7페이지면 6페이지도 포함
+        for (let page = marker.page + 1; page < nextMarker.page; page++) {
+          pages.add(page);
         }
       }
-    }
+    });
 
-    // 빈 Set인 경우 최소한 하나의 페이지는 포함
-    if (pages.size === 0 && markers.length > 0) {
-      pages.add(markers[0].page);
+    // 청크 시작 부분에 페이지 마커가 없는 경우
+    if (markers.length > 0 && markers[0].position > 100) {
+      // 첫 마커 이전에 충분한 내용이 있다면 이전 페이지도 포함
+      const firstPage = markers[0].page;
+      if (firstPage > 1) {
+        pages.add(firstPage - 1);
+      }
     }
 
     return Array.from(pages).sort((a, b) => a - b);
   }
 
   /**
-   * 청크에 구조화 데이터 메타데이터 추가 (해당 페이지만)
+   * 페이지의 실제 내용 길이 계산
+   */
+  private getPageContentLength(content: string, pageNum: number): number {
+    const pagePattern = new RegExp(`--- (페이지|슬라이드) ${pageNum} ---([\\s\\S]*?)(?:--- (?:페이지|슬라이드) \\d+ ---|$)`);
+    const match = content.match(pagePattern);
+
+    if (match && match[2]) {
+      // 페이지 마커 이후의 실제 내용 길이
+      return match[2].trim().length;
+    }
+
+    return 0;
+  }
+
+  /**
+   * 청크에 구조화 데이터 메타데이터 추가 (실제 내용이 있는 페이지만)
    */
   private enrichChunkWithMetadata(
     chunk: EnhancedChunkData,
@@ -461,14 +413,22 @@ export class DocumentChunker {
     endChar: number,
     pagesInChunk: number[]
   ): void {
-    // 해당 페이지의 이미지만 추가
-    const images = this.findImagesInPages(document, pagesInChunk);
+    const MIN_PAGE_CONTENT = 50; // 테이블/이미지를 포함하기 위한 최소 내용 길이
+
+    // 실제 내용이 있는 페이지만 필터링
+    const pagesWithContent = pagesInChunk.filter(pageNum => {
+      const contentLength = this.getPageContentLength(chunk.content, pageNum);
+      return contentLength >= MIN_PAGE_CONTENT;
+    });
+
+    // 실제 내용이 있는 페이지의 이미지만 추가
+    const images = this.findImagesInPages(document, pagesWithContent);
     if (images.length > 0) {
       chunk.enrichments!.images = images;
     }
 
-    // 해당 페이지의 테이블만 추가
-    const tables = this.findTablesInPages(document, pagesInChunk);
+    // 실제 내용이 있는 페이지의 테이블만 추가
+    const tables = this.findTablesInPages(document, pagesWithContent);
     if (tables.length > 0) {
       chunk.enrichments!.tables = tables;
     }
@@ -681,27 +641,8 @@ export class DocumentChunker {
 
     // 누락된 항목 재배치
     if (missingTables.length > 0 || missingImages.length > 0) {
-      console.log(`Recovering missing structured data: ${missingTables.length} tables, ${missingImages.length} images`);
-
-      // 각 누락된 항목에 대해 상세 로그
-      missingTables.forEach(table => {
-        console.log(`  Missing table: Page ${table.page || table.slide || 'unknown'}, Index ${table.table_index || 'unknown'}`);
-      });
-
       this.redistributeMissingStructuredData(chunks, missingTables, missingImages, document);
     }
-
-    // 최종 검증 로그
-    let finalTableCount = 0;
-    let finalImageCount = 0;
-    chunks.forEach(chunk => {
-      finalTableCount += chunk.enrichments?.tables?.length || 0;
-      finalImageCount += chunk.enrichments?.images?.length || 0;
-    });
-
-    console.log(`Final structured data distribution:`);
-    console.log(`  Tables: ${finalTableCount}/${originalTables.length}`);
-    console.log(`  Images: ${finalImageCount}/${originalImages.length}`);
   }
 
   /**
@@ -747,10 +688,6 @@ export class DocumentChunker {
           truncated: false,
           original_metadata: table
         });
-
-        console.log(`  Redistributed table from page ${tablePage} to chunk ${chunks.indexOf(targetChunk)}`);
-      } else {
-        console.log(`  Warning: No chunk found for table on page ${tablePage}`);
       }
     }
 
@@ -784,10 +721,6 @@ export class DocumentChunker {
           shape_id: image.shape_id,
           original_metadata: image
         });
-
-        console.log(`  Redistributed image from page ${imagePage} to chunk ${chunks.indexOf(targetChunk)}`);
-      } else {
-        console.log(`  Warning: No chunk found for image on page ${imagePage}`);
       }
     }
   }
@@ -860,22 +793,13 @@ export class DocumentChunker {
    * 청크 품질 검사 수행
    */
   public assessChunksQuality(chunks: EnhancedChunkData[]): ChunkQualityMetrics[] {
-    console.log(`Assessing quality of ${chunks.length} chunks...`);
-
     const qualityResults = chunks.map(chunk => assessChunkQuality(chunk));
 
     const validChunks = qualityResults.filter(result => result.is_valid).length;
     const invalidChunks = qualityResults.length - validChunks;
 
-    console.log(`Quality assessment complete: ${validChunks} valid, ${invalidChunks} invalid chunks`);
-
     if (invalidChunks > 0) {
-      console.log('Quality issues found:');
-      qualityResults
-        .filter(result => !result.is_valid)
-        .forEach(result => {
-          console.log(`  - ${result.chunk_id}: ${result.issues.join(', ')}`);
-        });
+      console.log(`⚠️  Quality issues found in ${invalidChunks} chunks`);
     }
 
     return qualityResults;
@@ -905,14 +829,15 @@ export class BatchChunker {
     const fileStatuses: FileProcessingStatus[] = [];
     const strategyStats: { [strategy: string]: { file_count: number; chunk_count: number; total_tokens: number } } = {};
 
-    console.log(`Starting batch processing of ${documents.length} documents...`);
+    console.log(`\nStarting batch processing of ${documents.length} documents...`);
+    console.log('─'.repeat(60));
 
     for (let i = 0; i < documents.length; i++) {
       const document = documents[i];
       const fileStartTime = Date.now();
 
       try {
-        console.log(`[${i + 1}/${documents.length}] Processing ${document.file_name}...`);
+        console.log(`[${i + 1}/${documents.length}] `, { end: '' });
 
         const result = await this.documentChunker.chunkDocument(document);
         allChunks.push(...result.chunks);
@@ -937,7 +862,7 @@ export class BatchChunker {
 
       } catch (error) {
         const processingTime = Date.now() - fileStartTime;
-        console.error(`Failed to process ${document.file_name}:`, error);
+        console.error(`✗ Failed to process ${document.file_name}:`, error);
 
         fileStatuses.push({
           file_path: document.file_path,
@@ -953,7 +878,8 @@ export class BatchChunker {
     const totalProcessingTime = Date.now() - startTime;
     const stats = this.calculateStats(allChunks, fileStatuses, strategyStats, totalProcessingTime);
 
-    console.log(`Batch processing completed in ${totalProcessingTime}ms`);
+    console.log('─'.repeat(60));
+    console.log(`\nBatch processing completed in ${totalProcessingTime}ms`);
     console.log(`Total chunks created: ${allChunks.length}`);
     console.log(`Successful files: ${fileStatuses.filter(s => s.status === 'completed').length}/${documents.length}`);
 
