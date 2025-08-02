@@ -4,7 +4,7 @@ import fs from 'fs';
 import path from 'path';
 import { getChunkingStrategy, RAG_CONFIG, isOptimalChunkSize } from './config/rag-config.js';
 import { PATHS } from './config/paths.js';
-import { ChunkData } from './rag/types.js';
+import { EnhancedChunkData } from './rag/types.js';
 
 interface ValidationResult {
   fileName: string;
@@ -23,20 +23,21 @@ interface ValidationResult {
     optimalRangePercentage: number;
   };
 
-  enrichmentStats: {
-    chunksWithTables: number;
-    chunksWithImages: number;
-    totalTables: number;
-    totalImages: number;
-    enrichmentCoverage: number;  // 보강 정보가 있는 청크 비율
-  };
-
   configComparison: {
     expectedChunkSize: number;
     actualAvgTokens: number;
     sizeDeviation: number;
     expectedOverlap: number;
     overlapVerified: boolean;
+  };
+
+  structuredData: {
+    totalTables: number;
+    totalImages: number;
+    chunksWithTables: number;
+    chunksWithImages: number;
+    avgTablesPerChunk: number;
+    avgImagesPerChunk: number;
   };
 
   issues: string[];
@@ -84,7 +85,7 @@ class ChunkingValidator {
    */
   private async validateChunkFile(filePath: string): Promise<void> {
     try {
-      const chunks: ChunkData[] = JSON.parse(
+      const chunks: EnhancedChunkData[] = JSON.parse(
         await fs.promises.readFile(filePath, 'utf-8')
       );
 
@@ -109,8 +110,8 @@ class ChunkingValidator {
       // 청크 통계 계산
       const chunkStats = this.calculateChunkStats(chunks);
 
-      // 보강 정보 통계 계산
-      const enrichmentStats = this.calculateEnrichmentStats(chunks);
+      // 구조화 데이터 통계 계산
+      const structuredDataStats = this.calculateStructuredDataStats(chunks);
 
       // 오버랩 검증
       const overlapChecks = this.checkOverlaps(chunks);
@@ -165,13 +166,6 @@ class ChunkingValidator {
         }
       }
 
-      // 보강 정보 검증
-      if (enrichmentStats.enrichmentCoverage === 0) {
-        warnings.push('테이블/이미지 정보가 전혀 포함되지 않았습니다');
-      } else if (enrichmentStats.enrichmentCoverage < 10) {
-        warnings.push(`보강 정보 적용률이 낮습니다: ${enrichmentStats.enrichmentCoverage.toFixed(1)}%`);
-      }
-
       // 결과 저장
       const result: ValidationResult = {
         fileName,
@@ -180,7 +174,6 @@ class ChunkingValidator {
         expectedStrategy: expectedStrategyName,
         isStrategyCorrect,
         chunkStats,
-        enrichmentStats,
         configComparison: {
           expectedChunkSize: expectedStrategy.chunkSize,
           actualAvgTokens: chunkStats.avgTokens,
@@ -188,6 +181,7 @@ class ChunkingValidator {
           expectedOverlap: expectedStrategy.overlap,
           overlapVerified: hasOverlap
         },
+        structuredData: structuredDataStats,
         issues,
         warnings
       };
@@ -203,7 +197,7 @@ class ChunkingValidator {
   /**
    * 청크 통계 계산
    */
-  private calculateChunkStats(chunks: ChunkData[]): ValidationResult['chunkStats'] {
+  private calculateChunkStats(chunks: EnhancedChunkData[]): ValidationResult['chunkStats'] {
     const tokenCounts = chunks.map(c => c.tokens);
     const charCounts = chunks.map(c => c.char_count);
 
@@ -224,41 +218,43 @@ class ChunkingValidator {
   }
 
   /**
-   * 보강 정보 통계 계산
+   * 구조화 데이터 통계 계산
    */
-  private calculateEnrichmentStats(chunks: ChunkData[]): ValidationResult['enrichmentStats'] {
-    let chunksWithTables = 0;
-    let chunksWithImages = 0;
+  private calculateStructuredDataStats(chunks: EnhancedChunkData[]): ValidationResult['structuredData'] {
     let totalTables = 0;
     let totalImages = 0;
+    let chunksWithTables = 0;
+    let chunksWithImages = 0;
 
     chunks.forEach(chunk => {
-      if (chunk.enrichments?.tables && chunk.enrichments.tables.length > 0) {
+      const tables = chunk.enrichments?.tables || [];
+      const images = chunk.enrichments?.images || [];
+
+      if (tables.length > 0) {
+        totalTables += tables.length;
         chunksWithTables++;
-        totalTables += chunk.enrichments.tables.length;
       }
-      if (chunk.enrichments?.images && chunk.enrichments.images.length > 0) {
+
+      if (images.length > 0) {
+        totalImages += images.length;
         chunksWithImages++;
-        totalImages += chunk.enrichments.images.length;
       }
     });
 
-    const enrichedChunks = new Set([...Array(chunksWithTables), ...Array(chunksWithImages)]).size;
-    const enrichmentCoverage = (enrichedChunks / chunks.length) * 100;
-
     return {
-      chunksWithTables,
-      chunksWithImages,
       totalTables,
       totalImages,
-      enrichmentCoverage
+      chunksWithTables,
+      chunksWithImages,
+      avgTablesPerChunk: chunksWithTables > 0 ? totalTables / chunksWithTables : 0,
+      avgImagesPerChunk: chunksWithImages > 0 ? totalImages / chunksWithImages : 0
     };
   }
 
   /**
    * 오버랩 검사
    */
-  private checkOverlaps(chunks: ChunkData[]): OverlapCheck[] {
+  private checkOverlaps(chunks: EnhancedChunkData[]): OverlapCheck[] {
     const overlaps: OverlapCheck[] = [];
 
     for (let i = 0; i < chunks.length - 1; i++) {
@@ -314,16 +310,26 @@ class ChunkingValidator {
     console.log(`  토큰: 평균 ${result.chunkStats.avgTokens} (${result.chunkStats.minTokens}-${result.chunkStats.maxTokens})`);
     console.log(`  최적 범위: ${result.chunkStats.optimalRangePercentage.toFixed(1)}% (${result.chunkStats.tokensInOptimalRange}/${result.chunkStats.totalChunks})`);
 
-    // 보강 정보 출력
-    console.log(`  [보강 정보]`);
-    console.log(`    테이블: ${result.enrichmentStats.chunksWithTables}개 청크 (총 ${result.enrichmentStats.totalTables}개 테이블)`);
-    console.log(`    이미지: ${result.enrichmentStats.chunksWithImages}개 청크 (총 ${result.enrichmentStats.totalImages}개 이미지)`);
-    console.log(`    적용률: ${result.enrichmentStats.enrichmentCoverage.toFixed(1)}%`);
-
     if (result.configComparison.overlapVerified) {
       console.log(`  오버랩: [적용됨]`);
     } else if (result.configComparison.expectedOverlap > 0) {
       console.log(`  오버랩: [미적용]`);
+    }
+
+    // 메타데이터 보강 검증
+    const { totalTables, totalImages } = result.structuredData;
+    if (totalTables > 0 || totalImages > 0) {
+      console.log(`  메타데이터: ${totalTables}개 테이블, ${totalImages}개 이미지`);
+
+      if (totalTables > 0) {
+        console.log(`    - 테이블 포함 청크: ${result.structuredData.chunksWithTables}개`);
+        console.log(`    - 청크당 평균 테이블: ${result.structuredData.avgTablesPerChunk.toFixed(1)}개`);
+      }
+
+      if (totalImages > 0) {
+        console.log(`    - 이미지 포함 청크: ${result.structuredData.chunksWithImages}개`);
+        console.log(`    - 청크당 평균 이미지: ${result.structuredData.avgImagesPerChunk.toFixed(1)}개`);
+      }
     }
 
     if (hasIssues) {
@@ -352,19 +358,9 @@ class ChunkingValidator {
 
     console.log('\n[전체 현황]');
     console.log(`총 검증 파일: ${totalFiles}개`);
-    console.log(`전략 일치: ${correctStrategies}/${totalFiles} (${(correctStrategies/totalFiles*100).toFixed(1)}%)`);
+    console.log(`전략 일치: ${correctStrategies}/${totalFiles} (${(correctStrategies / totalFiles * 100).toFixed(1)}%)`);
     console.log(`이슈 있음: ${filesWithIssues}개`);
     console.log(`경고 있음: ${filesWithWarnings}개`);
-
-    // 보강 정보 통계
-    console.log('\n[보강 정보 현황]');
-    const totalTablesAcrossFiles = this.results.reduce((sum, r) => sum + r.enrichmentStats.totalTables, 0);
-    const totalImagesAcrossFiles = this.results.reduce((sum, r) => sum + r.enrichmentStats.totalImages, 0);
-    const avgEnrichmentCoverage = this.results.reduce((sum, r) => sum + r.enrichmentStats.enrichmentCoverage, 0) / totalFiles;
-
-    console.log(`총 테이블: ${totalTablesAcrossFiles}개`);
-    console.log(`총 이미지: ${totalImagesAcrossFiles}개`);
-    console.log(`평균 보강 정보 적용률: ${avgEnrichmentCoverage.toFixed(1)}%`);
 
     // 전략별 통계
     console.log('\n[전략별 평균 토큰 크기]');
@@ -372,13 +368,13 @@ class ChunkingValidator {
 
     Object.entries(strategyGroups).forEach(([strategy, results]) => {
       const avgTokens = results.reduce((sum, r) => sum + r.chunkStats.avgTokens, 0) / results.length;
-      const expectedSize = RAG_CONFIG.CHUNKING.STRATEGIES[strategy]?.chunkSize ||
-                          RAG_CONFIG.CHUNKING.DEFAULT_STRATEGY.chunkSize;
+      const expectedSize = (RAG_CONFIG.CHUNKING.STRATEGIES as any)[strategy]?.chunkSize ||
+        RAG_CONFIG.CHUNKING.DEFAULT_STRATEGY.chunkSize;
       const deviation = ((avgTokens - expectedSize) / expectedSize * 100).toFixed(1);
 
       console.log(`\n  ${strategy}:`);
       console.log(`    예상: ${expectedSize} 토큰`);
-      console.log(`    실제: ${Math.round(avgTokens)} 토큰 (${deviation > 0 ? '+' : ''}${deviation}%)`);
+      console.log(`    실제: ${Math.round(avgTokens)} 토큰 (${Number(deviation) > 0 ? '+' : ''}${deviation}%)`);
       console.log(`    파일: ${results.length}개`);
     });
 
@@ -394,6 +390,31 @@ class ChunkingValidator {
       console.log(`[경고] 최적화 필요: 80% 이상 권장`);
     } else {
       console.log(`[양호] 잘 최적화됨`);
+    }
+
+    // 메타데이터 보강 통계
+    console.log('\n[메타데이터 보강 현황]');
+    const totalTables = this.results.reduce((sum, r) => sum + r.structuredData.totalTables, 0);
+    const totalImages = this.results.reduce((sum, r) => sum + r.structuredData.totalImages, 0);
+    const filesWithTables = this.results.filter(r => r.structuredData.totalTables > 0).length;
+    const filesWithImages = this.results.filter(r => r.structuredData.totalImages > 0).length;
+
+    console.log(`총 테이블: ${totalTables}개 (${filesWithTables}개 파일)`);
+    console.log(`총 이미지: ${totalImages}개 (${filesWithImages}개 파일)`);
+
+    if (totalTables > 0 || totalImages > 0) {
+      console.log('\n[메타데이터 분포]');
+      this.results
+        .filter(r => r.structuredData.totalTables > 0 || r.structuredData.totalImages > 0)
+        .forEach(r => {
+          console.log(`  ${r.fileName}:`);
+          if (r.structuredData.totalTables > 0) {
+            console.log(`    - 테이블: ${r.structuredData.totalTables}개`);
+          }
+          if (r.structuredData.totalImages > 0) {
+            console.log(`    - 이미지: ${r.structuredData.totalImages}개`);
+          }
+        });
     }
 
     // 주요 이슈 요약

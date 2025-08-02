@@ -27,6 +27,11 @@ export interface ParsedDocument {
     bbox?: number[];
     relationship_id?: string;
     target?: string;
+    shape_id?: number;
+    left?: number;
+    top?: number;
+    width?: number;
+    height?: number;
   }>;
   slides?: Array<{
     slide_number: number;
@@ -63,34 +68,6 @@ export interface ChunkData {
   tokens: number;                // 토큰 수
   char_count: number;            // 문자 수
   created_at: string;            // 생성 시간
-  enrichments?: ChunkEnrichments; // 테이블/이미지 정보 (추가)
-}
-
-/**
- * 청크 보강 정보 (테이블/이미지)
- */
-export interface ChunkEnrichments {
-  tables?: Array<{
-    table_id: string;              // 고유 식별자
-    page: number;                  // 원본 페이지
-    position: 'before' | 'within' | 'after'; // 청크 내 위치
-    summary?: string;              // 테이블 요약
-    headers?: string[];            // 컬럼 헤더
-    row_count: number;
-    col_count: number;
-    data?: string[][];             // 원본 데이터 (선택적)
-  }>;
-
-  images?: Array<{
-    image_id: string;              // 고유 식별자
-    page: number;                  // 원본 페이지
-    position: 'before' | 'within' | 'after'; // 청크 내 위치
-    context?: string;              // 이미지 주변 텍스트
-    bbox?: number[];               // 이미지 위치 정보
-    type?: string;                 // 차트, 다이어그램 등
-  }>;
-
-  embedded_text?: string;          // 임베딩용 통합 텍스트
 }
 
 /**
@@ -119,9 +96,63 @@ export interface ChunkMetadata {
   position: {
     start_char?: number;         // 원본에서의 시작 문자 위치
     end_char?: number;           // 원본에서의 끝 문자 위치
-    page?: number;               // 페이지 번호 (해당되는 경우)
+    pages?: number[];            // 청크가 포함하는 페이지 번호들
+    page?: number;               // 페이지 번호 (단일 페이지인 경우)
     slide?: number;              // 슬라이드 번호 (해당되는 경우)
   };
+}
+
+/**
+ * 향상된 이미지 메타데이터
+ */
+export interface EnhancedImageMetadata {
+  image_id: string;              // 고유 식별자
+  page?: number;                 // 페이지 번호
+  slide?: number;                // 슬라이드 번호
+  image_index?: number;          // 이미지 인덱스
+  xref?: number;                 // PDF 참조 번호
+  position: 'before' | 'within' | 'after';  // 청크 내 위치
+  context?: string;              // 이미지 설명/컨텍스트
+  bbox?: number[];               // 바운딩 박스 좌표
+  relationship_id?: string;      // DOCX 관계 ID
+  target?: string;               // 타겟 정보
+  shape_id?: number;             // PPTX shape ID
+  original_metadata?: any;       // 원본 메타데이터 보존
+}
+
+/**
+ * 향상된 테이블 메타데이터
+ */
+export interface EnhancedTableMetadata {
+  table_id: string;              // 고유 식별자
+  page?: number;                 // 페이지 번호
+  slide?: number;                // 슬라이드 번호
+  sheet_name?: string;           // 엑셀 시트명
+  table_index?: number;          // 테이블 인덱스
+  position: 'before' | 'within' | 'after';  // 청크 내 위치
+  summary?: string;              // 테이블 요약
+  headers?: string[];            // 테이블 헤더
+  row_count: number;             // 행 수
+  col_count: number;             // 열 수
+  data?: any[][];                // 테이블 데이터 (선택적)
+  truncated?: boolean;           // 잘림 여부
+  original_metadata?: any;       // 원본 메타데이터 보존
+}
+
+/**
+ * 청크 보강 정보 (Enrichments)
+ */
+export interface ChunkEnrichments {
+  tables?: EnhancedTableMetadata[];    // 테이블 정보
+  images?: EnhancedImageMetadata[];    // 이미지 정보
+  embedded_text?: string;               // 임베딩용 텍스트
+}
+
+/**
+ * 확장된 청크 데이터 구조
+ */
+export interface EnhancedChunkData extends ChunkData {
+  enrichments?: ChunkEnrichments;       // 보강 정보
 }
 
 /**
@@ -152,6 +183,7 @@ export interface ChunkingStats {
       file_count: number;
       chunk_count: number;
       avg_size: number;
+      total_tokens?: number;     // 전략별 총 토큰 수 (선택적)
     };
   };
   processing_time_ms: number;    // 처리 시간 (밀리초)
@@ -201,14 +233,14 @@ export interface ChunkQualityMetrics {
  */
 export type ChunkingResult = {
   success: true;
-  chunks: ChunkData[];
+  chunks: EnhancedChunkData[];
   stats: ChunkingStats;
   file_statuses: FileProcessingStatus[];
 } | {
   success: false;
   error: string;
   partial_results?: {
-    chunks: ChunkData[];
+    chunks: EnhancedChunkData[];
     file_statuses: FileProcessingStatus[];
   };
 };

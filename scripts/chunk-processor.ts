@@ -22,7 +22,7 @@ import {
   ParsedDocument,
   ChunkingOptions,
   ChunkingResult,
-  ChunkData,
+  EnhancedChunkData,
   FileProcessingStatus,
   ChunkingStats
 } from './rag/types.js';
@@ -206,10 +206,18 @@ class ChunkProcessor {
 
     console.log(`Processing ${documents.length} documents in ${documentBatches.length} batches (max ${maxParallel} parallel)`);
 
-    let allChunks: ChunkData[] = [];
+    // 병렬 처리 시 통계 초기화
+    let allChunks: EnhancedChunkData[] = [];
     let allFileStatuses: FileProcessingStatus[] = [];
 
     // 통계 초기화 - 필요한 필드 추가
+    interface StrategyStatsType {
+      file_count: number;
+      chunk_count: number;
+      avg_size: number;
+      total_tokens: number;
+    }
+
     let combinedStats: ChunkingStats = {
       total_files: 0,
       total_chunks: 0,
@@ -227,7 +235,7 @@ class ChunkProcessor {
       console.log(`Processing batch ${i + 1}/${documentBatches.length} (${batch.length} documents)...`);
 
       // processInParallel 메서드 내부 수정
-      const batchPromises = batch.map(async (document, docIndex) => {
+      const batchPromises = batch.map(async (document) => {
         const result = await this.documentChunker.chunkDocument(document);
 
         // 파일명 생성 (폴더 구조 없이)
@@ -279,12 +287,15 @@ class ChunkProcessor {
               file_count: 0,
               chunk_count: 0,
               avg_size: 0,
-              total_tokens: 0  // 추가
+              total_tokens: 0
             };
           }
-          combinedStats.strategies_used[strategy].file_count++;
-          combinedStats.strategies_used[strategy].chunk_count += stats.chunk_count;
-          combinedStats.strategies_used[strategy].total_tokens += stats.total_tokens;  // 추가
+          const strategyStats = combinedStats.strategies_used[strategy];
+          strategyStats.file_count++;
+          strategyStats.chunk_count += stats.chunk_count;
+          if (strategyStats.total_tokens !== undefined) {
+            strategyStats.total_tokens += stats.total_tokens;
+          }
 
         } else {
           console.error(`Failed to process ${document.file_name}:`, result.reason);
@@ -311,8 +322,8 @@ class ChunkProcessor {
     }
 
     // 전략별 평균 크기 계산
-    Object.values(combinedStats.strategies_used).forEach((strategyStats: any) => {
-      if (strategyStats.chunk_count > 0) {
+    Object.entries(combinedStats.strategies_used).forEach(([strategy, strategyStats]) => {
+      if (strategyStats.chunk_count > 0 && strategyStats.total_tokens) {
         strategyStats.avg_size = Math.round(strategyStats.total_tokens / strategyStats.chunk_count);
       }
     });
@@ -344,11 +355,11 @@ class ChunkProcessor {
     }
 
     console.log('\n전략별 통계:');
-    Object.entries(stats.strategies_used).forEach(([strategy, strategyStats]: [string, any]) => {
+    Object.entries(stats.strategies_used).forEach(([strategy, strategyStats]) => {
       console.log(`  ${strategy}:`);
-      console.log(`    파일: ${strategyStats.file_count}개`);
-      console.log(`    청크: ${strategyStats.chunk_count}개`);
-      console.log(`    평균 크기: ${strategyStats.avg_size}토큰`);
+      console.log(`    파일: ${(strategyStats as any).file_count}개`);
+      console.log(`    청크: ${(strategyStats as any).chunk_count}개`);
+      console.log(`    평균 크기: ${(strategyStats as any).avg_size}토큰`);
     });
 
     console.log('='.repeat(60));

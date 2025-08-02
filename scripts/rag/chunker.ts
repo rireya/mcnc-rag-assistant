@@ -1,6 +1,6 @@
 /**
- * MCNC RAG Assistant - 개선된 청킹 로직
- * 테이블/이미지 정보 보존 및 임베딩 최적화
+ * MCNC RAG Assistant - 청킹 로직
+ * RecursiveCharacterTextSplitter 기반 청킹 구현
  */
 
 import { RecursiveCharacterTextSplitter } from '@langchain/textsplitters';
@@ -10,11 +10,14 @@ import {
   ChunkData,
   ChunkMetadata,
   ChunkingStrategy,
-  ChunkEnrichments,
   ParsedDocument,
   FileProcessingStatus,
   ChunkingStats,
-  ChunkQualityMetrics
+  ChunkQualityMetrics,
+  EnhancedChunkData,
+  ChunkEnrichments,
+  EnhancedImageMetadata,
+  EnhancedTableMetadata
 } from './types.js';
 import {
   normalizeText,
@@ -24,11 +27,7 @@ import {
   generateChunkId,
   assessChunkQuality,
   getStrategyNameFromPath,
-  truncateToTokenLimit,
-  extractPageNumbers,
-  getChunkPageRange,
-  generateTableSummary,
-  prepareEmbeddingText
+  truncateToTokenLimit
 } from './utils.js';
 import { getChunkingStrategy, RAG_CONFIG } from '../config/rag-config.js';
 
@@ -61,7 +60,6 @@ export class TextChunker {
       separators: [...strategy.separators]
     });
   }
-
   /**
    * 텍스트를 청크로 분할
    */
@@ -184,14 +182,14 @@ export class TextChunker {
 }
 
 /**
- * 문서 청킹 처리 클래스 (개선됨)
+ * 문서 청킹 처리 클래스
  */
 export class DocumentChunker {
   /**
-   * 단일 문서를 청킹 (테이블/이미지 정보 포함)
+   * 단일 문서를 청킹
    */
   public async chunkDocument(document: ParsedDocument): Promise<{
-    chunks: ChunkData[];
+    chunks: EnhancedChunkData[];
     stats: { chunk_count: number; total_tokens: number; strategy_used: string };
   }> {
     const startTime = Date.now();
@@ -201,51 +199,79 @@ export class DocumentChunker {
     const strategy = getChunkingStrategy(document.file_path);
 
     console.log(`Processing ${document.file_name} with strategy: ${strategyName}`);
-    console.log(`  - Tables: ${document.tables?.length || 0}`);
-    console.log(`  - Images: ${document.images?.length || 0}`);
+
+    // 페이지 경계 정보 추출 (선택적 - 디버깅용)
+    // const pageBoundaries = this.extractPageBoundaries(document.content);
+    // console.log(`Found ${pageBoundaries.length} page boundaries`);
 
     // 텍스트 청킹
     const chunker = new TextChunker(strategy, strategyName);
     const textChunks = await chunker.chunkText(document.content);
 
-    // 청크 데이터 생성 (개선됨)
-    const chunks: ChunkData[] = [];
+    // 청크 데이터 생성
+    const chunks: EnhancedChunkData[] = [];
     let totalTokens = 0;
+
+    // 문자 위치 추적을 위한 변수
+    let currentPosition = 0;
 
     for (let i = 0; i < textChunks.length; i++) {
       const content = textChunks[i];
       const tokens = estimateTokenCount(content);
       totalTokens += tokens;
 
-      // 청크가 포함하는 페이지 범위 계산
-      const pageRange = getChunkPageRange(content);
+      // 청크의 시작/끝 위치 계산
+      const startChar = document.content.indexOf(content, currentPosition);
+      const endChar = startChar + content.length;
+      currentPosition = endChar;
 
-      // 해당 페이지의 테이블/이미지 찾기
-      const enrichments = this.findRelatedAssets(
-        content,
-        pageRange,
-        document.tables || [],
-        document.images || []
-      );
+      // 청크가 포함하는 페이지 번호들 계산 - 실제 텍스트 기반
+      const pagesInChunk = this.getPagesFromChunkContent(content);
 
-      // 임베딩용 텍스트 준비
-      const chunkDataTemp: ChunkData = {
+      // 디버깅을 위한 상세 로그
+      if (i < 10) { // 처음 10개 청크만 상세 로그
+        const chunkPreview = content.substring(0, 100).replace(/\n/g, '\\n');
+        const chunkEnd = content.substring(Math.max(0, content.length - 100)).replace(/\n/g, '\\n');
+        console.log(`\nChunk ${i}:`);
+        console.log(`  Position: ${startChar}-${endChar} (${endChar - startChar} chars)`);
+        console.log(`  Pages: [${pagesInChunk.join(', ')}]`);
+        console.log(`  Start: "${chunkPreview}..."`);
+        console.log(`  End: "...${chunkEnd}"`);
+
+        // 페이지 마커 확인
+        const pageMarkers = content.match(/--- (페이지|슬라이드) \d+ ---/g);
+        if (pageMarkers) {
+          console.log(`  Page markers found: ${pageMarkers.join(', ')}`);
+        }
+      }
+
+      const chunkData: EnhancedChunkData = {
         id: generateChunkId(document.file_path, i),
         content: content,
-        metadata: this.createChunkMetadata(document, i, textChunks.length, strategyName, strategy),
+        metadata: this.createChunkMetadata(
+          document,
+          i,
+          textChunks.length,
+          strategyName,
+          strategy,
+          startChar,
+          endChar,
+          pagesInChunk
+        ),
         tokens: tokens,
         char_count: content.length,
         created_at: new Date().toISOString(),
-        enrichments: enrichments
+        enrichments: {}  // 초기화
       };
 
-      // 임베딩용 통합 텍스트 생성
-      if (enrichments && (enrichments.tables?.length || enrichments.images?.length)) {
-        enrichments.embedded_text = prepareEmbeddingText(chunkDataTemp);
-      }
+      // 메타데이터 보강 (해당 페이지의 데이터만)
+      this.enrichChunkWithMetadata(chunkData, document, startChar, endChar, pagesInChunk);
 
-      chunks.push(chunkDataTemp);
+      chunks.push(chunkData);
     }
+
+    // 누락된 구조화 데이터 검증 및 복구
+    this.validateAndRecoverStructuredData(document, chunks);
 
     const processingTime = Date.now() - startTime;
     const avgTokens = chunks.length > 0 ? Math.round(totalTokens / chunks.length) : 0;
@@ -254,8 +280,8 @@ export class DocumentChunker {
     console.log(`  - Chunks created: ${chunks.length}`);
     console.log(`  - Total tokens: ${totalTokens.toLocaleString()}`);
     console.log(`  - Average tokens/chunk: ${avgTokens}`);
-    console.log(`  - Chunks with tables: ${chunks.filter(c => c.enrichments?.tables?.length).length}`);
-    console.log(`  - Chunks with images: ${chunks.filter(c => c.enrichments?.images?.length).length}`);
+    console.log(`  - Tables preserved: ${document.tables?.length || 0}`);
+    console.log(`  - Images preserved: ${document.images?.length || 0}`);
     console.log(`  - Processing time: ${processingTime}ms`);
 
     return {
@@ -269,69 +295,524 @@ export class DocumentChunker {
   }
 
   /**
-   * 청크와 관련된 테이블/이미지 찾기
+   * 페이지 경계 정보 추출
    */
-  private findRelatedAssets(
-    chunkContent: string,
-    pageRange: { start: number; end: number } | null,
-    tables: any[],
-    images: any[]
-  ): ChunkEnrichments | undefined {
-    if (!pageRange && !tables.length && !images.length) {
-      return undefined;
+  private extractPageBoundaries(content: string): Array<{ page: number; startPos: number; endPos: number }> {
+    const boundaries: Array<{ page: number; startPos: number; endPos: number }> = [];
+    const pagePattern = /\n--- (페이지|슬라이드) (\d+) ---\n/g;
+
+    const matches: Array<{ pageNum: number; index: number; length: number }> = [];
+    let match;
+
+    // 모든 페이지 마커 수집
+    while ((match = pagePattern.exec(content)) !== null) {
+      matches.push({
+        pageNum: parseInt(match[2]),
+        index: match.index,
+        length: match[0].length
+      });
     }
 
-    const enrichments: ChunkEnrichments = {};
+    // 페이지 번호 순서대로 정렬
+    matches.sort((a, b) => a.pageNum - b.pageNum);
 
-    // 페이지 기반 매핑 (우선)
-    if (pageRange) {
-      // 해당 페이지 범위의 테이블 찾기
-      const relatedTables = tables.filter(table => {
-        const tablePage = table.page || table.slide || 0;
-        return tablePage >= pageRange.start && tablePage <= pageRange.end;
+    // 페이지 경계 생성
+    for (let i = 0; i < matches.length; i++) {
+      const current = matches[i];
+      const next = matches[i + 1];
+
+      // 현재 페이지의 시작 위치 (마커 다음)
+      const pageStart = current.index + current.length;
+
+      // 현재 페이지의 끝 위치 (다음 마커 전 또는 문서 끝)
+      const pageEnd = next ? next.index : content.length;
+
+      boundaries.push({
+        page: current.pageNum,
+        startPos: pageStart,
+        endPos: pageEnd
       });
 
-      if (relatedTables.length > 0) {
-        enrichments.tables = relatedTables.map((table, idx) => ({
-          table_id: `t_${table.page || table.slide}_${table.table_index || idx}`,
-          page: table.page || table.slide || 0,
-          position: 'within' as const,
-          summary: generateTableSummary(table),
-          headers: table.data?.[0]?.filter((cell: any) => cell) || [],
+      // 누락된 페이지 번호 확인 (예: 5 다음에 7이 오면 6이 누락)
+      if (next && next.pageNum > current.pageNum + 1) {
+        // 중간에 마커가 없는 페이지들 추가
+        for (let missingPage = current.pageNum + 1; missingPage < next.pageNum; missingPage++) {
+          console.log(`  Warning: Page ${missingPage} has no explicit marker, inferring boundaries`);
+
+          // 페이지 내용을 균등하게 분할
+          const totalPages = next.pageNum - current.pageNum;
+          const contentLength = next.index - pageStart;
+          const pageLength = Math.floor(contentLength / totalPages);
+          const offset = (missingPage - current.pageNum) * pageLength;
+
+          boundaries.push({
+            page: missingPage,
+            startPos: pageStart + offset,
+            endPos: pageStart + offset + pageLength
+          });
+        }
+      }
+    }
+
+    // 첫 페이지가 마커 없이 시작하는 경우
+    if (matches.length === 0 || matches[0].pageNum > 1) {
+      const firstMarkerPos = matches.length > 0 ? matches[0].index : content.length;
+
+      // 1페이지부터 첫 마커 페이지 전까지 추가
+      const firstPageNum = matches.length > 0 ? matches[0].pageNum : 1;
+      for (let page = 1; page < firstPageNum; page++) {
+        boundaries.push({
+          page: page,
+          startPos: page === 1 ? 0 : Math.floor(firstMarkerPos * (page - 1) / (firstPageNum - 1)),
+          endPos: Math.floor(firstMarkerPos * page / (firstPageNum - 1))
+        });
+      }
+    }
+
+    // 페이지 번호순 정렬
+    boundaries.sort((a, b) => a.page - b.page);
+
+    console.log(`Page boundaries extracted: ${boundaries.length} pages`);
+    boundaries.forEach(b => {
+      const preview = content.substring(b.startPos, Math.min(b.startPos + 50, b.endPos)).replace(/\n/g, ' ');
+      console.log(`  Page ${b.page}: ${b.startPos}-${b.endPos} "${preview}..."`);
+    });
+
+    return boundaries;
+  }
+
+  /**
+   * 청크 텍스트를 분석하여 포함된 페이지 번호 추출
+   */
+  private getPagesFromChunkContent(content: string): number[] {
+    const pages = new Set<number>();
+    const pagePattern = /--- (페이지|슬라이드) (\d+) ---/g;
+
+    // 청크 내의 모든 페이지 마커와 위치 찾기
+    const markers: Array<{ page: number; position: number }> = [];
+    let match;
+    while ((match = pagePattern.exec(content)) !== null) {
+      markers.push({
+        page: parseInt(match[2]),
+        position: match.index
+      });
+    }
+
+    if (markers.length === 0) {
+      // 페이지 마커가 없는 경우, 페이지 1로 가정
+      return [1];
+    }
+
+    // 각 페이지 마커 이후의 내용 길이 확인
+    const MIN_CONTENT_LENGTH = 50; // 최소 50자 이상의 내용이 있어야 해당 페이지 포함
+
+    for (let i = 0; i < markers.length; i++) {
+      const current = markers[i];
+      const next = markers[i + 1];
+
+      // 현재 마커부터 다음 마커(또는 청크 끝)까지의 내용 길이
+      const contentStart = current.position + 20; // 마커 길이 대략 20자
+      const contentEnd = next ? next.position : content.length;
+      const contentLength = contentEnd - contentStart;
+
+      // 충분한 내용이 있으면 해당 페이지 포함
+      if (contentLength >= MIN_CONTENT_LENGTH) {
+        pages.add(current.page);
+
+        // 다음 페이지 마커까지 거리가 멀면 중간 페이지도 포함
+        if (next && next.page > current.page + 1) {
+          // 예: 5페이지 다음이 7페이지면 6페이지도 포함
+          for (let page = current.page + 1; page < next.page; page++) {
+            pages.add(page);
+          }
+        }
+      } else {
+        console.log(`  Page ${current.page} marker found but insufficient content (${contentLength} chars), excluding`);
+      }
+    }
+
+    // 청크 시작 부분 확인 - 페이지 마커 없이 시작하는 경우
+    if (markers.length > 0) {
+      const firstMarkerPos = markers[0].position;
+      if (firstMarkerPos > MIN_CONTENT_LENGTH) {
+        // 첫 마커 이전에 충분한 내용이 있다면 이전 페이지도 포함
+        const firstPage = markers[0].page;
+        if (firstPage > 1) {
+          pages.add(firstPage - 1);
+        }
+      }
+    }
+
+    // 빈 Set인 경우 최소한 하나의 페이지는 포함
+    if (pages.size === 0 && markers.length > 0) {
+      pages.add(markers[0].page);
+    }
+
+    return Array.from(pages).sort((a, b) => a - b);
+  }
+
+  /**
+   * 청크에 구조화 데이터 메타데이터 추가 (해당 페이지만)
+   */
+  private enrichChunkWithMetadata(
+    chunk: EnhancedChunkData,
+    document: ParsedDocument,
+    startChar: number,
+    endChar: number,
+    pagesInChunk: number[]
+  ): void {
+    // 해당 페이지의 이미지만 추가
+    const images = this.findImagesInPages(document, pagesInChunk);
+    if (images.length > 0) {
+      chunk.enrichments!.images = images;
+    }
+
+    // 해당 페이지의 테이블만 추가
+    const tables = this.findTablesInPages(document, pagesInChunk);
+    if (tables.length > 0) {
+      chunk.enrichments!.tables = tables;
+    }
+
+    // 임베딩 텍스트 생성
+    chunk.enrichments!.embedded_text = this.prepareEmbeddingText(chunk);
+  }
+
+  /**
+   * 특정 페이지들의 이미지 찾기
+   */
+  private findImagesInPages(
+    document: ParsedDocument,
+    pages: number[]
+  ): EnhancedImageMetadata[] {
+    if (!document.images || document.images.length === 0 || pages.length === 0) {
+      return [];
+    }
+
+    const enhancedImages: EnhancedImageMetadata[] = [];
+
+    for (const image of document.images) {
+      const imagePage = image.page || image.slide;
+
+      // 이미지가 청크의 페이지 범위에 포함되는지 확인
+      if (imagePage && pages.includes(imagePage)) {
+        enhancedImages.push({
+          image_id: `i_${imagePage}_${image.image_index || enhancedImages.length + 1}`,
+          page: image.page,
+          slide: image.slide,
+          image_index: image.image_index,
+          xref: image.xref,
+          position: 'within',
+          context: this.generateImageContext(image, document),
+          bbox: image.bbox,
+          relationship_id: image.relationship_id,
+          target: image.target,
+          shape_id: image.shape_id,
+          original_metadata: image
+        });
+      }
+    }
+
+    return enhancedImages;
+  }
+
+  /**
+   * 특정 페이지들의 테이블 찾기
+   */
+  private findTablesInPages(
+    document: ParsedDocument,
+    pages: number[]
+  ): EnhancedTableMetadata[] {
+    if (!document.tables || document.tables.length === 0 || pages.length === 0) {
+      return [];
+    }
+
+    const enhancedTables: EnhancedTableMetadata[] = [];
+
+    for (const table of document.tables) {
+      const tablePage = table.page || table.slide;
+
+      // 테이블이 청크의 페이지 범위에 포함되는지 확인
+      if (tablePage && pages.includes(tablePage)) {
+        const headers = this.extractTableHeaders(table);
+
+        enhancedTables.push({
+          table_id: `t_${tablePage}_${table.table_index || enhancedTables.length + 1}`,
+          page: table.page,
+          slide: table.slide,
+          sheet_name: table.sheet_name,
+          table_index: table.table_index,
+          position: 'within',
+          summary: this.generateTableSummary(table, headers),
+          headers: headers,
           row_count: table.row_count,
           col_count: table.col_count,
-          data: table.data // 원본 데이터 보존 (선택적)
-        }));
+          data: table.data,
+          truncated: false,
+          original_metadata: table
+        });
       }
+    }
 
-      // 해당 페이지 범위의 이미지 찾기
-      const relatedImages = images.filter(image => {
-        const imagePage = image.page || image.slide || 0;
-        return imagePage >= pageRange.start && imagePage <= pageRange.end;
+    return enhancedTables;
+  }
+
+  /**
+   * 이미지 컨텍스트 생성
+   */
+  private generateImageContext(image: any, document: ParsedDocument): string {
+    if (image.page) {
+      return `페이지 ${image.page}의 이미지`;
+    } else if (image.slide) {
+      return `슬라이드 ${image.slide}의 이미지`;
+    }
+    return '문서의 이미지';
+  }
+
+  /**
+   * 테이블 헤더 추출
+   */
+  private extractTableHeaders(table: any): string[] {
+    if (table.data && table.data.length > 0) {
+      // 첫 번째 행을 헤더로 간주
+      return table.data[0].map((cell: any) => String(cell || '').trim());
+    }
+    return [];
+  }
+
+  /**
+   * 테이블 요약 생성
+   */
+  private generateTableSummary(table: any, headers: string[]): string {
+    if (headers.length > 0) {
+      const validHeaders = headers.filter(h => h && h.length > 0);
+      if (validHeaders.length > 0) {
+        return validHeaders.join(', ');
+      }
+    }
+
+    if (table.sheet_name) {
+      return `${table.sheet_name} 시트의 테이블`;
+    } else if (table.page) {
+      return `페이지 ${table.page}의 테이블`;
+    } else if (table.slide) {
+      return `슬라이드 ${table.slide}의 테이블`;
+    }
+
+    return `${table.row_count}x${table.col_count} 테이블`;
+  }
+
+  /**
+   * 임베딩 텍스트 준비
+   */
+  private prepareEmbeddingText(chunk: EnhancedChunkData): string {
+    let embeddingText = chunk.content;
+
+    // 테이블 정보 추가 (중복 제거)
+    if (chunk.enrichments?.tables && chunk.enrichments.tables.length > 0) {
+      const tableDescriptions = chunk.enrichments.tables
+        .filter(table => table.summary && table.summary.length > 10)
+        .map(table => `[테이블] ${table.summary}`)
+        .slice(0, 3);
+
+      if (tableDescriptions.length > 0) {
+        embeddingText += '\n\n' + tableDescriptions.join('\n');
+      }
+    }
+
+    // 이미지 정보 추가 (중복 제거)
+    if (chunk.enrichments?.images && chunk.enrichments.images.length > 0) {
+      const meaningfulImages = chunk.enrichments.images
+        .filter(img => img.context && !img.context.match(/^(페이지|슬라이드) \d+의 이미지$/))
+        .slice(0, 5);
+
+      if (meaningfulImages.length > 0) {
+        const imageDescriptions = meaningfulImages
+          .map(img => `[이미지] ${img.context}`)
+          .join('\n');
+        embeddingText += '\n\n' + imageDescriptions;
+      } else if (chunk.enrichments.images.length > 0) {
+        embeddingText += `\n\n[${chunk.enrichments.images.length}개 이미지 포함]`;
+      }
+    }
+
+    return embeddingText;
+  }
+
+  /**
+   * 누락된 구조화 데이터 검증 및 복구
+   */
+  private validateAndRecoverStructuredData(
+    document: ParsedDocument,
+    chunks: EnhancedChunkData[]
+  ): void {
+    const originalTables = document.tables || [];
+    const originalImages = document.images || [];
+
+    // 청크에 포함된 테이블/이미지 수집
+    const includedTableIds = new Set<string>();
+    const includedImageIds = new Set<string>();
+
+    chunks.forEach(chunk => {
+      chunk.enrichments?.tables?.forEach(table => {
+        includedTableIds.add(table.table_id);
+      });
+      chunk.enrichments?.images?.forEach(image => {
+        includedImageIds.add(image.image_id);
+      });
+    });
+
+    // 누락된 항목 찾기
+    const missingTables: any[] = [];
+    const missingImages: any[] = [];
+
+    originalTables.forEach((table, index) => {
+      const tableId = `t_${table.page || table.slide || 0}_${table.table_index || index + 1}`;
+      if (!includedTableIds.has(tableId)) {
+        missingTables.push(table);
+      }
+    });
+
+    originalImages.forEach((image, index) => {
+      const imageId = `i_${image.page || image.slide || 0}_${image.image_index || index + 1}`;
+      if (!includedImageIds.has(imageId)) {
+        missingImages.push(image);
+      }
+    });
+
+    // 누락된 항목 재배치
+    if (missingTables.length > 0 || missingImages.length > 0) {
+      console.log(`Recovering missing structured data: ${missingTables.length} tables, ${missingImages.length} images`);
+
+      // 각 누락된 항목에 대해 상세 로그
+      missingTables.forEach(table => {
+        console.log(`  Missing table: Page ${table.page || table.slide || 'unknown'}, Index ${table.table_index || 'unknown'}`);
       });
 
-      if (relatedImages.length > 0) {
-        enrichments.images = relatedImages.map((image, idx) => ({
-          image_id: `i_${image.page || image.slide}_${image.image_index || idx}`,
-          page: image.page || image.slide || 0,
-          position: 'within' as const,
-          context: `페이지 ${image.page || image.slide}의 이미지`,
-          bbox: image.bbox,
-          type: image.type
-        }));
+      this.redistributeMissingStructuredData(chunks, missingTables, missingImages, document);
+    }
+
+    // 최종 검증 로그
+    let finalTableCount = 0;
+    let finalImageCount = 0;
+    chunks.forEach(chunk => {
+      finalTableCount += chunk.enrichments?.tables?.length || 0;
+      finalImageCount += chunk.enrichments?.images?.length || 0;
+    });
+
+    console.log(`Final structured data distribution:`);
+    console.log(`  Tables: ${finalTableCount}/${originalTables.length}`);
+    console.log(`  Images: ${finalImageCount}/${originalImages.length}`);
+  }
+
+  /**
+   * 누락된 구조화 데이터 재배치
+   */
+  private redistributeMissingStructuredData(
+    chunks: EnhancedChunkData[],
+    missingTables: any[],
+    missingImages: any[],
+    document: ParsedDocument
+  ): void {
+    // 각 청크가 포함하는 페이지 정보는 이미 메타데이터에 있음
+
+    // 누락된 테이블 재배치
+    for (const table of missingTables) {
+      const tablePage = table.page || table.slide;
+      if (!tablePage) continue;
+
+      // 해당 페이지를 포함하는 청크 찾기
+      const targetChunk = chunks.find(chunk => {
+        const pages = chunk.metadata.position.pages || [];
+        return pages.includes(tablePage);
+      });
+
+      if (targetChunk) {
+        if (!targetChunk.enrichments!.tables) {
+          targetChunk.enrichments!.tables = [];
+        }
+
+        const headers = this.extractTableHeaders(table);
+        targetChunk.enrichments!.tables.push({
+          table_id: `t_${tablePage}_${table.table_index || targetChunk.enrichments!.tables.length + 1}`,
+          page: table.page,
+          slide: table.slide,
+          sheet_name: table.sheet_name,
+          table_index: table.table_index,
+          position: 'within',
+          summary: this.generateTableSummary(table, headers),
+          headers: headers,
+          row_count: table.row_count,
+          col_count: table.col_count,
+          data: table.data,
+          truncated: false,
+          original_metadata: table
+        });
+
+        console.log(`  Redistributed table from page ${tablePage} to chunk ${chunks.indexOf(targetChunk)}`);
+      } else {
+        console.log(`  Warning: No chunk found for table on page ${tablePage}`);
       }
     }
 
-    // 텍스트 기반 매핑 (보조)
-    // 청크 내용에 "표", "그림", "도표" 등의 참조가 있는지 확인
-    const tableReferences = chunkContent.match(/(?:표|테이블|Table)\s*\d+/gi);
-    const imageReferences = chunkContent.match(/(?:그림|이미지|Figure|Image)\s*\d+/gi);
+    // 누락된 이미지 재배치
+    for (const image of missingImages) {
+      const imagePage = image.page || image.slide;
+      if (!imagePage) continue;
 
-    if (tableReferences || imageReferences) {
-      console.log(`Found references in chunk: Tables=${tableReferences?.length || 0}, Images=${imageReferences?.length || 0}`);
+      // 해당 페이지를 포함하는 청크 찾기
+      const targetChunk = chunks.find(chunk => {
+        const pages = chunk.metadata.position.pages || [];
+        return pages.includes(imagePage);
+      });
+
+      if (targetChunk) {
+        if (!targetChunk.enrichments!.images) {
+          targetChunk.enrichments!.images = [];
+        }
+
+        targetChunk.enrichments!.images.push({
+          image_id: `i_${imagePage}_${image.image_index || targetChunk.enrichments!.images.length + 1}`,
+          page: image.page,
+          slide: image.slide,
+          image_index: image.image_index,
+          xref: image.xref,
+          position: 'within',
+          context: this.generateImageContext(image, document),
+          bbox: image.bbox,
+          relationship_id: image.relationship_id,
+          target: image.target,
+          shape_id: image.shape_id,
+          original_metadata: image
+        });
+
+        console.log(`  Redistributed image from page ${imagePage} to chunk ${chunks.indexOf(targetChunk)}`);
+      } else {
+        console.log(`  Warning: No chunk found for image on page ${imagePage}`);
+      }
+    }
+  }
+
+  /**
+   * 구조화 데이터를 위한 최적 청크 찾기
+   */
+  private findBestChunkForStructuredData(
+    chunks: EnhancedChunkData[],
+    structuredData: any
+  ): EnhancedChunkData | null {
+    const pageNum = structuredData.page || structuredData.slide;
+
+    if (pageNum) {
+      // 해당 페이지/슬라이드를 포함하는 청크 찾기
+      for (const chunk of chunks) {
+        if (chunk.content.includes(`페이지 ${pageNum}`) ||
+          chunk.content.includes(`슬라이드 ${pageNum}`)) {
+          return chunk;
+        }
+      }
     }
 
-    return (enrichments.tables?.length || enrichments.images?.length) ? enrichments : undefined;
+    // 기본적으로 첫 번째 청크에 추가
+    return chunks.length > 0 ? chunks[0] : null;
   }
 
   /**
@@ -342,7 +823,10 @@ export class DocumentChunker {
     chunkIndex: number,
     totalChunks: number,
     strategyName: string,
-    strategy: ChunkingStrategy
+    strategy: ChunkingStrategy,
+    startChar?: number,
+    endChar?: number,
+    pagesInChunk?: number[]
   ): ChunkMetadata {
     return {
       source_file: document.file_path,
@@ -363,11 +847,11 @@ export class DocumentChunker {
       },
 
       position: {
-        // 추후 구현: 원본 텍스트에서의 정확한 위치 계산
-        start_char: undefined,
-        end_char: undefined,
-        page: undefined,
-        slide: undefined
+        start_char: startChar,
+        end_char: endChar,
+        pages: pagesInChunk || [],
+        page: pagesInChunk && pagesInChunk.length === 1 ? pagesInChunk[0] : undefined,
+        slide: undefined  // 추후 개선 가능
       }
     };
   }
@@ -375,7 +859,7 @@ export class DocumentChunker {
   /**
    * 청크 품질 검사 수행
    */
-  public assessChunksQuality(chunks: ChunkData[]): ChunkQualityMetrics[] {
+  public assessChunksQuality(chunks: EnhancedChunkData[]): ChunkQualityMetrics[] {
     console.log(`Assessing quality of ${chunks.length} chunks...`);
 
     const qualityResults = chunks.map(chunk => assessChunkQuality(chunk));
@@ -412,20 +896,16 @@ export class BatchChunker {
    * 여러 문서를 배치로 청킹
    */
   public async processDocuments(documents: ParsedDocument[]): Promise<{
-    allChunks: ChunkData[];
+    allChunks: EnhancedChunkData[];
     stats: ChunkingStats;
     fileStatuses: FileProcessingStatus[];
   }> {
     const startTime = Date.now();
-    const allChunks: ChunkData[] = [];
+    const allChunks: EnhancedChunkData[] = [];
     const fileStatuses: FileProcessingStatus[] = [];
     const strategyStats: { [strategy: string]: { file_count: number; chunk_count: number; total_tokens: number } } = {};
 
     console.log(`Starting batch processing of ${documents.length} documents...`);
-
-    // 통계 정보 추가
-    let totalTablesIncluded = 0;
-    let totalImagesIncluded = 0;
 
     for (let i = 0; i < documents.length; i++) {
       const document = documents[i];
@@ -436,16 +916,6 @@ export class BatchChunker {
 
         const result = await this.documentChunker.chunkDocument(document);
         allChunks.push(...result.chunks);
-
-        // 테이블/이미지 통계 업데이트
-        result.chunks.forEach(chunk => {
-          if (chunk.enrichments?.tables) {
-            totalTablesIncluded += chunk.enrichments.tables.length;
-          }
-          if (chunk.enrichments?.images) {
-            totalImagesIncluded += chunk.enrichments.images.length;
-          }
-        });
 
         // 전략별 통계 업데이트
         const strategy = result.stats.strategy_used;
@@ -485,8 +955,6 @@ export class BatchChunker {
 
     console.log(`Batch processing completed in ${totalProcessingTime}ms`);
     console.log(`Total chunks created: ${allChunks.length}`);
-    console.log(`Total tables included: ${totalTablesIncluded}`);
-    console.log(`Total images included: ${totalImagesIncluded}`);
     console.log(`Successful files: ${fileStatuses.filter(s => s.status === 'completed').length}/${documents.length}`);
 
     return { allChunks, stats, fileStatuses };
@@ -496,7 +964,7 @@ export class BatchChunker {
    * 통계 계산
    */
   private calculateStats(
-    chunks: ChunkData[],
+    chunks: EnhancedChunkData[],
     fileStatuses: FileProcessingStatus[],
     strategyStats: any,
     processingTime: number
@@ -518,7 +986,8 @@ export class BatchChunker {
           {
             file_count: stats.file_count,
             chunk_count: stats.chunk_count,
-            avg_size: stats.chunk_count > 0 ? Math.round(stats.total_tokens / stats.chunk_count) : 0
+            avg_size: stats.chunk_count > 0 ? Math.round(stats.total_tokens / stats.chunk_count) : 0,
+            total_tokens: stats.total_tokens
           }
         ])
       ),

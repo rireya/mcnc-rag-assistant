@@ -6,7 +6,7 @@
 import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
-import { ParsedDocument, ChunkData, ChunkQualityMetrics, QUALITY_THRESHOLDS } from './types.js';
+import { ParsedDocument, EnhancedChunkData, ChunkQualityMetrics, QUALITY_THRESHOLDS } from './types.js';
 
 // ==================== 파일 처리 유틸리티 ====================
 
@@ -90,7 +90,7 @@ export async function scanParsedFiles(directoryPath: string): Promise<string[]> 
 /**
  * 청크 데이터를 JSON 파일로 저장
  */
-export async function saveChunks(chunks: ChunkData[], outputPath: string): Promise<void> {
+export async function saveChunks(chunks: EnhancedChunkData[], outputPath: string): Promise<void> {
   try {
     // 출력 디렉터리 생성
     const outputDir = path.dirname(outputPath);
@@ -313,7 +313,7 @@ export function generateOutputPath(inputPath: string, outputDir: string): string
 /**
  * 청크 품질 검사
  */
-export function assessChunkQuality(chunk: ChunkData): ChunkQualityMetrics {
+export function assessChunkQuality(chunk: EnhancedChunkData): ChunkQualityMetrics {
   const issues: string[] = [];
   let sizeScore = 1.0;
   let contentScore = 1.0;
@@ -348,8 +348,8 @@ export function assessChunkQuality(chunk: ChunkData): ChunkQualityMetrics {
   }
 
   const isValid = issues.length === 0 &&
-                  sizeScore >= QUALITY_THRESHOLDS.MIN_SIZE_SCORE &&
-                  contentScore >= QUALITY_THRESHOLDS.MIN_CONTENT_SCORE;
+    sizeScore >= QUALITY_THRESHOLDS.MIN_SIZE_SCORE &&
+    contentScore >= QUALITY_THRESHOLDS.MIN_CONTENT_SCORE;
 
   return {
     chunk_id: chunk.id,
@@ -400,85 +400,4 @@ export function chunkArray<T>(array: T[], chunkSize: number): T[][] {
  */
 export function delay(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-// ==================== 테이블/이미지 처리 유틸리티 ====================
-
-/**
- * 페이지 번호 추출
- */
-export function extractPageNumbers(content: string): number[] {
-  const pagePattern = /--- 페이지 (\d+) ---/g;
-  const pages: number[] = [];
-  let match;
-
-  while ((match = pagePattern.exec(content)) !== null) {
-    pages.push(parseInt(match[1], 10));
-  }
-
-  return [...new Set(pages)].sort((a, b) => a - b);
-}
-
-/**
- * 청크가 포함하는 페이지 범위 계산
- */
-export function getChunkPageRange(chunkContent: string): { start: number; end: number } | null {
-  const pages = extractPageNumbers(chunkContent);
-
-  if (pages.length === 0) return null;
-
-  return {
-    start: Math.min(...pages),
-    end: Math.max(...pages)
-  };
-}
-
-/**
- * 테이블 요약 생성
- */
-export function generateTableSummary(table: any): string {
-  const { headers, row_count, col_count, data } = table;
-
-  if (headers && headers.length > 0) {
-    return `${headers.join(', ')} 테이블 (${row_count}행 × ${col_count}열)`;
-  }
-
-  // 첫 번째 행을 헤더로 추정
-  if (data && data.length > 0 && data[0]) {
-    const estimatedHeaders = data[0].filter((cell: string) => cell && cell.trim());
-    if (estimatedHeaders.length > 0) {
-      return `${estimatedHeaders.join(', ')} 관련 테이블 (${row_count}행)`;
-    }
-  }
-
-  return `테이블 (${row_count}행 × ${col_count}열)`;
-}
-
-/**
- * 임베딩용 텍스트 준비
- */
-export function prepareEmbeddingText(chunk: ChunkData): string {
-  let text = chunk.content;
-
-  // 테이블 정보 추가
-  if (chunk.enrichments?.tables && chunk.enrichments.tables.length > 0) {
-    text += "\n\n[포함된 테이블 정보]\n";
-    chunk.enrichments.tables.forEach((table, idx) => {
-      text += `${idx + 1}. ${table.summary}\n`;
-      if (table.headers && table.headers.length > 0) {
-        text += `   컬럼: ${table.headers.join(', ')}\n`;
-      }
-    });
-  }
-
-  // 이미지 정보 추가
-  if (chunk.enrichments?.images && chunk.enrichments.images.length > 0) {
-    text += "\n[관련 이미지]\n";
-    chunk.enrichments.images.forEach((image, idx) => {
-      const context = image.context || `페이지 ${image.page}의 이미지`;
-      text += `${idx + 1}. ${context}\n`;
-    });
-  }
-
-  return text.trim();
 }
