@@ -1,122 +1,132 @@
-# MCNC RAG Assistant - 청킹 시스템 페이지 매핑 개선 요약
+# MCNC RAG Assistant 개발 진행 요약
 
-## 📋 작업 개요
-- **작업 내용**: 청킹 시스템의 페이지별 메타데이터 매핑 정확도 개선
-- **작업 일시**: 2025-01-31
-- **주요 이슈**: 각 청크에 잘못된 페이지의 테이블/이미지가 포함되는 문제 해결
+## 📅 작업 일자: 2025-01-31 ~ 2025-02-08
 
-## 🔧 해결한 문제들
+## 🎯 프로젝트 개요
 
-### 1. **weakenPage 전략의 페이지 경계 처리 문제**
+**MCNC RAG Assistant**: 문서 파싱 → 청킹 → 임베딩 → 벡터 DB 저장의 RAG 파이프라인 구축
 
-#### 발견된 문제
-- 청크 0: "...사업을주도하고있습니다.\n01. Overview\n\n--- 페이지 5 ---" (끝)
-- 문제: 5페이지 마커만 있고 실제 내용이 없는데도 5페이지 테이블/이미지가 포함됨
-- RAG 관점: 사용자가 "5페이지 테이블" 검색 시 내용이 없는 청크 0이 반환되면 무의미
+### 주요 특징
+- text-embedding-3-small 모델에 최적화된 청킹 전략
+- 문서 타입별 맞춤 설정 (회사문서, 기술명세, 코드, 튜토리얼 등)
+- 페이지별 메타데이터(테이블, 이미지) 정확한 매핑
+- weakenPage 전처리로 페이지 경계 오버랩 처리
 
-#### 해결책
-- 페이지 마커만 있고 실제 내용이 충분하지 않으면 해당 페이지 메타데이터 제외
-- 최소 50자 이상의 실제 내용이 있어야 해당 페이지로 인정
+## 🔧 주요 이슈 및 해결
 
-### 2. **페이지 번호 계산 오류**
+### 1. 페이지 번호 처리 문제
 
 #### 발견된 문제
+- 청크에 페이지 3이 누락되는 현상 발견
+- 원인: 페이지 내용이 50자 미만인 경우 제외되는 로직
+
+#### 해결 방안
+1. **페이지 번호는 모두 포함**: 내용 길이와 무관하게 모든 페이지 번호 보존
+2. **메타데이터만 필터링**: 테이블/이미지는 50자 이상 내용이 있는 페이지만 포함
+
+### 2. 오버랩으로 인한 페이지 중복
+
+#### 문제
 ```
-청크 1: "--- 페이지 5 ---\n내용...\n--- 페이지 7 ---"
-실제: 5, 6페이지 포함
-오류: [1, 2, 4, 5] 페이지로 잘못 계산
-```
-
-#### 해결책
-- 복잡한 문자 위치 기반 계산 제거
-- 청크 텍스트에서 직접 페이지 마커를 찾아 분석
-- 연속되지 않은 페이지 번호 사이의 누락된 페이지 자동 추가 (5→7이면 6 포함)
-
-### 3. **타입 오류**
-- `chunk-processor.ts`: 암시적 any 타입 오류
-- `types.ts`: `total_tokens` 필드 누락
-
-## 📝 주요 코드 변경사항
-
-### 1. **새로운 페이지 추출 메서드** (chunker.ts)
-```typescript
-private getPagesFromChunkContent(content: string): number[] {
-  // 청크 내용에서 직접 페이지 마커 찾기
-  // 각 마커 이후 최소 50자 이상의 내용 확인
-  // 중간에 누락된 페이지 번호 자동 추가
-}
+청크 끝부분: "--- 페이지 5 ---" (내용 없음)
 ```
 
-### 2. **페이지 경계 추출 개선**
-```typescript
-private extractPageBoundaries(content: string) {
-  // 모든 페이지 마커 수집
-  // 누락된 페이지 번호 감지 및 보간
-  // 각 페이지의 실제 내용 시작/끝 위치 정확히 계산
-}
+#### 해결
+- 마지막 페이지 마커 이후 30자 미만의 내용만 있으면 오버랩으로 간주하여 제외
+- `getPagesFromChunkContent` 메서드에 마지막 마커 특별 처리 로직 추가
+
+### 3. 로그 출력 간소화
+
+#### 변경 전
+- 청크별 상세 내용 출력
+- 페이지 경계 추출 상세 로그
+- 중복 제거 상세 로그
+
+#### 변경 후
+```
+Processing: 2025_회사소개서.pdf [documents/corporate]
+✓ 2025_회사소개서.pdf: 20 chunks, 4,567 tokens (234ms)
 ```
 
-### 3. **메타데이터 위치 정보 확장** (types.ts)
-```typescript
-position: {
-  pages?: number[];  // 청크가 포함하는 모든 페이지 번호들
-  page?: number;     // 단일 페이지인 경우
-}
-```
+## 📝 코드 수정 내역
 
-## 🎯 개선 결과
+### chunker.ts 주요 변경사항
 
-### 변경 전
-- 청크에 잘못된 페이지의 메타데이터 포함
-- 페이지 마커만 있어도 해당 페이지로 인식
-- 중간 페이지 누락 (5→7 사이의 6페이지)
+1. **getPagesFromChunkContent 메서드 개선**
+   ```typescript
+   // 마지막 마커 특별 처리
+   const contentAfterLastMarker = content.substring(lastMarker.position + 20).trim();
+   const MIN_TRAILING_CONTENT = 30;
 
-### 변경 후
-- 각 청크는 실제 내용이 있는 페이지의 메타데이터만 포함
-- 최소 내용 길이 검증으로 정확도 향상
-- 누락된 페이지 번호 자동 보간
+   if (isLastMarker && contentAfterLastMarker.length < MIN_TRAILING_CONTENT) {
+     return; // 오버랩으로 간주하여 제외
+   }
+   ```
 
-## 📊 검증 방법
+2. **enrichChunkWithMetadata 메서드 수정**
+   ```typescript
+   // 실제 내용이 있는 페이지만 필터링
+   const pagesWithContent = pagesInChunk.filter(pageNum => {
+     const contentLength = this.getPageContentLength(chunk.content, pageNum);
+     return contentLength >= MIN_PAGE_CONTENT;
+   });
+   ```
 
-### 실행
+3. **로그 간소화**
+   - TextChunker 생성자의 상세 로그 제거
+   - chunkDocument 메서드의 진행 로그 단순화
+   - 개별 청크 생성 로그 제거
+
+## 🚀 다음 단계: 임베딩 처리
+
+### 1. 환경 설정
 ```bash
-rm -rf data/processed/chunks
-npm run chunk
+# .env.example (최종)
+# OpenAI API 설정 (임베딩 생성용)
+OPENAI_API_KEY=your_openai_api_key_here
+
+# ChromaDB 설정 (향후 벡터 저장소 구축 시 사용)
+# CHROMA_URL=http://localhost:8000
+# CHROMA_COLLECTION_NAME=mcnc_documents
 ```
 
-### 로그 확인
-```
-Chunk 0:
-  Pages: [1, 2, 3, 4]  // 5 제외됨
-  Page markers found: --- 페이지 5 ---
-
-Chunk 1:
-  Pages: [5, 6]  // 정확히 계산됨
-  Page markers found: --- 페이지 5 ---, --- 페이지 7 ---
+### 2. 필요한 패키지
+```bash
+npm install openai @langchain/openai
 ```
 
-### 메타데이터 검증
-- 각 청크의 enrichments에 해당 페이지의 테이블/이미지만 포함
-- 누락된 구조화 데이터 자동 재배치 및 로그 출력
+### 3. 구현 계획
+1. 임베딩 타입 정의
+2. OpenAI API 연동
+3. 배치 처리 (100개씩)
+4. 결과 저장 (`data/processed/embeddings/`)
 
-## 🔍 핵심 개선사항
+## 🔐 보안 고려사항
 
-1. **검색 정확도 향상**
-   - 테이블/이미지와 관련 텍스트가 같은 청크에 위치
-   - 잘못된 페이지 메타데이터로 인한 검색 노이즈 제거
+### API 키 관리 (Public Repository)
+1. `.env` 파일은 `.gitignore`에 추가 (필수)
+2. `.env.example`만 커밋
+3. 로컬에서만 실제 키 관리
+4. GitHub Actions 사용 시 Secrets 활용
 
-2. **페이지 계산 정확도**
-   - 청크 텍스트 기반 직접 분석
-   - 누락된 페이지 번호 자동 감지 및 추가
+## 📊 현재 프로젝트 상태
 
-3. **디버깅 정보 강화**
-   - 각 청크의 페이지 범위 상세 로그
-   - 누락된 구조화 데이터 재배치 과정 추적
+- ✅ 문서 파싱 시스템 구축 완료
+- ✅ 청킹 시스템 구현 및 최적화 완료
+- ✅ 페이지 매핑 정확도 개선
+- ⏳ 임베딩 생성 시스템 구현 예정
+- ⏳ ChromaDB 연동 예정
+- ⏳ MCP 서버 구축 예정
 
-## 📅 작업 완료
-2025-01-31 - 페이지별 메타데이터 매핑 정확도 개선 완료
+## 💡 주요 학습 사항
 
-## 🚀 다음 단계
-- 임베딩 시스템 구현
-- 청킹 품질 검증 자동화
-- 다양한 문서 형식에 대한 테스트
+1. **페이지 정보의 중요성**: 단순히 내용 길이로 페이지를 제외하면 안됨
+2. **오버랩 처리**: 청크 경계의 페이지 마커는 특별히 처리 필요
+3. **로그 가독성**: 개발 중에는 간결한 로그가 더 효율적
+4. **설정 관리**: 하드코딩보다 중앙 집중식 설정이 유지보수에 유리
+
+## 📌 참고 사항
+
+- 프로젝트 구조는 `scripts/config/paths.ts`에서 중앙 관리
+- 청킹 전략은 `scripts/config/rag-config.ts`에서 관리
+- text-embedding-3-small 모델 사용 (비용 효율적)
