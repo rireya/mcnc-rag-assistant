@@ -25,13 +25,12 @@
     "health-check": "tsx scripts/maintenance/health-check.ts",
     "check-structure": "find data/ -type d | sort",
     "build-scripts": "tsc scripts/*.ts --outDir dist/scripts",
-
     "data": "chcp 65001 >nul && tsx scripts/verify-data-setup.ts",
     "chunk": "tsx scripts/chunk-processor.ts --parallel",
-
     "validate:setup": "tsx scripts/verify-data-setup.ts",
     "validate:chunks": "tsx scripts/validate-chunking-strategy.ts",
-    "validate:all": "npm run validate:setup && npm run validate:chunks"
+    "validate:all": "npm run validate:setup && npm run validate:chunks",
+    "embeddings": "tsx scripts/generate-embeddings.ts"
   },
   "devDependencies": {
     "@types/node": "^24.1.0",
@@ -41,6 +40,8 @@
   },
   "dependencies": {
     "@langchain/core": "^0.3.66",
-    "@langchain/textsplitters": "^0.1.0"
+    "@langchain/textsplitters": "^0.1.0",
+    "dotenv": "^17.2.1",
+    "openai": "^5.11.0"
   }
 }

@@ -18,7 +18,7 @@ import {
   ChunkEnrichments,
   EnhancedImageMetadata,
   EnhancedTableMetadata
-} from './types.js';
+} from '../types/chunk.types.js';
 import {
   normalizeText,
   estimateTokenCount,

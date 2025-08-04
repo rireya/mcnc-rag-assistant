@@ -25,7 +25,7 @@ import {
   EnhancedChunkData,
   FileProcessingStatus,
   ChunkingStats
-} from './rag/types.js';
+} from './types/chunk.types.js';
 
 /**
  * 청킹 처리 메인 클래스

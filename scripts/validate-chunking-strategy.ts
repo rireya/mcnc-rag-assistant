@@ -4,7 +4,7 @@ import fs from 'fs';
 import path from 'path';
 import { getChunkingStrategy, RAG_CONFIG, isOptimalChunkSize } from './config/rag-config.js';
 import { PATHS } from './config/paths.js';
-import { EnhancedChunkData } from './rag/types.js';
+import { EnhancedChunkData } from './types/chunk.types.js';
 
 interface ValidationResult {
   fileName: string;

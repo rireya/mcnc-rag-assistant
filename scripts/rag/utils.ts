@@ -6,7 +6,7 @@
 import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
-import { ParsedDocument, EnhancedChunkData, ChunkQualityMetrics, QUALITY_THRESHOLDS } from './types.js';
+import { ParsedDocument, EnhancedChunkData, ChunkQualityMetrics, QUALITY_THRESHOLDS } from '../types/chunk.types.js';
 
 // ==================== 파일 처리 유틸리티 ====================
 
