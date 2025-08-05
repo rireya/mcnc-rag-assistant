@@ -19,6 +19,10 @@ build/
 .env.test
 .env.production
 .env.*.local
+.env.render
+
+# Docker volumes
+data/chroma/
 
 # Logs
 logs/
@@ -50,9 +54,6 @@ ehthumbs.db
 Thumbs.db
 
 # Vector database and embeddings
-data/vector-store/
-data/embeddings/
-data/indexes/
 *.faiss
 *.pkl
 *.bin

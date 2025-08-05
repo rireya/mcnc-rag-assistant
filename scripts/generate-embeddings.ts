@@ -12,7 +12,8 @@ import { RAG_CONFIG } from './config/rag-config';
 import { ChunkData, EmbeddingData, ProcessingStats } from './types/embedding.types';
 
 // 환경 변수 로드
-dotenv.config();
+dotenv.config({ path: '.env.local' });
+dotenv.config(); // .env 파일도 로드 (fallback)
 
 // OpenAI 클라이언트 초기화
 const openai = new OpenAI({
@@ -23,6 +24,8 @@ const openai = new OpenAI({
 const BATCH_SIZE = RAG_CONFIG.EMBEDDING.BATCH_SIZE;
 const MODEL = RAG_CONFIG.EMBEDDING.MODEL;
 const MAX_RETRIES = RAG_CONFIG.EMBEDDING.MAX_RETRIES;
+const PRICE_PER_1M_TOKENS = 0.02; // text-embedding-3-small 가격
+const KRW_EXCHANGE_RATE = 1300; // USD to KRW 환율
 
 /**
  * 청크 파일 로드
@@ -40,7 +43,7 @@ function loadChunks(filePath: string): ChunkData[] {
 /**
  * 임베딩 생성 (배치 처리)
  */
-async function generateEmbeddings(texts: string[]): Promise<number[][]> {
+async function generateEmbeddings(texts: string[]): Promise<{ embeddings: number[][], tokens: number }> {
   for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
     try {
       const response = await openai.embeddings.create({
@@ -48,7 +51,10 @@ async function generateEmbeddings(texts: string[]): Promise<number[][]> {
         input: texts,
       });
 
-      return response.data.map(item => item.embedding);
+      return {
+        embeddings: response.data.map(item => item.embedding),
+        tokens: response.usage.total_tokens
+      };
     } catch (error: any) {
       console.error(`[오류] 임베딩 생성 실패 (시도 ${attempt}/${MAX_RETRIES}):`, error.message);
 
@@ -109,6 +115,7 @@ async function processFile(chunkFilePath: string, stats: ProcessingStats): Promi
   stats.totalChunks += chunks.length;
   const embeddings: EmbeddingData[] = [];
   const startTime = Date.now();
+  let fileTokens = 0; // 파일별 토큰 추적
 
   // 배치 처리
   for (let i = 0; i < chunks.length; i += BATCH_SIZE) {
@@ -118,19 +125,21 @@ async function processFile(chunkFilePath: string, stats: ProcessingStats): Promi
     process.stdout.write(`   배치 처리: ${i + 1}-${Math.min(i + BATCH_SIZE, chunks.length)}/${chunks.length}...`);
 
     try {
-      const batchEmbeddings = await generateEmbeddings(batchTexts);
+      const result = await generateEmbeddings(batchTexts);
 
       // 결과 저장
       batch.forEach((chunk, idx) => {
         embeddings.push({
           chunk_id: chunk.id,
-          embedding: batchEmbeddings[idx],
+          embedding: result.embeddings[idx],
           model: MODEL,
           created_at: new Date().toISOString()
         });
       });
 
       stats.processedChunks += batch.length;
+      stats.totalTokens += result.tokens;
+      fileTokens += result.tokens;
       process.stdout.write(' 완료\n');
     } catch (error) {
       stats.failedChunks += batch.length;
@@ -143,7 +152,9 @@ async function processFile(chunkFilePath: string, stats: ProcessingStats): Promi
   if (embeddings.length > 0) {
     saveEmbeddings(embeddings, outputPath);
     const duration = ((Date.now() - startTime) / 1000).toFixed(1);
+    const fileCost = (fileTokens / 1_000_000) * PRICE_PER_1M_TOKENS;
     console.log(`[완료] ${fileName}: ${embeddings.length}/${chunks.length} 청크 완료 (${duration}초)`);
+    console.log(`       토큰: ${fileTokens.toLocaleString()} | 비용: ${fileCost.toFixed(4)}`);
     stats.processedFiles++;
   } else {
     console.error(`[오류] ${fileName}: 임베딩 생성 실패`);
@@ -189,6 +200,8 @@ async function main() {
     totalChunks: 0,
     processedChunks: 0,
     failedChunks: 0,
+    totalTokens: 0,
+    totalCost: 0,
     startTime: Date.now()
   };
 
@@ -201,6 +214,9 @@ async function main() {
   stats.endTime = Date.now();
   const totalDuration = ((stats.endTime - stats.startTime) / 1000).toFixed(1);
 
+  // 비용 계산
+  stats.totalCost = (stats.totalTokens / 1_000_000) * PRICE_PER_1M_TOKENS;
+
   console.log('\n' + '='.repeat(50));
   console.log('[완료] 임베딩 생성 완료');
   console.log('='.repeat(50));
@@ -210,7 +226,11 @@ async function main() {
     console.log(`실패한 청크: ${stats.failedChunks}`);
   }
   console.log(`소요 시간: ${totalDuration}초`);
-  console.log(`사용된 토큰: 약 ${stats.processedChunks * 100} 토큰 (추정치)`);
+  console.log('-'.repeat(50));
+  console.log(`[비용 정보]`);
+  console.log(`사용된 토큰: ${stats.totalTokens.toLocaleString()} 토큰`);
+  console.log(`예상 비용: ${stats.totalCost.toFixed(4)} USD`);
+  console.log(`원화 환산: ₩${(stats.totalCost * KRW_EXCHANGE_RATE).toFixed(0)} (환율: ${KRW_EXCHANGE_RATE}원/USD)`);
   console.log('='.repeat(50));
 }
 

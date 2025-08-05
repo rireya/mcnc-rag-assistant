@@ -47,6 +47,8 @@ export interface ProcessingStats {
   totalChunks: number;
   processedChunks: number;
   failedChunks: number;
+  totalTokens: number;      // 추가: 총 토큰 사용량
+  totalCost: number;        // 추가: 총 비용 (USD)
   startTime: number;
   endTime?: number;
 }

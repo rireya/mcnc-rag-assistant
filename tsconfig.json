@@ -13,7 +13,13 @@
     // "rootDir": "./src",
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["src/*"],              // src 폴더 전체
+      "@scripts/*": ["scripts/*"],    // scripts 폴더 전체
+      "@config/*": ["scripts/config/*"],
+      "@types/*": ["scripts/types/*"],
+      "@rag/*": ["scripts/rag/*"],
+      "@services/*": ["src/services/*"],
+      "@mcp/*": ["src/mcp-server/*"]
     }
   },
   "include": [

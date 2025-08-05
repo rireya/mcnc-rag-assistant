@@ -30,7 +30,11 @@
     "validate:setup": "tsx scripts/verify-data-setup.ts",
     "validate:chunks": "tsx scripts/validate-chunking-strategy.ts",
     "validate:all": "npm run validate:setup && npm run validate:chunks",
-    "embeddings": "tsx scripts/generate-embeddings.ts"
+    "embeddings": "tsx scripts/generate-embeddings.ts",
+    "chroma": "tsx scripts/load-to-chroma.ts",
+    "search": "tsx scripts/test-search.ts",
+    "search:examples": "tsx scripts/test-search.ts --examples",
+    "search:stats": "tsx scripts/test-search.ts --stats"
   },
   "devDependencies": {
     "@types/node": "^24.1.0",
@@ -39,8 +43,10 @@
     "typescript": "^5.8.3"
   },
   "dependencies": {
+    "@chroma-core/default-embed": "^0.1.8",
     "@langchain/core": "^0.3.66",
     "@langchain/textsplitters": "^0.1.0",
+    "chromadb": "^3.0.10",
     "dotenv": "^17.2.1",
     "openai": "^5.11.0"
   }
