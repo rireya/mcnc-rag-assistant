@@ -48,8 +48,11 @@ async function searchChroma(
   query: string,
   topK: number = SEARCH.DEFAULT_K
 ): Promise<void> {
+  const url = new URL(CHROMA_URL);
   const client = new ChromaClient({
-    path: CHROMA_URL
+    host: url.hostname,
+    port: parseInt(url.port || '8000'),
+    ssl: url.protocol === 'https:'
   });
 
   try {
@@ -195,8 +198,11 @@ async function interactiveSearch() {
  * 통계 정보 출력
  */
 async function printStatistics() {
+  const url = new URL(CHROMA_URL);
   const client = new ChromaClient({
-    path: CHROMA_URL
+    host: url.hostname,
+    port: parseInt(url.port || '8000'),
+    ssl: url.protocol === 'https:'
   });
 
   try {

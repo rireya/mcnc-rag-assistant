@@ -90,7 +90,8 @@ async function saveToChroma(
     metadata: {
       ...COLLECTION_METADATA,
       ...HNSW_CONFIG
-    }
+    },
+    embeddingFunction: null as any  // 직접 임베딩을 제공하므로 함수 불필요
   });
 
   console.log(`[생성] 컬렉션 생성됨: ${COLLECTION_NAME}`);
