@@ -1,6 +1,7 @@
 /**
  * MCNC RAG Assistant - ChromaDB 로드 스크립트
  * chunks와 embeddings를 ChromaDB에 저장
+ * ChromaDB v1.x 최신 API 사용
  */
 
 import fs from 'fs';
@@ -13,7 +14,7 @@ import { ChunkData, EmbeddingData } from './types/embedding.types.js';
 
 // 환경 변수 로드 (.env.local 우선)
 dotenv.config({ path: '.env.local' });
-dotenv.config(); // .env 파일도 로드 (fallback)
+dotenv.config();
 
 // 설정 가져오기
 const { COLLECTION_NAME, COLLECTION_METADATA, HNSW_CONFIG, BATCH } = DATABASE_CONFIG.CHROMADB;
@@ -73,25 +74,34 @@ async function saveToChroma(
   chunks: ChunkData[],
   embeddings: Map<string, number[]>
 ): Promise<void> {
-  // ChromaDB 클라이언트 초기화 (기본값: localhost:8000)
-  const client = new ChromaClient();
+  // URL 파싱
+  const url = new URL(CHROMA_URL);
+
+  // ChromaClient 초기화 (host, port 사용)
+  const client = new ChromaClient({
+    host: url.hostname,
+    port: parseInt(url.port || '8000'),
+    ssl: url.protocol === 'https:'
+  });
 
   // 기존 컬렉션 삭제 (있으면)
   try {
     await client.deleteCollection({ name: COLLECTION_NAME });
     console.log(`[삭제] 기존 컬렉션 삭제됨: ${COLLECTION_NAME}`);
-  } catch (error) {
+  } catch (error: any) {
     // 컬렉션이 없으면 무시
+    if (!error.message?.includes('does not exist')) {
+      console.error('[오류] 컬렉션 삭제 실패:', error.message);
+    }
   }
 
-  // 새 컬렉션 생성 (최적화된 설정 적용)
-  const collection = await client.createCollection({
+  // 새 컬렉션 생성 - 임베딩은 직접 제공하므로 함수 불필요
+  const collection = await client.getOrCreateCollection({
     name: COLLECTION_NAME,
     metadata: {
       ...COLLECTION_METADATA,
       ...HNSW_CONFIG
-    },
-    embeddingFunction: null as any  // 직접 임베딩을 제공하므로 함수 불필요
+    }
   });
 
   console.log(`[생성] 컬렉션 생성됨: ${COLLECTION_NAME}`);
@@ -171,8 +181,22 @@ async function main() {
   console.log('='.repeat(60));
   console.log('MCNC RAG Assistant - ChromaDB 로드');
   console.log('='.repeat(60));
+  console.log(`ChromaDB URL: ${CHROMA_URL}`);
+  console.log(`Collection: ${COLLECTION_NAME}`);
 
   try {
+    // URL 파싱
+    const url = new URL(CHROMA_URL);
+
+    // ChromaDB 연결 테스트
+    const client = new ChromaClient({
+      host: url.hostname,
+      port: parseInt(url.port || '8000'),
+      ssl: url.protocol === 'https:'
+    });
+    const heartbeat = await client.heartbeat();
+    console.log('[연결] ChromaDB 서버 상태:', heartbeat);
+
     // 1. 데이터 로드
     const { chunks, embeddings } = await loadChunksAndEmbeddings();
 
@@ -197,8 +221,14 @@ async function main() {
     console.log(`- 다음 단계: npm run search`);
     console.log('='.repeat(60));
 
-  } catch (error) {
-    console.error('[치명적 오류]:', error);
+  } catch (error: any) {
+    console.error('[치명적 오류]:', error.message || error);
+    console.error('\n[도움말]');
+    console.error('1. ChromaDB 서버가 실행 중인지 확인하세요:');
+    console.error('   docker ps | grep chromadb');
+    console.error('2. ChromaDB URL이 올바른지 확인하세요:');
+    console.error(`   현재 URL: ${CHROMA_URL}`);
+    console.error('3. 네트워크 연결을 확인하세요');
     process.exit(1);
   }
 }

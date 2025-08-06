@@ -38,7 +38,7 @@ export const DATABASE_CONFIG = {
     SEARCH: {
       DEFAULT_K: 10,                  // 기본 검색 결과 수
       MAX_K: 50,                      // 최대 검색 결과 수
-      SIMILARITY_THRESHOLD: 0.7       // 최소 유사도 (0-1)
+      SIMILARITY_THRESHOLD: 0.5       // 최소 유사도 (0.7 → 0.5로 낮춤)
     }
   }
 } as const;
@@ -46,7 +46,7 @@ export const DATABASE_CONFIG = {
 // ==================== 유틸리티 함수 ====================
 
 /**
- * 유사도 기반 결과 필터링
+ * 유사도 기반 결과 필터링 (디버깅 정보 추가)
  */
 export function filterBySimilarity(
   results: any,
@@ -56,20 +56,32 @@ export function filterBySimilarity(
   const documents = results.documents?.[0] || [];
   const metadatas = results.metadatas?.[0] || [];
 
+  console.log(`[필터링] 임계값: ${threshold} (${(threshold * 100).toFixed(0)}%)`);
+
   const filtered = {
     documents: [[] as string[]],
     metadatas: [[] as any[]],
     distances: [[] as number[]]
   };
 
+  let filteredCount = 0;
   for (let i = 0; i < distances.length; i++) {
     const similarity = 1 - distances[i];
+
+    // 디버깅: 각 문서의 유사도 출력
+    if (i < 3) {
+      console.log(`[필터링] 문서 ${i + 1}: 유사도 ${(similarity * 100).toFixed(1)}%`);
+    }
+
     if (similarity >= threshold) {
       filtered.documents[0].push(documents[i]);
       filtered.metadatas[0].push(metadatas[i]);
       filtered.distances[0].push(distances[i]);
+      filteredCount++;
     }
   }
+
+  console.log(`[필터링] ${distances.length}개 중 ${filteredCount}개 통과`);
 
   return filtered;
 }

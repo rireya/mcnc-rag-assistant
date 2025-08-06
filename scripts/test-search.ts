@@ -1,6 +1,7 @@
 /**
  * MCNC RAG Assistant - ChromaDB 검색 테스트
  * 로컬 ChromaDB에서 검색 기능 테스트
+ * ChromaDB v1.x 최신 API 사용
  */
 
 import { ChromaClient } from 'chromadb';
@@ -11,7 +12,7 @@ import { DATABASE_CONFIG, filterBySimilarity } from './config/database-config.js
 
 // 환경 변수 로드 (.env.local 우선)
 dotenv.config({ path: '.env.local' });
-dotenv.config(); // .env 파일도 로드 (fallback)
+dotenv.config();
 
 // 설정 가져오기
 const { COLLECTION_NAME, SEARCH } = DATABASE_CONFIG.CHROMADB;
@@ -33,12 +34,17 @@ const rl = readline.createInterface({
  * 쿼리 임베딩 생성
  */
 async function createQueryEmbedding(query: string): Promise<number[]> {
-  const response = await openai.embeddings.create({
-    model: EMBEDDING_MODEL,
-    input: query,
-  });
+  try {
+    const response = await openai.embeddings.create({
+      model: EMBEDDING_MODEL,
+      input: query,
+    });
 
-  return response.data[0].embedding;
+    return response.data[0].embedding;
+  } catch (error: any) {
+    console.error('[오류] 임베딩 생성 실패:', error.message);
+    throw error;
+  }
 }
 
 /**
@@ -48,7 +54,10 @@ async function searchChroma(
   query: string,
   topK: number = SEARCH.DEFAULT_K
 ): Promise<void> {
+  // URL 파싱
   const url = new URL(CHROMA_URL);
+
+  // ChromaClient 초기화 (host, port 사용)
   const client = new ChromaClient({
     host: url.hostname,
     port: parseInt(url.port || '8000'),
@@ -59,8 +68,17 @@ async function searchChroma(
     // 컬렉션 가져오기
     const collection = await client.getCollection({ name: COLLECTION_NAME });
 
+    // 컬렉션 정보 확인
+    const count = await collection.count();
+    if (count === 0) {
+      console.log('\n[경고] 컬렉션이 비어있습니다. 먼저 데이터를 로드하세요.');
+      return;
+    }
+
     // 쿼리 임베딩 생성
     console.log(`\n[검색] "${query}"`);
+    console.log(`[정보] 컬렉션에 ${count}개의 문서가 있습니다.`);
+
     const queryEmbedding = await createQueryEmbedding(query);
 
     // 검색 수행
@@ -70,6 +88,13 @@ async function searchChroma(
       include: ['documents', 'metadatas', 'distances']
     });
 
+    // 디버깅: 원본 결과 확인
+    console.log(`[디버그] 원본 결과 개수: ${results.documents[0]?.length || 0}`);
+    if (results.distances[0]?.length > 0) {
+      console.log(`[디버그] 상위 3개 거리:`, results.distances[0].slice(0, 3));
+      console.log(`[디버그] 상위 3개 유사도:`, results.distances[0].slice(0, 3).map(d => (1 - (d || 0)) * 100));
+    }
+
     // 유사도 필터링
     const filtered = filterBySimilarity(results);
 
@@ -78,7 +103,7 @@ async function searchChroma(
     const metadatas = filtered.metadatas[0];
     const distances = filtered.distances[0];
 
-    if (documents.length === 0) {
+    if (!documents || documents.length === 0) {
       console.log('\n[결과 없음] 유사한 문서를 찾을 수 없습니다.');
       console.log(`(유사도 임계값: ${SEARCH.SIMILARITY_THRESHOLD * 100}% 이상)`);
       return;
@@ -127,8 +152,17 @@ async function searchChroma(
       console.log('─'.repeat(80));
     }
 
-  } catch (error) {
-    console.error('[오류] 검색 실패:', error);
+  } catch (error: any) {
+    console.error('[오류] 검색 실패:', error.message || error);
+
+    if (error.message?.includes('does not exist')) {
+      console.error('\n[도움말] 컬렉션이 존재하지 않습니다.');
+      console.error('먼저 다음 명령을 실행하세요: npm run chroma');
+    } else if (error.message?.includes('connect')) {
+      console.error('\n[도움말] ChromaDB 서버에 연결할 수 없습니다.');
+      console.error('1. ChromaDB 서버가 실행 중인지 확인하세요');
+      console.error('2. CHROMA_URL이 올바른지 확인하세요:', CHROMA_URL);
+    }
   }
 }
 
@@ -198,7 +232,9 @@ async function interactiveSearch() {
  * 통계 정보 출력
  */
 async function printStatistics() {
+  // URL 파싱
   const url = new URL(CHROMA_URL);
+
   const client = new ChromaClient({
     host: url.hostname,
     port: parseInt(url.port || '8000'),
@@ -211,7 +247,7 @@ async function printStatistics() {
 
     // 샘플 데이터로 통계 확인
     const sample = await collection.get({
-      limit: 100,
+      limit: Math.min(100, count),
       include: ['metadatas']
     });
 
@@ -221,7 +257,7 @@ async function printStatistics() {
     let tableCount = 0;
     let imageCount = 0;
 
-    sample.metadatas.forEach(metadata => {
+    sample.metadatas?.forEach(metadata => {
       // metadata null 체크
       if (!metadata) return;
 
@@ -265,8 +301,28 @@ async function printStatistics() {
     console.log(`  - 이미지 포함: ${imageCount}개 청크`);
     console.log('─'.repeat(50) + '\n');
 
-  } catch (error) {
-    console.error('[오류] 통계 조회 실패:', error);
+  } catch (error: any) {
+    console.error('[오류] 통계 조회 실패:', error.message || error);
+  }
+}
+
+/**
+ * ChromaDB 연결 테스트
+ */
+async function testConnection(): Promise<boolean> {
+  try {
+    const url = new URL(CHROMA_URL);
+    const client = new ChromaClient({
+      host: url.hostname,
+      port: parseInt(url.port || '8000'),
+      ssl: url.protocol === 'https:'
+    });
+    const heartbeat = await client.heartbeat();
+    console.log('[연결] ChromaDB 서버 상태:', heartbeat);
+    return true;
+  } catch (error: any) {
+    console.error('[오류] ChromaDB 연결 실패:', error.message);
+    return false;
   }
 }
 
@@ -277,10 +333,26 @@ async function main() {
   console.log('='.repeat(60));
   console.log('MCNC RAG Assistant - ChromaDB 검색 테스트');
   console.log('='.repeat(60));
+  console.log(`ChromaDB URL: ${CHROMA_URL}`);
+  console.log(`Collection: ${COLLECTION_NAME}`);
 
   // API 키 확인
   if (!process.env.OPENAI_API_KEY) {
     console.error('[오류] OPENAI_API_KEY가 설정되지 않았습니다.');
+    console.error('      .env 파일에 OPENAI_API_KEY를 추가해주세요.');
+    process.exit(1);
+  }
+
+  // ChromaDB 연결 테스트
+  const isConnected = await testConnection();
+  if (!isConnected) {
+    console.error('\n[도움말]');
+    console.error('1. ChromaDB 서버가 실행 중인지 확인하세요:');
+    console.error('   docker ps | grep chromadb');
+    console.error('2. ChromaDB가 설치되지 않았다면:');
+    console.error('   docker run -p 8000:8000 chromadb/chroma');
+    console.error('3. URL이 올바른지 확인하세요:');
+    console.error(`   현재: ${CHROMA_URL}`);
     process.exit(1);
   }
 
@@ -304,5 +376,8 @@ async function main() {
 
 // 실행
 if (require.main === module) {
-  main().catch(console.error);
+  main().catch(error => {
+    console.error('\n[치명적 오류]:', error);
+    process.exit(1);
+  });
 }
