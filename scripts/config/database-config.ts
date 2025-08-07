@@ -38,7 +38,7 @@ export const DATABASE_CONFIG = {
     SEARCH: {
       DEFAULT_K: 10,                  // 기본 검색 결과 수
       MAX_K: 50,                      // 최대 검색 결과 수
-      SIMILARITY_THRESHOLD: 0.5       // 최소 유사도 (0.7 → 0.5로 낮춤)
+      SIMILARITY_THRESHOLD: 0.5       // 최소 유사도 임계값
     }
   }
 } as const;

@@ -65,8 +65,20 @@ async function searchChroma(
   });
 
   try {
+    // 경고 메시지 필터링을 위한 임시 console.warn 오버라이드
+    const originalWarn = console.warn;
+    console.warn = (...args) => {
+      const message = args[0]?.toString() || '';
+      if (!message.includes('@chroma-core/undefined')) {
+        originalWarn.apply(console, args);
+      }
+    };
+
     // 컬렉션 가져오기
     const collection = await client.getCollection({ name: COLLECTION_NAME });
+
+    // console.warn 복원
+    console.warn = originalWarn;
 
     // 컬렉션 정보 확인
     const count = await collection.count();
@@ -147,7 +159,8 @@ async function searchChroma(
       }
 
       console.log(`\n내용 미리보기:`);
-      const preview = doc && doc.length > 300 ? doc.substring(0, 300) + '...' : doc || '';
+      // 내용 미리보기를 한 줄(약 80자)로 제한
+      const preview = doc && doc.length > 80 ? doc.substring(0, 80) + '...' : doc || '';
       console.log(preview);
       console.log('─'.repeat(80));
     }
@@ -167,15 +180,19 @@ async function searchChroma(
 }
 
 /**
- * 예제 쿼리 실행
+ * 예제 쿼리 실행 - 실제 청크 데이터 기반
  */
 async function runExampleQueries() {
+  // 실제 청크 내용 기반 예제 쿼리
   const exampleQueries = [
-    'bizMOB 파일 업로드 방법',
-    'Network request 함수 사용법',
-    'Database 연결하는 방법',
-    'Push 알림 설정',
-    '회사 소개'
+    'bizMOB Device isIOS 메서드',              // Device 클래스 관련
+    'Network requestTr 서버 통신',             // Network 클래스 관련
+    '모빌씨앤씨 회사 소개',                     // 회사소개서 관련
+    'bizMOB4.0 엔터프라이즈 플랫폼',           // Products 관련
+    'MARU 코어뱅킹 프레임워크',                // 코어뱅킹 관련
+    'front 화면 개발 native 앱',               // 개발 관련
+    'progress bar 백그라운드 데이터',          // 기술 상세
+    '캄보디아 법인 ASEAN'                      // 글로벌 사업 관련
   ];
 
   console.log('\n[예제 쿼리 실행]\n');
@@ -211,7 +228,7 @@ async function interactiveSearch() {
     if (query.toLowerCase() === 'help') {
       console.log('\n[도움말]');
       console.log('- 일반 검색: 검색하고 싶은 내용을 입력하세요');
-      console.log('- 예시: "파일 업로드", "데이터베이스 연결", "회사 소개"');
+      console.log('- 예시: "Device 클래스", "requestTr 메서드", "모빌씨앤씨", "bizMOB 플랫폼"');
       console.log('- 종료: exit');
       console.log('- 통계: stats\n');
       continue;
@@ -242,7 +259,19 @@ async function printStatistics() {
   });
 
   try {
+    // 경고 메시지 필터링을 위한 임시 console.warn 오버라이드
+    const originalWarn = console.warn;
+    console.warn = (...args) => {
+      const message = args[0]?.toString() || '';
+      if (!message.includes('@chroma-core/undefined')) {
+        originalWarn.apply(console, args);
+      }
+    };
+
     const collection = await client.getCollection({ name: COLLECTION_NAME });
+
+    // console.warn 복원
+    console.warn = originalWarn;
     const count = await collection.count();
 
     // 샘플 데이터로 통계 확인
